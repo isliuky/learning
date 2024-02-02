@@ -82,7 +82,7 @@ for i in range(len(requestlist)):
         # with open("datap/"+tmp["name"]+".pk",'wb') as f:
         # 	pickle.dump(tmp,f);
 
-        # with io.open("/Users/hujinhong/PycharmProjects/untitled5/food/changsha/" + tmp["name"] + ".txt", 'w',
+        # with io.open("/Users/hujinhong/PythonProjects/untitled5/food/changsha/" + tmp["name"] + ".txt", 'w',
         #              encoding="utf-8") as f:
         #     f.write(str(tmp))
 # print(l)
