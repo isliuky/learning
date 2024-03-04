@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="416f98b9-a8e8-44a6-b835-34d37e61a8a1" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/爬虫/doubanzufang3.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/爬虫/test_simple_demo.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -101,7 +99,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1706854108881</updated>
-      <workItem from="1706854110046" duration="5495000" />
+      <workItem from="1706854110046" duration="6090000" />
     </task>
     <servers />
   </component>
