@@ -12,7 +12,8 @@ def find_flash_window():
     hwnd = win32gui.FindWindow(None, "百炼英雄")
     if (hwnd):
         rect = win32gui.GetWindowRect(hwnd)
-        win32gui.SetForegroundWindow(hwnd)
+        # cmd 环境不支持
+        # win32gui.SetForegroundWindow(hwnd)
         return rect
     return None
 
@@ -25,19 +26,21 @@ def getSource(x, y):
 
 # 获取窗口
 window = find_flash_window()
-# x 开始
-x_start = window[0]
-# x 结束
-x_end = window[2]
-# y 开始
-y_start = window[1]
-# y 结束
-y_end = window[3]
-# 长
-length = x_end - x_start
-# 宽
-breadth = y_end - y_start
-
+if window is not None:
+    # x 开始
+    x_start = window[0]
+    # x 结束
+    x_end = window[2]
+    # y 开始
+    y_start = window[1]
+    # y 结束
+    y_end = window[3]
+    # 长
+    length = x_end - x_start
+    # 宽
+    breadth = y_end - y_start
+else:
+    exit()
 # 以后要设置成参数
 map_point1 = [getSource(0.23, 0.278), getSource(0.23, 0.344), getSource(0.23, 0.403), getSource(0.23, 0.462),
               getSource(0.23, 0.520)]
@@ -79,6 +82,7 @@ def jump(p1, p2):
 
 
 def restart():
+    print("restart")
     global _map
     pyautogui.click(*restart_point[0])
     time.sleep(0.3)
@@ -122,6 +126,7 @@ def slide(x, y, x1, y1, duration):
 
 
 def click(x, y):
+    print(x,y)
     pyautogui.click(x, y)
 
 

@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="416f98b9-a8e8-44a6-b835-34d37e61a8a1" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blyx脚本/blyx2.py" beforeDir="false" afterPath="$PROJECT_DIR$/blyx脚本/blyx2.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,8 +50,8 @@
       <recent name="E:\Code\GitHub\learning\PythonProjects\爬虫" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.bailian1">
-    <configuration name="bailian1" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.blyx2 (1)">
+    <configuration name="blyx2 (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="PythonProjects" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -59,12 +59,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/爬虫" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/blyx脚本" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="E:\Code\GitHub\learning\PythonProjects\爬虫\bailian1.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/blyx脚本/blyx2.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -163,6 +163,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.blyx2 (1)" />
         <item itemvalue="Python.win32_test" />
         <item itemvalue="Python.wxpuhser_test" />
         <item itemvalue="Python.wxauto_test (1)" />
@@ -198,6 +199,7 @@
       <workItem from="1713092098996" duration="1073000" />
       <workItem from="1713093485925" duration="45000" />
       <workItem from="1713093614845" duration="5000" />
+      <workItem from="1713094038914" duration="1341000" />
     </task>
     <servers />
   </component>
@@ -230,5 +232,6 @@
     <SUITE FILE_PATH="coverage/PythonProjects$doubanzufang3.coverage" NAME="doubanzufang3 覆盖结果" MODIFIED="1706861952141" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/爬虫" />
     <SUITE FILE_PATH="coverage/PythonProjects$bailian.coverage" NAME="bailian 覆盖结果" MODIFIED="1712596961755" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/爬虫" />
     <SUITE FILE_PATH="coverage/PythonProjects$myblyx.coverage" NAME="myblyx 覆盖结果" MODIFIED="1713090548714" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/爬虫" />
+    <SUITE FILE_PATH="coverage/PythonSpease$blyx2__1_.coverage" NAME="blyx2 (1) 覆盖结果" MODIFIED="1713097177316" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/blyx脚本" />
   </component>
 </project>
