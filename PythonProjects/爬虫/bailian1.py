@@ -53,9 +53,7 @@ def next_coordinate(x, y, angle_degrees):
 
 # 移动
 def go(random_angle, time):
-    print(random_angle,time)
     x1, y1 = next_coordinate(*point, random_angle)
-    print(x1,y1)
     slide(*point, x1, y1, time)
 
 
@@ -76,8 +74,8 @@ def restart():
     # 新手礼包需要点击空白处跳过
     if click_empty != 0:
         print("点击空白处")
-        time.sleep(7)
-        click(1500,1360)
+        time.sleep(5)
+        click(1500,1390)
         # time.sleep(click_empty)
 
 
@@ -103,18 +101,18 @@ def m1_1():
 
 def m1_2():
     jump(3, 3)
-    go(0, 1.6)
+    go(0, 1.2)
     go(310, 2)
     time.sleep(master2)
-    go(130, 2)
-    go(180, 1.6)
+    go(110, 1.6)
+    go(180, 2)
 
 
 def m1_3():
     jump(2, 2)
     go(270, 0.5)
     go(225, 3)
-    go(285, 5)
+    go(285, 5.2)
     # go(225, 1.5)
     time.sleep(master3)
 
@@ -127,7 +125,7 @@ def m1_4():
 
 def m1_5():
     go(225, 1)
-    go(270, 6)
+    go(270, 6.5)
     time.sleep(master5)
 
 
