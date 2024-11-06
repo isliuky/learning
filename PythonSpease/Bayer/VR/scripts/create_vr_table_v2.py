@@ -65,9 +65,9 @@ with open(ddl_file_path, 'w', encoding='utf-8') as ddl_file, open(insert_file_pa
         select_sql = 'SELECT\n'
         fixed_columns = {
             'insert_dt': 'getdate()',  # 使用数据库的getdate()函数
-            'insert_user': "'CDP'",
+            'insert_user': "'bayer_cn_cdp'",
             'update_dt': 'getdate()',  # 使用数据库的getdate()函数
-            'update_user': "'CDP'"
+            'update_user': "'bayer_cn_cdp'"
         }
 
         for column_name, column_type, from_column in columns:
