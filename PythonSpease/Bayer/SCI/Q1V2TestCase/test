@@ -1,0 +1,132 @@
+with dt1 as (
+SELECT a.year_month,a.year
+     , a.market_code
+     , a.brand_code
+     , a.product_code
+     , a.final_client_code
+     , a.client_code
+     , a.territory_type_name
+     , a.territory_code
+     , a.sales_qty AS CDP_SCI_sales_qty
+     , a.all_sales_qty as CDP_SCI_ALL_SALES_QTY
+     , b.sales_qty AS Legacy_SCI_sales_qty
+     , abs(a.sales_qty - b.sales_qty) AS qty_diff
+FROM analytical_sci.sci_sales_publish_newstruct a
+    INNER JOIN sci_2.analytical_compare.sci_sales_publish_newstruct b
+        ON a.year_month = b.year_month
+           AND a.market_code = b.market_code
+           AND a.product_code = b.product_code
+           AND a.client_code = b.client_code
+           AND a.territory_type_name = b.territory_type_name
+           AND a.territory_code = b.territory_code
+WHERE 1 = 1
+      AND a.year_month = 202401
+      AND qty_diff > 1E-2
+)
+,dt3 as (
+    select distinct year_month,client_code,product_code
+    from analytical_sci.sci_sales_publish_after_transfer where market_code<>5
+    and year = 2024
+),dt4 as ( -- 新增判断 cdp = 0 的同时在调量和日月里面不存在
+   select year,month,year_month,client_code,product_code,sum(quantity) as sales_qty,'日月流向' as flag
+    from analytical_sci.sci_pef_in_market_sales
+    where  year = 2024
+    group by year,month,year_month,client_code,product_code
+), dt5 as (
+    select distinct year_month,client_code,product_code,is_supplement from analytical_sci.sci_sales_publish_after_transfer
+    where year = 2024 and territory_type_name <> 'KA' and is_supplement = 'true'
+), dt7 as (
+    select year,month,year_month,client_code,product_code,sum(sales_qty) as all_sales_qty
+    from sci_2.analytical_compare.sci_sales_publish_after_transfer
+    where territory_type_name <> 'KA'  and is_supplement = 'false'
+    and year = 2024
+    group by year,month,year_month,client_code,product_code
+)
+select
+    a.*
+    ,case
+        when qty_diff<1 then '可接受的差异'
+        when CDP_SCI_sales_qty=0 and legacy_sci_sales_qty<>0 and c.client_code is null and d.client_code is null then 'CDP为0,终端在调量和日月流向都不存在'
+        when CDP_SCI_sales_qty<>0 and (legacy_sci_sales_qty='0' or legacy_sci_sales_qty=0 ) and e.is_supplement = 'true' then '调量表中为补充架构，CDP取日月流向销量，老系统没有'
+        when CDP_SCI_sales_qty<>0 and (legacy_sci_sales_qty='0' or legacy_sci_sales_qty=0 ) and c.client_code is null and d.client_code is not null and abs(a.CDP_SCI_ALL_SALES_QTY - d.sales_qty)<0.1 then '调量表中无数据，CDP取日月流向老系统没有取'
+        when CDP_SCI_sales_qty<>0 and (legacy_sci_sales_qty='0' or legacy_sci_sales_qty=0 ) and g.client_code is not null and abs(a.CDP_SCI_ALL_SALES_QTY - g.all_sales_qty )<0.1 then 'CDP有值且等于调量，老系统没有取到'
+        when CDP_SCI_sales_qty=0 and (legacy_sci_sales_qty<>'0' or legacy_sci_sales_qty<>0 ) and g.client_code is not null and abs(a.CDP_SCI_ALL_SALES_QTY - g.all_sales_qty)<0.1 then 'CDP=0调量表为0，老系统有值没有取调量表的值'
+        else null end
+    as type
+from dt1 as a
+left join dt3 as c on a.client_code=c.client_code and a.product_code=c.product_code and a.year_month=c.year_month
+left join dt4 as d on a.client_code=d.client_code and a.product_code=d.product_code and a.year_month=d.year_month
+left join dt5 as e on a.client_code=e.client_code and a.product_code=e.product_code and a.year_month=e.year_month
+left join dt7 as g on a.client_code=g.client_code and a.product_code=g.product_code and a.year_month=g.year_month
+where type = 'CDP为0,终端在调量和日月流向都不存在'
+order by client_code,territory_code desc
+;
+
+
+year_month	year	market_code	brand_code	product_code	final_client_code	client_code	territory_type_name	territory_code	cdp_sci_sales_qty	cdp_sci_all_sales_qty	legacy_sci_sales_qty	qty_diff	type
+202401	2024	10	2	6	743704	743704	EP-CV	10060203-T5	0	0	10	10	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	2	7	641911	744528	EP-CV	10020105-T3	0	0	2	2	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	2	2	641911	744528	EP-CV	10020105-T3	0	0	6	6	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	641911	744528	EP-CV	10020105-T3	0	0	5	5	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	640339	744610	EP-CV	10020303-T1	0	0	10	10	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	76	640339	744610	EP-CV	10020303-T1	0	0	13	13	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	76	640339	744614	EP-CV	10020303-T1	0	0	11	11	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	2	7	640339	744614	EP-CV	10020303-T1	0	0	3	3	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	640339	744614	EP-CV	10020303-T1	0	0	12	12	CDP为0,终端在调量和日月流向都不存在
+202401	2024	11	62	84	744753	744753	CVRM	11020102-T3	0	0	20	20	CDP为0,终端在调量和日月流向都不存在
+202401	2024	11	62	84	744755	744755	CVRM	11020101-T2	0	0	15	15	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	61	83	744755	744755	EP-CV	10020204-T3	0	0	6	6	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	536584	744764	EP-CV	10020402-T1	0	0	-10	10	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	2	2	536596	744765	EP-CV	10020402-T1	0	0	5	5	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	2	6	536596	744765	EP-CV	10020402-T1	0	0	5	5	CDP为0,终端在调量和日月流向都不存在
+202401	2024	13	53	69	1137	744768	OPH	13060204-T5	0	0	6	6	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	687162	744907	EP-CV	10020402-T4	0	0	30	30	CDP为0,终端在调量和日月流向都不存在
+202401	2024	11	62	84	744976	744976	CVRM	11030405-T7	0	0	24	24	CDP为0,终端在调量和日月流向都不存在
+202401	2024	11	62	84	744977	744977	CVRM	11030405-T7	0	0	40	40	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	2	6	689255	744988	EP-CV	10020402-T8	0	0	1	1	CDP为0,终端在调量和日月流向都不存在
+202401	2024	11	62	84	745014	745014	CVRM	11020101-T5	0	0	10	10	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	76	1486	745063	EP-CV	10030601-T5	0	0	8	8	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	1483	745065	EP-CV	10030601-T3	0	0	20	20	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	522493	745070	EP-CV	10030902-T2	0	0	10	10	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	2	2	522493	745070	EP-CV	10030902-T2	0	0	5	5	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	76	520687	745082	EP-CV	10030601-T7	0	0	4	4	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	76	1479	745115	EP-CV	10030601-T3	0	0	2	2	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	640353	745116	EP-CV	10030601-T7	0	0	40	40	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	528048	745159	EP-CV	10030902-T2	0	0	50	50	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	522493	745160	EP-CV	10030902-T2	0	0	1	1	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	2	2	522493	745160	EP-CV	10030902-T2	0	0	15	15	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	683277	745164	EP-CV	10020402-T4	0	0	10	10	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	1349	745170	EP-CV	10020402-T4	0	0	15	15	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	717431	745179	EP-CV	10020402-T4	0	0	30	30	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	8	13	717431	745179	EP-CV	10020402-T4	0	0	30	30	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	1355	745191	EP-CV	10020402-T4	0	0	20	20	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	2	6	536266	745208	EP-CV	10020402-T2	0	0	2	2	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	536266	745208	EP-CV	10020402-T2	0	0	66	66	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	1414	745220	EP-CV	10020402-T2	0	0	500	500	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	683276	745252	EP-CV	10020402-T4	0	0	20	20	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	743327	745333	EP-CV	10020303-T4	0	0	30	30	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	743336	745335	EP-CV	10020303-T4	0	0	20	20	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	2	2	743336	745335	EP-CV	10020303-T4	0	0	24	24	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	568016	745336	EP-CV	10020303-T4	0	0	40	40	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	2	2	568016	745336	EP-CV	10020303-T4	0	0	-2	2	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	2	6	568016	745337	EP-CV	10020303-T4	0	0	-2	2	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	2	7	568016	745337	EP-CV	10020303-T4	0	0	2	2	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	743336	745338	EP-CV	10020303-T4	0	0	10	10	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	743332	745339	EP-CV	10020303-T4	0	0	10	10	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	743305	745343	EP-CV	10020303-T4	0	0	5	5	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	741667	745394	EP-CV	10020105-T3	0	0	3	3	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	741667	745395	EP-CV	10020105-T3	0	0	2	2	CDP为0,终端在调量和日月流向都不存在
+202401	2024	11	62	84	745401	745401	CVRM	11020105-T8	0	0	10	10	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	2837	745451	EP-CV	10030904-T4	0	0	30	30	CDP为0,终端在调量和日月流向都不存在
+202401	2024	13	52	68	2636	745562	ONC	13040201-T11	0	0	2	2	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	742256	745674	EP-CV	10060201-T1	0	0	15	15	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	742086	745676	EP-CV	10060201-T3	0	0	32	32	CDP为0,终端在调量和日月流向都不存在
+202401	2024	12	7	9	3705	746009	WHC	12011101-T1	0	0	5	5	CDP为0,终端在调量和日月流向都不存在
+202401	2024	13	52	68	2839	746080	ONC	13040401-T1	0	0	-1	1	CDP为0,终端在调量和日月流向都不存在
+202401	2024	13	59	75	2839	746080	ONC	13040401-T1	0	0	1	1	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	8	13	538714	746430	EP-CV	10050204-T3	0	0	2	2	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	538714	746430	EP-CV	10050204-T3	0	0	5	5	CDP为0,终端在调量和日月流向都不存在
+202401	2024	10	1	1	3782	746431	EP-CV	10050204-T3	0	0	5	5	CDP为0,终端在调量和日月流向都不存在
+202401	2024	12	54	70	514185	746433	WHC	12010605-T3	0	0	1	1	CDP为0,终端在调量和日月流向都不存在
+
+具有上下文菜单

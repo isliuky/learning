@@ -1,0 +1,28 @@
+1. model_sci.sci_data_version_config 逻辑
+    1. 根据mttm_id做增量
+    2. 做完增量逻辑之后update model version config表，当供数截止日期<trunc(getdate())时，flag='Y'
+2. model_sci.sci_calculated_version_config 逻辑
+    1. 全删全插
+    2. 根据  market_codes is not null
+    and period_type <> 'MTM_LastYear'
+    and flag is null
+    and data_prepared_date <= trunc(getdate()) 扩行
+    3. 根据 cluster_codes is not null
+    and period_type <> 'MTM_LastYear'
+    and flag is null
+    and data_prepared_date <= trunc(getdate()) 扩行 -- 为什么 market 来一遍 cluster_codes 也要来一遍? 会不会数据重复?
+    4.
+3. model_sci.sp_sci_data_territory_target 逻辑
+    1. 跟据market_code做增量
+    2. 根据cluster_code做增量
+    3. 从enriched和sci_calculated_version_config做关联, 根据年,月,market_code,cluster_code 分组,优先取cluster_code的, 取version_no,load_id最大的
+4. model_sci.sp_sci_data_product_area_filter_pre 指定产品\品牌限定区域补充架构
+    1. 根据年选择最大load_id
+    2. 扩充月份
+    3. 补充market_code
+    4. 补充territory_type_name
+    5. 补充province_code
+    6. 补充brand_code
+    7. 补充product_code
+    8. 限定在指标架构
+5. model_sci.sp_sci_data_territory_target_supplement 补充架构
