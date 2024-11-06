@@ -1,0 +1,29 @@
+1. C360 介绍
+    1.1 Customer 360是一款实现线上代表任务指标量化、帮助代表们筛选医院和医生的基本信息和沟通情况，让代表们可以快速筛选和定位到目标客户
+    1.2 该项目是基于wefeng和影像学苑的数据进行分析：
+        1.2.1 对医药代表进行KPI考核，查看医药代表的每日、月、季度的有效拜访及活跃度
+        1.2.2 医院的基本信息，是否有机会点，医生列表，医院产品内部销量，外部销量，设备状况
+        1.2.3 医生的基本信息，用户画像，用户沟通互动信息，用户感兴趣的信息，以及一些app的行为信息
+    1.3 页面展示
+        https://customer360.bayer.com.cn/subordinate/index
+2. 数据源
+    1. wefeng 主数据
+        医生, 医院的信息
+        销量信息
+        KPI指标信息(rep给医生打电话的信息, 医生参加的会议信息等)
+        机会点
+        设备信息
+    2. 影像学苑
+        医生的活跃情况, 阅读文章信息, 获取徽章的信息等
+3. SP介绍
+    3.1 基本表的生成
+        sp_customer_360_basic_user_info 所有最终结果表的维度信息提取, 医生, 医院等
+        sp_customer_360_basic_kpi_detail 所有最终结果表的的度量数据提取, 电话, 会议等
+    3.2 基于上述基本表做汇总
+        sp_customer_360_other_tables HCP 等
+        sp_customer_360_main_tables Customer表, hco 等
+4. 数据字典
+    基本表: https://bayergroup.sharepoint.com/:x:/r/sites/CDPMDM/_layouts/15/Doc.aspx?sourcedoc=%7B0AF7BC6E-137F-4046-AE03-CF3367F6ED6B%7D&file=Customer_360_basic_tables.xlsx&action=default&mobileredirect=true
+    整体逻辑: https://bayergroup.sharepoint.com/:x:/r/sites/CDPMDM/_layouts/15/Doc.aspx?sourcedoc=%7B91DBBFFB-C5AA-4022-8D8D-D3C1792CDC6D%7D&file=Customer_360_target_tables.xlsx&action=default&mobileredirect=true
+
+

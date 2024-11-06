@@ -1,0 +1,6 @@
+1. 在copy的时候报错
+        ERROR:Delimiter not found [ErrorId: 1-6721ecc0-5f36d9a621a41f5c2b108b3c]
+    原因:
+        1. 原始文件中有空行, 因为换行符导致数据copy有问题
+    解决方案:
+        1. 加一个参数  FILLRECORD

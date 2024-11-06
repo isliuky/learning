@@ -1,0 +1,413 @@
+1. 第二次验证复制表
+    后缀加2的是第二次验证的数据(完整的指标架构), sci_calculated_version_config_kaiyang 是最原始的数据
+    create table  enriched_mttm.staging_sci_data_territory_target_kaiyang
+    as
+    select * from enriched_mttm.staging_sci_data_territory_target;
+    create table  enriched_mttm.sci_data_territory_target_kaiyang
+    as
+    select * from enriched_mttm.sci_data_territory_target;
+
+    create table  model_sci.sci_data_version_config_kaiyang
+    as
+    select * from model_sci.sci_data_version_config;
+
+    create table  model_sci.sci_calculated_version_config_kaiyang_2
+    as
+    select * from model_sci.sci_calculated_version_config;
+    create table  model_sci.sci_data_territory_target_kaiyang
+    as
+    select * from model_sci.sci_data_territory_target;
+
+    create table  model_sci.sci_data_territory_target_supplement_kaiyang
+    as
+    select * from model_sci.sci_data_territory_target_supplement;
+2. 准备数据
+    将4份target 表导入staging
+        truncate table enriched_mttm.staging_sci_data_territory_target;
+        -- 5972953
+        COPY enriched_mttm.staging_sci_data_territory_target
+        FROM 's3://ph-cdp-nprod-qa-cn-north-1/cn_cdp_init/test/TerritoryTarget_20240301_PH.csv'
+        IAM_ROLE 'arn:aws-cn:iam::828533277754:role/ph-cdp-qa-redshift-spectrum'
+        FORMAT AS csv
+        DATEFORMAT 'auto' EMPTYASNULL
+        DELIMITER ','
+        QUOTE '\"'
+        IGNOREHEADER 1
+        ACCEPTANYDATE BLANKSASNULL EMPTYASNULL
+        ENCODING UTF8
+        IGNOREBLANKLINES
+        TRIMBLANKS
+        REGION AS 'cn-north-1'
+        FILLRECORD
+        ;
+        select * from enriched_mttm.staging_sci_data_territory_target;
+        select count(*) from enriched_mttm.staging_sci_data_territory_target;
+        select distinct market_code from enriched_mttm.staging_sci_data_territory_target;
+        -- 131393
+        COPY enriched_mttm.staging_sci_data_territory_target
+        FROM 's3://ph-cdp-nprod-qa-cn-north-1/cn_cdp_init/test/TerritoryTarget_20240304_RAD.csv'
+        IAM_ROLE 'arn:aws-cn:iam::828533277754:role/ph-cdp-qa-redshift-spectrum'
+        FORMAT AS csv
+        DATEFORMAT 'auto' EMPTYASNULL
+        DELIMITER ','
+        QUOTE '\"'
+        IGNOREHEADER 1
+        ACCEPTANYDATE BLANKSASNULL EMPTYASNULL
+        ENCODING UTF8
+        IGNOREBLANKLINES
+        TRIMBLANKS
+        REGION AS 'cn-north-1'
+        FILLRECORD
+        ;
+        -- 18880
+        COPY enriched_mttm.staging_sci_data_territory_target
+        FROM 's3://ph-cdp-nprod-qa-cn-north-1/cn_cdp_init/test/TerritoryTarget_20240303_KA.csv'
+        IAM_ROLE 'arn:aws-cn:iam::828533277754:role/ph-cdp-qa-redshift-spectrum'
+        FORMAT AS csv
+        DATEFORMAT 'auto' EMPTYASNULL
+        DELIMITER ','
+        QUOTE '\"'
+        IGNOREHEADER 1
+        ACCEPTANYDATE BLANKSASNULL EMPTYASNULL
+        ENCODING UTF8
+        IGNOREBLANKLINES
+        TRIMBLANKS
+        REGION AS 'cn-north-1'
+        FILLRECORD
+        ;
+        -- 144900
+        COPY enriched_mttm.staging_sci_data_territory_target
+        FROM 's3://ph-cdp-nprod-qa-cn-north-1/cn_cdp_init/test/TerritoryTarget_20240302_OP.csv'
+        IAM_ROLE 'arn:aws-cn:iam::828533277754:role/ph-cdp-qa-redshift-spectrum'
+        FORMAT AS csv
+        DATEFORMAT 'auto' EMPTYASNULL
+        DELIMITER ','
+        QUOTE '\"'
+        IGNOREHEADER 1
+        ACCEPTANYDATE BLANKSASNULL EMPTYASNULL
+        ENCODING UTF8
+        IGNOREBLANKLINES
+        TRIMBLANKS
+        REGION AS 'cn-north-1'
+        FILLRECORD
+        ;
+
+
+        update enriched_mttm.staging_sci_data_territory_target
+        set load_id = '20241031160448'
+        ;
+    修改version config的配置
+        select * from model_sci.sci_data_version_config;
+
+        update model_sci.sci_data_version_config
+        set territory_target_version_code = '20240301'
+        where data_prepared_date = '2024-10-29' and market_codes = '9;1;2;3';
+
+        update model_sci.sci_data_version_config
+        set territory_target_version_code = '20240302'
+        where data_prepared_date = '2024-10-29' and market_codes = '7';
+        update model_sci.sci_data_version_config
+        set territory_target_version_code = '20240303'
+        where data_prepared_date = '2024-10-29' and market_codes = '5';
+        update model_sci.sci_data_version_config
+        set territory_target_version_code = '20240304'
+        where data_prepared_date = '2024-10-29' and market_codes = '4';
+    跑SP
+3. 跑所有的SP
+4. 验证数据
+5. 准备跨集群复制
+    准备复制的表
+        1. enriched
+            enriched_pharmeyes.staging_sci_data_partners_for_sales_publish
+            enriched_pharmeyes.staging_sci_data_mapped_sales_supplement
+            enriched_pharmeyes.staging_sci_data_sales_monthly_for_sales_publish
+            enriched_mttm.staging_sci_data_territory_target
+
+            enriched_pharmeyes.sci_data_partners_for_sales_publish
+            enriched_pharmeyes.sci_data_mapped_sales_supplement
+            enriched_pharmeyes.sci_data_sales_monthly_for_sales_publish
+            enriched_mttm.sci_data_territory_target
+        2. model
+            model_sci.sci_data_version_config
+            model_sci.sci_calculated_version_config
+            model_sci.sci_data_territory_target
+            model_sci.sci_data_product_area_filter_pre
+            model_sci.sci_data_territory_target_supplement_to_filter
+            model_sci.sci_data_product_area_filter
+            model_sci.sci_data_territory_target_supplement
+            model_sci.sci_data_entire_territory_target
+            model_sci.sci_data_calculation_rule_control
+            model_sci.sci_data_share_terminal_none_target_mapping
+            model_sci.sci_data_product_target_ratio
+
+        3. analytical
+            analytical_sci.sci_pef_in_market_sales
+            analytical_sci.sci_data_in_market_sales
+            analytical_sci.sci_data_territory_detail_level_target
+            analytical_sci.sci_data_territory_detail_w_sales_daily
+            analytical_sci.sci_data_territory_detail_w_sales_monthly
+            analytical_sci.sci_data_territory_detail_w_sales_daily_n_monthly
+6. 复制
+    1.
+        {
+            "source_aws_env": "qa",
+            "target_aws_env": "qa",
+            "redshift_user": "sci",
+            "unloadSource": {
+            "clusterSecret": "phcdp/redshift/cn-sci-qa-1029",
+            "database": "cn_sci_qa",
+            "directConnect": "false",
+            "schemaName": "enriched_mttm",
+            "tableNames": [
+            "sci_data_territory_target"
+            ]
+            },
+            "copyTarget": {
+            "database": "cn_sci_qa_4",
+            "schemaName": "enriched_mttm",
+            "tableNames": [
+            "sci_data_territory_target"
+            ]
+            },
+            "destinationTableForceDropCreate": "true",
+            "destinationTableForceTruncate": "true"
+            }
+    2.
+            {
+            "source_aws_env": "qa",
+            "target_aws_env": "qa",
+            "redshift_user": "sci",
+            "unloadSource": {
+            "clusterSecret": "phcdp/redshift/cn-sci-qa-1029",
+            "database": "cn_sci_qa",
+            "directConnect": "false",
+            "schemaName": "enriched_pharmeyes",
+            "tableNames": [
+            "sci_data_partners_for_sales_publish"
+            ,"sci_data_mapped_sales_supplement"
+            ,"sci_data_sales_monthly_for_sales_publish"
+            ]
+            },
+            "copyTarget": {
+            "database": "cn_sci_qa_4",
+            "schemaName": "enriched_pharmeyes",
+            "tableNames": [
+            "sci_data_partners_for_sales_publish"
+            ,"sci_data_mapped_sales_supplement"
+            ,"sci_data_sales_monthly_for_sales_publish"
+            ]
+            },
+            "destinationTableForceDropCreate": "true",
+            "destinationTableForceTruncate": "true"
+            }
+    3.
+                {
+            "source_aws_env": "qa",
+            "target_aws_env": "qa",
+            "redshift_user": "sci",
+            "unloadSource": {
+            "clusterSecret": "phcdp/redshift/cn-sci-qa-1029",
+            "database": "cn_sci_qa",
+            "directConnect": "false",
+            "schemaName": "model_sci",
+            "tableNames": [
+                "sci_data_version_config"
+                ,"sci_calculated_version_config"
+                ,"sci_data_territory_target"
+                ,"sci_data_product_area_filter_pre"
+                ,"sci_data_territory_target_supplement_to_filter"
+                ,"sci_data_product_area_filter"
+                ,"sci_data_territory_target_supplement"
+                ,"sci_data_entire_territory_target"
+                ,"sci_data_calculation_rule_control"
+                ,"sci_data_share_terminal_none_target_mapping"
+                ,"sci_data_product_target_ratio"
+                ,"sci_data_mapped_sales_supplement"
+                ,"sci_data_partners"
+                ,"sci_data_sales_monthly"
+            ]
+            },
+            "copyTarget": {
+            "database": "cn_sci_qa_4",
+            "schemaName": "model_sci",
+            "tableNames": [
+              "sci_data_version_config"
+              ,"sci_calculated_version_config"
+              ,"sci_data_territory_target"
+              ,"sci_data_product_area_filter_pre"
+              ,"sci_data_territory_target_supplement_to_filter"
+              ,"sci_data_product_area_filter"
+              ,"sci_data_territory_target_supplement"
+              ,"sci_data_entire_territory_target"
+              ,"sci_data_calculation_rule_control"
+              ,"sci_data_share_terminal_none_target_mapping"
+              ,"sci_data_product_target_ratio"
+              ,"sci_data_mapped_sales_supplement"
+              ,"sci_data_partners"
+              ,"sci_data_sales_monthly"
+            ]
+            },
+            "destinationTableForceDropCreate": "true",
+            "destinationTableForceTruncate": "true"
+            }
+    4.
+        {
+            "source_aws_env": "qa",
+            "target_aws_env": "qa",
+            "redshift_user": "sci",
+            "unloadSource": {
+            "clusterSecret": "phcdp/redshift/cn-sci-qa-1029",
+            "database": "cn_sci_qa",
+            "directConnect": "false",
+            "schemaName": "analytical_sci",
+            "tableNames": [
+              "sci_pef_in_market_sales"
+              ,"sci_data_in_market_sales"
+              ,"sci_data_territory_detail_level_target"
+              ,"sci_data_territory_detail_w_sales_daily"
+              ,"sci_data_territory_detail_w_sales_monthly"
+              ,"sci_data_territory_detail_w_sales_daily_n_monthly"
+            ]
+            },
+            "copyTarget": {
+            "database": "cn_sci_qa_4",
+            "schemaName": "analytical_sci",
+            "tableNames": [
+              "sci_pef_in_market_sales"
+              ,"sci_data_in_market_sales"
+              ,"sci_data_territory_detail_level_target"
+              ,"sci_data_territory_detail_w_sales_daily"
+              ,"sci_data_territory_detail_w_sales_monthly"
+              ,"sci_data_territory_detail_w_sales_daily_n_monthly"
+            ]
+            },
+            "destinationTableForceDropCreate": "true",
+            "destinationTableForceTruncate": "true"
+            }
+
+7. 验证
+     select* from   enriched_pharmeyes.staging_sci_data_partners_for_sales_publish
+    ;select* from   enriched_pharmeyes.staging_sci_data_mapped_sales_supplement
+    ;select* from   enriched_pharmeyes.staging_sci_data_sales_monthly_for_sales_publish
+    ;select* from   enriched_mttm.staging_sci_data_territory_target
+    ;select* from   enriched_pharmeyes.sci_data_partners_for_sales_publish
+    ;select* from   enriched_pharmeyes.sci_data_mapped_sales_supplement
+    ;select* from   enriched_pharmeyes.sci_data_sales_monthly_for_sales_publish
+    ;select* from   enriched_mttm.sci_data_territory_target
+
+    ;select* from   model_sci.sci_data_version_config
+    ;select* from   model_sci.sci_calculated_version_config
+    ;select* from   model_sci.sci_data_territory_target
+    ;select* from   model_sci.sci_data_product_area_filter_pre
+    ;select* from   model_sci.sci_data_territory_target_supplement_to_filter
+    ;select* from   model_sci.sci_data_product_area_filter
+    ;select* from   model_sci.sci_data_territory_target_supplement
+    ;select* from   model_sci.sci_data_entire_territory_target
+    ;select* from   model_sci.sci_data_calculation_rule_control
+    ;select* from   model_sci.sci_data_share_terminal_none_target_mapping
+    ;select* from   model_sci.sci_data_product_target_ratio
+    ;select* from   model_sci.sci_data_mapped_sales_supplement
+    ;select* from   model_sci.sci_data_partners
+    ;select* from   model_sci.sci_data_sales_monthly
+
+    ;select* from   analytical_sci.sci_pef_in_market_sales
+    ;select* from   analytical_sci.sci_data_in_market_sales
+    ;select* from   analytical_sci.sci_data_territory_detail_level_target
+    ;select* from   analytical_sci.sci_data_territory_detail_w_sales_daily
+    ;select* from   analytical_sci.sci_data_territory_detail_w_sales_monthly
+    ;select* from   analytical_sci.sci_data_territory_detail_w_sales_daily_n_monthly
+8. 备份
+
+    create table enriched_pharmeyes.sci_data_partners_for_sales_publish_1104
+    as
+    select * from enriched_pharmeyes.sci_data_partners_for_sales_publish;
+
+    create table enriched_pharmeyes.sci_data_mapped_sales_supplement_1104
+    as
+    select * from enriched_pharmeyes.sci_data_mapped_sales_supplement;
+
+    create table enriched_pharmeyes.sci_data_sales_monthly_for_sales_publish_1104
+    as
+    select * from enriched_pharmeyes.sci_data_sales_monthly_for_sales_publish;
+
+    create table enriched_mttm.sci_data_territory_target_1104
+    as
+    select * from enriched_mttm.sci_data_territory_target;
+
+    create table model_sci.sci_data_partners_1104
+    as
+    select * from model_sci.sci_data_partners;
+
+    create table model_sci.sci_data_mapped_sales_supplement_1104
+    as
+    select * from model_sci.sci_data_mapped_sales_supplement;
+
+    create table model_sci.sci_data_sales_monthly_for_sales_publish_1104
+    as
+    select * from model_sci.sci_data_sales_monthly_for_sales_publish;
+
+    create table model_sci.data_version_config_1104
+    as
+    select * from model_sci.data_version_config;
+
+    create table model_sci.sci_data_territory_target_1104
+    as
+    select * from model_sci.sci_data_territory_target;
+
+    create table model_sci.sci_data_product_area_filter_pre_1104
+    as
+    select * from model_sci.sci_data_product_area_filter_pre;
+
+    create table model_sci.sci_data_territory_target_supplement_to_filter_1104
+    as
+    select * from model_sci.sci_data_territory_target_supplement_to_filter;
+
+    create table model_sci.sci_data_territory_target_supplement_1104
+    as
+    select * from model_sci.sci_data_territory_target_supplement;
+
+    create table model_sci.sci_data_entire_territory_target_1104
+    as
+    select * from model_sci.sci_data_entire_territory_target;
+
+    create table model_sci.sci_data_calculation_rule_control_1104
+    as
+    select * from model_sci.sci_data_calculation_rule_control;
+
+    create table model_sci.sci_data_product_target_ratio_1104
+    as
+    select * from model_sci.sci_data_product_target_ratio;
+
+    create table analytical_sci.sci_pef_in_market_sales_1104
+    as
+    select * from analytical_sci.sci_pef_in_market_sales;
+
+    create table analytical_sci.sci_data_in_market_sales_1104
+    as
+    select * from analytical_sci.sci_data_in_market_sales;
+
+    create table analytical_sci.sci_data_territory_detail_level_target_1104
+    as
+    select * from analytical_sci.sci_data_territory_detail_level_target;
+
+    create table analytical_sci.sci_data_territory_detail_w_sales_daily_1104
+    as
+    select * from analytical_sci.sci_data_territory_detail_w_sales_daily;
+
+    create table analytical_sci.sci_data_territory_detail_w_sales_monthly_1104
+    as
+    select * from analytical_sci.sci_data_territory_detail_w_sales_monthly;
+
+    create table analytical_sci.sci_data_territory_detail_w_sales_daily_n_monthly_1104
+    as
+    select * from analytical_sci.sci_data_territory_detail_w_sales_daily_n_monthly;
+
+
+
+
+
+
+
+
+
+
