@@ -41,11 +41,11 @@ def main():
         file_content = read_file(uploaded_file)
 
         if file_content is not None:
-            st.write("原始内容:")
-            if file_type == 'text/plain':
-                st.code(file_content)
-            elif file_type == 'application/json':
-                st.json(file_content)
+            # st.write("原始内容:")
+            # if file_type == 'text/plain':
+            #     st.code(file_content)
+            # elif file_type == 'application/json':
+            #     st.json(file_content)
 
             # 定义替换规则
             replacements = {
