@@ -72,11 +72,11 @@ def main():
             # 执行替换
             modified_content = replace_text(file_content, replacements)
 
-            st.write("修改后的内容:")
-            if file_type == 'text/plain':
-                st.code(modified_content)
-            elif file_type == 'application/json':
-                st.json(modified_content)
+            # st.write("修改后的内容:")
+            # if file_type == 'text/plain':
+            #     st.code(modified_content)
+            # elif file_type == 'application/json':
+            #     st.json(modified_content)
 
             if st.button("保存并下载"):
                 new_file_content = write_file(modified_content, file_type)
