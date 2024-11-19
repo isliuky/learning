@@ -91,19 +91,19 @@ with open(ddl_file_path, 'w', encoding='utf-8') as ddl_file, open(insert_file_pa
 
         insert_into_sql = insert_into_sql.rstrip(',\n') + '\n)'
         select_sql = select_sql.rstrip(',\n')
-        if re.search("cxg", table_name):
+        if re.search("cxg", table_name) or re.search("vr_account", table_name):
             staging_table_name = table_name.split(".")[1]
             str_to_remove = 'vr'
             staging_table_name_result = re.sub(str_to_remove, '', staging_table_name)
             # 生成DELETE语句
-            delete_sql = f'DELETE FROM {table_name} WHERE record_id IN (SELECT id FROM enriched_vr.staging{staging_table_name_result});\n'
+            delete_sql = f'DELETE FROM {table_name} WHERE id IN (SELECT id FROM enriched_vr.staging{staging_table_name_result});'
             insert_file.write(delete_sql)
             insert_file.write('-' * 80 + '\n')
 
             insert_into_sql += f'\n{select_sql}\nFROM enriched_vr.staging{staging_table_name_result};\n'
         else:
             # 生成DELETE语句
-            delete_sql = f'DELETE FROM {table_name} WHERE record_id IN (SELECT id FROM enriched_vr.staging_{table_name.split(".")[1]});\n'
+            delete_sql = f'DELETE FROM {table_name} WHERE id IN (SELECT id FROM enriched_vr.staging_{table_name.split(".")[1]});'
             insert_file.write(delete_sql)
             insert_file.write('-' * 80 + '\n')
             insert_into_sql += f'\n{select_sql}\nFROM enriched_vr.staging_{table_name.split(".")[1]};\n'

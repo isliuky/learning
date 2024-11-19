@@ -1,0 +1,21 @@
+ALTER TABLE enriched_prestage_airepbi.hospital_equipment ADD COLUMN host_model varchar(200);
+ALTER TABLE enriched_prestage_airepbi.hospital_equipment ADD COLUMN devices_num varchar(200);
+ALTER TABLE enriched_prestage_airepbi.hospital_equipment ADD COLUMN host_brand_1 varchar(200);
+ALTER TABLE enriched_prestage_airepbi.hospital_equipment ADD COLUMN high_injection_brand varchar(200);
+ALTER TABLE enriched_prestage_airepbi.hospital_equipment ADD COLUMN high_injection_model varchar(200);
+ALTER TABLE enriched_prestage_airepbi.hospital_equipment ADD COLUMN host_brand_2 varchar(200);
+
+
+
+ALTER TABLE analytical_martph_customer360.customer_360_my_customer ADD COLUMN is_qtd_active_hospitals varchar(200);
+ALTER TABLE analytical_martph_customer360.customer_360_hcp ADD COLUMN mtd_effective_visit decimal(10,4);
+ALTER TABLE analytical_martph_customer360.customer_360_hcp ADD COLUMN qtd_effective_visit decimal(10,4);
+ALTER TABLE analytical_martph_customer360.customer_360_hcp ADD COLUMN is_mtd_activity varchar(200);
+ALTER TABLE analytical_martph_customer360.customer_360_hcp ADD COLUMN is_qtd_activity_doctor varchar(200);
+
+
+ALTER TABLE analytical_martph_customer360.customer_360_my_customer_his ADD COLUMN is_qtd_active_hospitals varchar(200);
+ALTER TABLE analytical_martph_customer360.customer_360_hcp_his ADD COLUMN mtd_effective_visit decimal(10,4);
+ALTER TABLE analytical_martph_customer360.customer_360_hcp_his ADD COLUMN qtd_effective_visit decimal(10,4);
+ALTER TABLE analytical_martph_customer360.customer_360_hcp_his ADD COLUMN is_mtd_activity varchar(200);
+ALTER TABLE analytical_martph_customer360.customer_360_hcp_his ADD COLUMN is_qtd_activity_doctor varchar(200);

@@ -1,0 +1,650 @@
+1. 数据源
+    1. 基本维度表
+        analytical_martph_customer360.customer_360_basic_user_info
+        analytical_martph_customer360.customer_360_recruiting_hospital_his
+        enriched_prestage_airepbi.business_opportunity
+        enriched_prestage_airepbi.corpinfo
+        enriched_prestage_radacademy.analysis_learn_log
+        enriched_prestage_radacademy.bayer_campain_content
+        enriched_prestage_radacademy.bayer_content
+        enriched_prestage_radacademy.bayer_member
+        enriched_prestage_radacademy.bayer_score_log
+        enriched_prestage_radacademy.view_log
+        enriched_stage_airepbi.airep_province_mapping
+        enriched_stage_airepbi.internal_ai_rep_hosp_list
+        enriched_stage_airepbi.userinfo
+        model_dw_airepbi.dim_user
+        model_dw_radsale.dim_territoryorg_hospital_data
+        model_dw_radsale.fact_internal_summary_data
+    2. 基本KPI表
+        enriched_prestage_radacademy.bayer_member
+        model_dw_airepbi.ScrmWechatBizRecord
+        model_dw_airepbi.weifeng_mobile
+        model_dw_airepbi.fact_meeting
+        enriched_prestage_radacademy.bayer_meeting_ccmtv_data
+        enriched_prestage_radacademy.bayer_member
+        model_dw_airepbi.fact_meeting
+        model_dw_airepbi.dim_user_history
+        enriched_prestage_radacademy.bayer_meeting_ccmtv_data
+        enriched_prestage_radacademy.bayer_member
+        model_dw_airepbi.Fact_Wechat
+        analytical_martph_customer360.customer_360_basic_user_info
+        enriched_prestage_radacademy.bayer_learn_log
+        enriched_prestage_radacademy.analysis_monitor
+        enriched_prestage_radacademy.bayer_learn_log
+        enriched_prestage_radacademy.bayer_member
+        enriched_prestage_radacademy.bayer_learn_times_log
+        enriched_prestage_radacademy.bayer_meeting_ccmtv_data_log
+        enriched_prestage_radacademy.analysis_learn_log
+        enriched_prestage_radacademy.bayer_meeting_ccmtv_data
+        model_dw_airepbi.ScrmWechatBizRecord
+        model_dw_airepbi.weifeng_mobile
+        model_dw_airepbi.Fact_Meeting
+        analytical_martph_customer360.customer_360_recruiting_hospital_his
+        analytical_martph_customer360.customer_360_basic_kpi_detail_his
+        analytical_martph_customer360.customer_360_basic_kpi_detail
+    3. 主表
+        analytical_martph_customer360.customer_360_basic_user_info
+        enriched_prestage_radacademy.bayer_member
+        enriched_stage_airepbi.airep_province_mapping
+        analytical_martph_customer360.customer_360_basic_kpi_detail
+        analytical_martph_customer360.customer_360_recruiting_hospital_his
+        analytical_martph_airepbi.v_report_internal_summary_data
+        enriched_prestage_radacademy.analysis_learn_log
+        enriched_prestage_radacademy.bayer_member
+        analytical_martph_customer360.customer_360_my_customer_his
+        enriched_stage_airepbi.business_opportunity
+        analytical_martph_customer360.customer_360_opportunity_point_his
+        model_dw_radsale.Fact_Internal_Summary_Data
+        analytical_martph_customer360.customer_360_internal_sales_mtd_his
+        analytical_martph_customer360.customer_360_internal_sales_mtd
+        analytical_martph_customer360.customer_360_internal_sales_qtd_his
+        model_dw_radsale.Fact_Internal_Summary_Data
+        analytical_martph_radsale.report_external_cpa_cha_summary_data
+        enriched_STAGE_AIREPBI.hospital_equipment
+        enriched_prestage_radacademy.bayer_medal_member
+        enriched_prestage_radacademy.bayer_member
+        analytical_martph_customer360.customer_360_badge
+        enriched_prestage_radacademy.bayer_certificate_member
+        enriched_prestage_radacademy.analysis_learn_log
+        enriched_prestage_radacademy.bayer_learn_log
+        enriched_prestage_radacademy.bayer_learn_times_log
+        enriched_prestage_radacademy.bayer_content
+        enriched_prestage_radacademy.bayer_campain_content
+    4. 其他表
+        analytical_martph_customer360.customer_360_basic_user_info
+        analytical_martph_customer360.customer_360_badge
+        analytical_martph_customer360.customer_360_certificate
+        model_dw_airepbi.ScrmWechatBizRecord
+        analytical_martph_customer360.customer_360_basic_kpi_detail
+        model_dw_airepbi.weifeng_mobile
+        model_dw_airepbi.ScrmWechatBizRecord
+        model_dw_airepbi.Fact_Meeting
+        enriched_prestage_radacademy.bayer_meeting_ccmtv_data
+        enriched_prestage_radacademy.bayer_member
+        enriched_prestage_radacademy.bayer_question_answer
+        enriched_prestage_radacademy.bayer_question
+        enriched_prestage_radacademy.bayer_form_question_answer
+        enriched_prestage_radacademy.bayer_comments
+        enriched_prestage_radacademy.bayer_content
+        enriched_prestage_radacademy.bayer_campain_content
+        enriched_prestage_radacademy.bayer_form_question_answer
+    5. v_report_internal_summary_data
+        analytical_martph_radsale.report_internal_summary_data
+        enriched_stage_radsale.external_all_hospital_mapping
+        analytical_martph_airepbi.ai_rep_report_monthly
+        enriched_stage_airepbi.internal_ai_rep_hosp_list
+        analytical_martph_airepbi.ai_rep_report_monthly
+        analytical_martph_airepbi.ai_rep_report_monthly
+2. 总结
+    analytical_martph_airepbi.ai_rep_report_monthly
+    analytical_martph_airepbi.v_report_internal_summary_data
+
+    analytical_martph_radsale.report_external_cpa_cha_summary_data
+    analytical_martph_radsale.report_internal_summary_data
+
+    enriched_prestage_airepbi.business_opportunity
+    enriched_prestage_airepbi.corpinfo
+
+    enriched_prestage_radacademy.analysis_learn_log
+    enriched_prestage_radacademy.analysis_monitor
+    enriched_prestage_radacademy.bayer_campain_content
+    enriched_prestage_radacademy.bayer_certificate_member
+    enriched_prestage_radacademy.bayer_comments
+    enriched_prestage_radacademy.bayer_content
+    enriched_prestage_radacademy.bayer_form_question_answer
+    enriched_prestage_radacademy.bayer_learn_log
+    enriched_prestage_radacademy.bayer_learn_times_log
+    enriched_prestage_radacademy.bayer_medal_member
+    enriched_prestage_radacademy.bayer_meeting_ccmtv_data
+    enriched_prestage_radacademy.bayer_meeting_ccmtv_data_log
+    enriched_prestage_radacademy.bayer_member
+    enriched_prestage_radacademy.bayer_question
+    enriched_prestage_radacademy.bayer_question_answer
+    enriched_prestage_radacademy.bayer_score_log
+    enriched_prestage_radacademy.view_log
+
+    enriched_stage_airepbi.airep_province_mapping
+    enriched_stage_airepbi.business_opportunity
+    enriched_stage_airepbi.hospital_equipment
+    enriched_stage_airepbi.internal_ai_rep_hosp_list
+    enriched_stage_airepbi.userinfo
+
+    enriched_stage_radsale.external_all_hospital_mapping
+
+    model_dw_airepbi.dim_user
+    model_dw_airepbi.dim_user_history
+    model_dw_airepbi.fact_meeting
+    model_dw_airepbi.fact_wechat
+    model_dw_airepbi.scrmwechatbizrecord
+    model_dw_airepbi.weifeng_mobile
+
+    model_dw_radsale.dim_territoryorg_hospital_data
+    model_dw_radsale.fact_internal_summary_data
+
+    analytical_martph_customer360.customer_360_admission_equipment
+    analytical_martph_customer360.customer_360_ai_rep
+    analytical_martph_customer360.customer_360_badge
+    analytical_martph_customer360.customer_360_basic_kpi_detail
+    analytical_martph_customer360.customer_360_basic_user_info
+    analytical_martph_customer360.customer_360_cda_ct_mr_occupancy
+    analytical_martph_customer360.customer_360_certificate
+    analytical_martph_customer360.customer_360_hco
+    analytical_martph_customer360.customer_360_hcp
+    analytical_martph_customer360.customer_360_hospital_equipment
+    analytical_martph_customer360.customer_360_imaging_academy_last_five_reading
+    analytical_martph_customer360.customer_360_internal_sales_mtd
+    analytical_martph_customer360.customer_360_internal_sales_qtd
+    analytical_martph_customer360.customer_360_internal_sales_ytd
+    analytical_martph_customer360.customer_360_last_30days_call_log
+    analytical_martph_customer360.customer_360_last_five_behavior
+    analytical_martph_customer360.customer_360_last_three_call
+    analytical_martph_customer360.customer_360_last_three_call_log
+    analytical_martph_customer360.customer_360_last_three_meeting
+    analytical_martph_customer360.customer_360_last_three_wechat_visits
+    analytical_martph_customer360.customer_360_my_customer
+    analytical_martph_customer360.customer_360_my_subordinate
+    analytical_martph_customer360.customer_360_opportunity_point
+    analytical_martph_customer360.customer_360_recruiting_hospital_his
+
+
+3. 同步
+    3.1
+        {
+          "source_aws_env": "prod",
+          "target_aws_env": "dev",
+          "redshift_user": "cdp",
+          "unloadSource": {
+            "database": "cn_cdp_prod",
+            "schemaName": "analytical_martph_airepbi",
+            "tableNames": [
+              "ai_rep_report_monthly"
+            ]
+          },
+          "copyTarget": {
+            "database": "cn_cdp_dev",
+            "schemaName": "analytical_martph_airepbi",
+            "tableNames": [
+              "ai_rep_report_monthly"
+            ]
+          },
+          "destinationSchemaAutoCreate": "true",
+          "destinationTableForceDropCreate": "true"
+        }
+    3.2
+         {
+          "source_aws_env": "prod",
+          "target_aws_env": "dev",
+          "redshift_user": "cdp",
+          "unloadSource": {
+            "database": "cn_cdp_prod",
+            "schemaName": "analytical_martph_radsale",
+            "tableNames": [
+              "report_external_cpa_cha_summary_data",
+              "report_internal_summary_data"
+            ]
+          },
+          "copyTarget": {
+            "database": "cn_cdp_dev",
+            "schemaName": "analytical_martph_radsale",
+            "tableNames": [
+              "report_external_cpa_cha_summary_data",
+              "report_internal_summary_data"
+            ]
+          },
+          "destinationSchemaAutoCreate": "true",
+          "destinationTableForceDropCreate": "true"
+        }
+    3.3
+          {
+          "source_aws_env": "prod",
+          "target_aws_env": "dev",
+          "redshift_user": "cdp",
+          "unloadSource": {
+            "database": "cn_cdp_prod",
+            "schemaName": "enriched_prestage_airepbi",
+            "tableNames": [
+                    "airep_province_mapping"
+                    ,"business_opportunity"
+                    ,"businessinfo"
+                    ,"corpinfo"
+                    ,"hospital_equipment"
+                    ,"internal_ai_rep_hosp_list"
+                    ,"meetinginfo"
+                    ,"mobileinfo"
+                    ,"scrmassign"
+                    ,"scrmuserinfo"
+                    ,"scrmwechatbizrecord"
+                    ,"udeskmobileinfo"
+                    ,"userinfo"
+                    ,"wechatcard"
+                    ,"wechatchatrecord"
+                    ,"wechatemotion"
+                    ,"wechatexternalredpacket"
+                    ,"wechatfile"
+                    ,"wechatimage"
+                    ,"wechatlink"
+                    ,"wechattext"
+                    ,"wechatvideo"
+                    ,"wechatvoice"
+                    ,"wechatweapp"
+            ]
+          },
+          "copyTarget": {
+            "database": "cn_cdp_dev",
+            "schemaName": "enriched_prestage_airepbi",
+            "tableNames": [
+                "airep_province_mapping"
+                ,"business_opportunity"
+                ,"businessinfo"
+                ,"corpinfo"
+                ,"hospital_equipment"
+                ,"internal_ai_rep_hosp_list"
+                ,"meetinginfo"
+                ,"mobileinfo"
+                ,"scrmassign"
+                ,"scrmuserinfo"
+                ,"scrmwechatbizrecord"
+                ,"udeskmobileinfo"
+                ,"userinfo"
+                ,"wechatcard"
+                ,"wechatchatrecord"
+                ,"wechatemotion"
+                ,"wechatexternalredpacket"
+                ,"wechatfile"
+                ,"wechatimage"
+                ,"wechatlink"
+                ,"wechattext"
+                ,"wechatvideo"
+                ,"wechatvoice"
+                ,"wechatweapp"
+            ]
+          },
+          "destinationSchemaAutoCreate": "true",
+          "destinationTableForceDropCreate": "true"
+        }
+    3.4
+          {
+          "source_aws_env": "prod",
+          "target_aws_env": "dev",
+          "redshift_user": "cdp",
+          "unloadSource": {
+            "database": "cn_cdp_prod",
+            "schemaName": "enriched_prestage_radacademy",
+            "tableNames": [
+                "analysis_learn_log",
+                "analysis_monitor",
+                "bayer_campain_content",
+                "bayer_certificate_member",
+                "bayer_comments",
+                "bayer_content",
+                "bayer_form_question_answer",
+                "bayer_learn_log",
+                "bayer_learn_times_log",
+                "bayer_medal_member",
+                "bayer_meeting_ccmtv_data",
+                "bayer_meeting_ccmtv_data_log",
+                "bayer_member",
+                "bayer_question",
+                "bayer_question_answer",
+                "bayer_score_log",
+                "view_log"
+            ]
+          },
+          "copyTarget": {
+            "database": "cn_cdp_dev",
+            "schemaName": "enriched_prestage_radacademy",
+            "tableNames": [
+              "analysis_learn_log",
+              "analysis_monitor",
+              "bayer_campain_content",
+              "bayer_certificate_member",
+              "bayer_comments",
+              "bayer_content",
+              "bayer_form_question_answer",
+              "bayer_learn_log",
+              "bayer_learn_times_log",
+              "bayer_medal_member",
+              "bayer_meeting_ccmtv_data",
+              "bayer_meeting_ccmtv_data_log",
+              "bayer_member",
+              "bayer_question",
+              "bayer_question_answer",
+              "bayer_score_log",
+              "view_log"
+            ]
+          },
+          "destinationSchemaAutoCreate": "true",
+          "destinationTableForceDropCreate": "true"
+        }
+    3.5
+          {
+          "source_aws_env": "prod",
+          "target_aws_env": "dev",
+          "redshift_user": "cdp",
+          "unloadSource": {
+            "database": "cn_cdp_prod",
+            "schemaName": "enriched_stage_airepbi",
+            "tableNames": [
+             "airep_province_mapping"
+                ,"assignlog"
+                ,"business_opportunity"
+                ,"businessinfo"
+                ,"corpinfo"
+                ,"hospital_equipment"
+                ,"internal_ai_rep_hosp_list"
+                ,"meetinginfo"
+                ,"mobileinfo"
+                ,"scrmassign"
+                ,"scrmwechatbizrecord"
+                ,"udeskmobileinfo"
+                ,"userinfo"
+                ,"wechatcard"
+                ,"wechatchatrecord"
+                ,"wechatemotion"
+                ,"wechatexternalredpacket"
+                ,"wechatfile"
+                ,"wechatimage"
+                ,"wechatlink"
+                ,"wechattext"
+                ,"wechatvideo"
+                ,"wechatvoice"
+                ,"wechatweapp"
+            ]
+          },
+          "copyTarget": {
+            "database": "cn_cdp_dev",
+            "schemaName": "enriched_stage_airepbi",
+            "tableNames": [
+                "airep_province_mapping"
+                ,"assignlog"
+                ,"business_opportunity"
+                ,"businessinfo"
+                ,"corpinfo"
+                ,"hospital_equipment"
+                ,"internal_ai_rep_hosp_list"
+                ,"meetinginfo"
+                ,"mobileinfo"
+                ,"scrmassign"
+                ,"scrmwechatbizrecord"
+                ,"udeskmobileinfo"
+                ,"userinfo"
+                ,"wechatcard"
+                ,"wechatchatrecord"
+                ,"wechatemotion"
+                ,"wechatexternalredpacket"
+                ,"wechatfile"
+                ,"wechatimage"
+                ,"wechatlink"
+                ,"wechattext"
+                ,"wechatvideo"
+                ,"wechatvoice"
+                ,"wechatweapp"
+            ]
+          },
+          "destinationSchemaAutoCreate": "true",
+          "destinationTableForceDropCreate": "true"
+        }
+    3.6
+          {
+          "source_aws_env": "prod",
+          "target_aws_env": "dev",
+          "redshift_user": "cdp",
+          "unloadSource": {
+            "database": "cn_cdp_prod",
+            "schemaName": "enriched_stage_radsale",
+            "tableNames": [
+                "external_all_hospital_mapping"
+            ]
+          },
+          "copyTarget": {
+            "database": "cn_cdp_dev",
+            "schemaName": "enriched_stage_radsale",
+            "tableNames": [
+              "external_all_hospital_mapping"
+            ]
+          },
+          "destinationSchemaAutoCreate": "true",
+          "destinationTableForceDropCreate": "true"
+        }
+    3.7
+          {
+          "source_aws_env": "prod",
+          "target_aws_env": "dev",
+          "redshift_user": "cdp",
+          "unloadSource": {
+            "database": "cn_cdp_prod",
+            "schemaName": "model_dw_airepbi",
+            "tableNames": [
+                "dim_user"
+                ,"dim_user_history"
+                ,"fact_meeting"
+                ,"fact_wechat"
+                ,"scrmwechatbizrecord"
+                ,"weifeng_mobile"
+            ]
+          },
+          "copyTarget": {
+            "database": "cn_cdp_dev",
+            "schemaName": "model_dw_airepbi",
+            "tableNames": [
+                "dim_user"
+                ,"dim_user_history"
+                ,"fact_meeting"
+                ,"fact_wechat"
+                ,"scrmwechatbizrecord"
+                ,"weifeng_mobile"
+            ]
+          },
+          "destinationSchemaAutoCreate": "true",
+          "destinationTableForceDropCreate": "true"
+        }
+    3.8
+          {
+          "source_aws_env": "prod",
+          "target_aws_env": "dev",
+          "redshift_user": "cdp",
+          "unloadSource": {
+            "database": "cn_cdp_prod",
+            "schemaName": "model_dw_radsale",
+            "tableNames": [
+                "dim_territoryorg_hospital_data"
+                ,"fact_internal_summary_data"
+            ]
+          },
+          "copyTarget": {
+            "database": "cn_cdp_dev",
+            "schemaName": "model_dw_radsale",
+            "tableNames": [
+                "dim_territoryorg_hospital_data"
+                ,"fact_internal_summary_data"
+            ]
+          },
+          "destinationSchemaAutoCreate": "true",
+          "destinationTableForceDropCreate": "true"
+        }
+    3.9
+      {
+          "source_aws_env": "prod",
+          "target_aws_env": "dev",
+          "redshift_user": "cdp",
+          "unloadSource": {
+            "database": "cn_cdp_prod",
+            "schemaName": "analytical_martph_customer360",
+            "tableNames": [
+                 "customer_360_admission_equipment"
+                  ,"customer_360_ai_rep"
+                  ,"customer_360_badge"
+                  ,"customer_360_basic_kpi_detail"
+                  ,"customer_360_basic_user_info"
+                  ,"customer_360_cda_ct_mr_occupancy"
+                  ,"customer_360_certificate"
+                  ,"customer_360_hco"
+                  ,"customer_360_hcp"
+                  ,"customer_360_hospital_equipment"
+                  ,"customer_360_imaging_academy_last_five_reading"
+                  ,"customer_360_internal_sales_mtd"
+                  ,"customer_360_internal_sales_qtd"
+                  ,"customer_360_internal_sales_ytd"
+                  ,"customer_360_last_30days_call_log"
+                  ,"customer_360_last_five_behavior"
+                  ,"customer_360_last_three_call"
+                  ,"customer_360_last_three_call_log"
+                  ,"customer_360_last_three_meeting"
+                  ,"customer_360_last_three_wechat_visits"
+                  ,"customer_360_my_customer"
+                  ,"customer_360_my_subordinate"
+                  ,"customer_360_opportunity_point"
+                  ,"customer_360_recruiting_hospital_his"
+            ]
+          },
+          "copyTarget": {
+            "database": "cn_cdp_dev",
+            "schemaName": "analytical_martph_customer360",
+            "tableNames": [
+                  "customer_360_admission_equipment"
+                  ,"customer_360_ai_rep"
+                  ,"customer_360_badge"
+                  ,"customer_360_basic_kpi_detail"
+                  ,"customer_360_basic_user_info"
+                  ,"customer_360_cda_ct_mr_occupancy"
+                  ,"customer_360_certificate"
+                  ,"customer_360_hco"
+                  ,"customer_360_hcp"
+                  ,"customer_360_hospital_equipment"
+                  ,"customer_360_imaging_academy_last_five_reading"
+                  ,"customer_360_internal_sales_mtd"
+                  ,"customer_360_internal_sales_qtd"
+                  ,"customer_360_internal_sales_ytd"
+                  ,"customer_360_last_30days_call_log"
+                  ,"customer_360_last_five_behavior"
+                  ,"customer_360_last_three_call"
+                  ,"customer_360_last_three_call_log"
+                  ,"customer_360_last_three_meeting"
+                  ,"customer_360_last_three_wechat_visits"
+                  ,"customer_360_my_customer"
+                  ,"customer_360_my_subordinate"
+                  ,"customer_360_opportunity_point"
+                  ,"customer_360_recruiting_hospital_his"
+            ]
+          },
+          "destinationSchemaAutoCreate": "true",
+          "destinationTableForceDropCreate": "true"
+        }
+        3.10  mapping 表
+                    {
+                      "source_aws_env": "prod",
+                      "target_aws_env": "dev",
+                      "redshift_user": "cdp",
+                      "unloadSource": {
+                        "database": "cn_cdp_prod",
+                        "schemaName": "analytical_martph_ph",
+                        "tableNames": [
+                          "dim_ctm_hospital_hcomp"
+                        ]
+                      },
+                      "copyTarget": {
+                        "database": "cn_cdp_dev",
+                        "schemaName": "analytical_martph_ph",
+                        "tableNames": [
+                          "dim_ctm_hospital_hcomp"
+                        ]
+                      },
+                      "destinationSchemaAutoCreate": "true",
+                      "destinationTableForceDropCreate": "true"
+                    }
+    4. 验证
+
+        analytical_martph_airepbi cdp ok
+        analytical_martph_radsale cdp ok
+        enriched_prestage_airepbi cdp ok
+        enriched_prestage_radacademy cdp ok
+        enriched_stage_airepbi cdp ok
+        enriched_stage_radsale cdp ok
+        model_dw_airepbi cdp ok
+        model_dw_radsale cdp ok
+        analytical_martph_customer360 cdp ok
+
+
+        select* from analytical_martph_airepbi.ai_rep_report_monthly order by yearmonth desc;
+        select* from    analytical_martph_airepbi.v_report_internal_summary_data                      order by sys_created_dt  desc
+        ;select* from    analytical_martph_radsale.report_external_cpa_cha_summary_data order by last_updt_time desc
+        ;select* from    analytical_martph_radsale.report_internal_summary_data order by last_updt_time desc
+        ;select* from    enriched_prestage_airepbi.business_opportunity                                order by sys_created_dt  desc
+        ;select* from    enriched_prestage_airepbi.corpinfo                                            order by sys_created_dt  desc
+        ;select* from    enriched_prestage_radacademy.analysis_learn_log                               order by sys_created_dt  desc
+        ;select* from    enriched_prestage_radacademy.analysis_monitor                                 order by sys_created_dt  desc
+        ;select* from    enriched_prestage_radacademy.bayer_campain_content                            order by sys_created_dt  desc
+        ;select* from    enriched_prestage_radacademy.bayer_certificate_member                         order by sys_created_dt  desc
+        ;select* from    enriched_prestage_radacademy.bayer_comments                                   order by sys_created_dt  desc
+        ;select* from    enriched_prestage_radacademy.bayer_content                                    order by sys_created_dt  desc
+        ;select* from    enriched_prestage_radacademy.bayer_form_question_answer                       order by sys_created_dt  desc
+        ;select* from    enriched_prestage_radacademy.bayer_learn_log                                  order by sys_created_dt  desc
+        ;select* from    enriched_prestage_radacademy.bayer_learn_times_log                            order by sys_created_dt  desc
+        ;select* from    enriched_prestage_radacademy.bayer_medal_member                               order by sys_created_dt  desc
+        ;select* from    enriched_prestage_radacademy.bayer_meeting_ccmtv_data                         order by sys_created_dt  desc
+        ;select* from    enriched_prestage_radacademy.bayer_meeting_ccmtv_data_log                     order by sys_created_dt  desc
+        ;select* from    enriched_prestage_radacademy.bayer_member                                     order by sys_created_dt  desc
+        ;select* from    enriched_prestage_radacademy.bayer_question                                   order by sys_created_dt  desc
+        ;select* from    enriched_prestage_radacademy.bayer_question_answer                            order by sys_created_dt  desc
+        ;select* from    enriched_prestage_radacademy.bayer_score_log                                  order by sys_created_dt  desc
+        ;select* from    enriched_prestage_radacademy.view_log                                         order by sys_created_dt  desc
+        ;select* from    enriched_stage_airepbi.airep_province_mapping
+        ;select* from    enriched_stage_airepbi.business_opportunity                                   order by etl_update_time  desc
+        ;select* from    enriched_stage_airepbi.hospital_equipment                                     order by etl_update_time  desc  --
+        ;select* from    enriched_stage_airepbi.internal_ai_rep_hosp_list                                --
+        ;select* from    enriched_stage_airepbi.userinfo                                               order by last_updt_time  desc  --
+        ;select* from    enriched_stage_radsale.external_all_hospital_mapping                            --
+        ;select* from    model_dw_airepbi.dim_user                                                     order by lastupdateddt  desc  --
+        ;select* from    model_dw_airepbi.dim_user_history                                             order by lastupdateddt  desc  --
+        ;select* from    model_dw_airepbi.fact_meeting                                                 order by lastupdateddt  desc  --
+        ;select* from    model_dw_airepbi.fact_wechat                                                  order by lastupdateddt  desc  --
+        ;select* from    model_dw_airepbi.scrmwechatbizrecord                                          order by lastupdttime  desc  --
+        ;select* from    model_dw_airepbi.weifeng_mobile                                               order by lastupdateddt  desc  --
+
+        ;select* from    model_dw_radsale.dim_territoryorg_hospital_data                               order by etl_update_time  desc  --
+        ;select* from    model_dw_radsale.fact_internal_summary_data                                   order by last_updt_time  desc  --
+
+        ;select* from    analytical_martph_customer360.customer_360_admission_equipment                order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_ai_rep                             order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_badge                              order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_basic_kpi_detail                   order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_basic_user_info                    order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_cda_ct_mr_occupancy                order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_certificate                        order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_hco                                order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_hcp                                order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_hospital_equipment                 order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_imaging_academy_last_five_reading  order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_internal_sales_mtd                 order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_internal_sales_qtd                 order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_internal_sales_ytd                 order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_last_30days_call_log               order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_last_five_behavior                 order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_last_three_call                    order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_last_three_meeting                 order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_last_three_wechat_visits           order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_my_customer                        order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_my_subordinate                     order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_opportunity_point                  order by etl_update_time  desc  --
+        ;select* from    analytical_martph_customer360.customer_360_recruiting_hospital_his            order by etl_update_time  desc  --

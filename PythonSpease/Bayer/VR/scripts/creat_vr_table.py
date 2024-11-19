@@ -6,7 +6,7 @@ import re
 product_file_path = r'C:\Bayer\09_VR'
 # 读取Excel文件
 file_path = f'{product_file_path}\ddl 1.xlsx'
-df = pd.read_excel(file_path, header=None, sheet_name='Sheet1')
+df = pd.read_excel(file_path, header=None, sheet_name='Sheet2')
 
 # 初始化变量
 tables = []
@@ -87,19 +87,19 @@ for table_name, columns in tables:
 
     insert_into_sql = insert_into_sql.rstrip(',\n') + '\n)'
     select_sql = select_sql.rstrip(',\n')
-    if re.search("cxg", table_name):
+    if re.search("cxg", table_name)or re.search("vr_account", table_name) :
         staging_table_name = table_name.split(".")[1]
         str_to_remove = 'vr'
         staging_table_name_result = re.sub(str_to_remove, '', staging_table_name)
         # 生成DELETE语句
-        delete_sql = f'DELETE FROM {table_name} WHERE record_id IN (SELECT id FROM enriched_vr.staging{staging_table_name_result});'
+        delete_sql = f'DELETE FROM {table_name} WHERE id IN (SELECT id FROM enriched_vr.staging{staging_table_name_result});'
         print(delete_sql)
         print('\n' + '-' * 80 + '\n')
 
         insert_into_sql += f'\n{select_sql}\nFROM enriched_vr.staging{staging_table_name_result};'
     else:
         # 生成DELETE语句
-        delete_sql = f'DELETE FROM {table_name} WHERE record_id IN (SELECT id FROM enriched_vr.staging_{table_name.split(".")[1]});'
+        delete_sql = f'DELETE FROM {table_name} WHERE id IN (SELECT id FROM enriched_vr.staging_{table_name.split(".")[1]});'
         print(delete_sql)
         print('\n' + '-' * 80 + '\n')
         insert_into_sql += f'\n{select_sql}\nFROM enriched_vr.staging_{table_name.split(".")[1]};'
