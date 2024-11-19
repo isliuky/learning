@@ -1,0 +1,33 @@
+{
+          "source_aws_env": "prod",
+          "target_aws_env": "dev",
+          "redshift_user": "cdp",
+          "unloadSource": {
+            "database": "cn_cdp_prod",
+            "schemaName": "enriched_stage_airepbi",
+            "tableNames": [
+                "smsinfo"
+                ,"meetinginfo"
+                ,"scrmwechatbizrecord"
+                ,"scrmassign"
+                ,"corpinfo"
+                ,"scrmuserinfo"
+                ,"mobileinfo"
+            ]
+          },
+          "copyTarget": {
+            "database": "cn_cdp_dev",
+            "schemaName": "enriched_stage_airepbi",
+            "tableNames": [
+                "smsinfo"
+                ,"meetinginfo"
+                ,"scrmwechatbizrecord"
+                ,"scrmassign"
+                ,"corpinfo"
+                ,"scrmuserinfo"
+                ,"mobileinfo"
+            ]
+          },
+          "destinationSchemaAutoCreate": "true",
+          "destinationTableForceDropCreate": "true"
+        }

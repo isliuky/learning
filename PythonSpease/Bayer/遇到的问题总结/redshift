@@ -4,3 +4,5 @@
         1. 原始文件中有空行, 因为换行符导致数据copy有问题
     解决方案:
         1. 加一个参数  FILLRECORD
+2. 创建数据库 忽略大小写
+    create database cn_cdp_dev_vr COLLATE  CASE_INSENSITIVE
