@@ -1,0 +1,1428 @@
+CREATE OR REPLACE PROCEDURE analytical_sci.sp_sci_data_online_pharmacy()
+ LANGUAGE plpgsql
+AS $$
+BEGIN
+
+	SET timezone to 'Asia/Shanghai';
+
+	DROP TABLE if exists #sci_data_in_market_sales_online_pharmacy;
+	DROP TABLE if exists #sci_data_territory_detail_level_target;
+	DROP TABLE if exists #sci_data_online_pharmacy_buyer_sales_daily;
+	DROP TABLE if exists #sci_data_online_pharmacy_buyer_sales_monthly;
+	DROP TABLE if exists #sci_data_territory_detail_level_target_seller;
+	DROP TABLE if exists #sci_data_online_pharmacy_seller_sales_daily;
+	DROP TABLE if exists #sci_data_online_pharmacy_seller_sales_monthly;
+
+	-- 获取线上商业零售需求流向数据
+	create temp table #sci_data_in_market_sales_online_pharmacy as
+	WITH config AS (
+		SELECT
+			*
+		FROM  model_sci.sci_data_online_pharmacy_config
+	)
+	SELECT
+		d.*
+	FROM
+		analytical_sci.sci_data_in_market_sales d
+	JOIN
+		config c
+	ON
+		d.year_month BETWEEN c.start_year_month AND c.end_year_month
+		AND d.p_seller_code = c.p_seller_code
+		AND d.product_code = c.product_code
+		AND (c.province_name IS NULL OR d.province_name = c.province_name)
+		AND (c.city_name IS NULL OR d.city_name = c.city_name)
+		AND (c.online_or_offline IS NULL OR d.online_or_offline = c.online_or_offline)
+		AND (
+			(c.limit_method = '上限' AND d.quantity <= c.quantity) OR
+			(c.limit_method = '下限' AND d.quantity >= c.quantity) OR
+			c.limit_method IS NULL
+		)
+	-- WHERE
+	-- 	(c.is_cal_seller IS NULL  or c.is_cal_seller = true)
+	-- 	AND (c.is_cal_buyer IS NULL OR c.is_cal_buyer = true)
+		;
+
+	-- 考核买方
+		-- 获取买方架构
+	create temp table #sci_data_territory_detail_level_target as
+	select
+		b.*
+	from (
+		-- 去重
+		select
+			*
+		from (
+			SELECT
+				distinct
+				start_year_month
+				,nvl(end_year_month, (LEFT(CAST(start_year_month AS VARCHAR), 4) || '12')::INT) as end_year_month
+				,market_code
+				,product_code
+				,ROW_NUMBER() OVER (PARTITION BY market_code, product_code
+							   ORDER BY (end_year_month - start_year_month) DESC, start_year_month ASC) AS rn
+			FROM model_sci.sci_data_online_pharmacy_config
+			where is_cal_buyer = 'TRUE')
+		where rn = 1
+	)a
+	join analytical_sci.sci_data_territory_detail_level_target b on b.year_month between a.start_year_month and a.end_year_month
+	and a.market_code = b.market_code and a.product_code = b.product_code;
+
+	-- 挂日维度的销量
+	create temp table #sci_data_online_pharmacy_buyer_sales_daily as
+	select
+			a.year
+		 , a.month
+		 , a.year_month
+		 , a.division_code
+		 , a.market_code
+		 , a.market_name
+		 , a.cluster_code
+		 , a.cluster_name
+		 , a.cluster_head_code
+		 , a.cluster_head_name
+		 , a.cluster_is_substitute
+		 , a.region_code
+		 , a.region_name
+		 , a.rsm_code
+		 , a.rsm_name
+		 , a.rsm_is_substitute
+		 , a.district_code
+		 , a.district_name
+		 , a.dsm_code
+		 , a.dsm_name
+		 , a.dsm_is_substitute
+		 , a.territory_code
+		 , a.territory_name
+		 , a.territory_type_name
+		 , a.client_type
+		 , a.client_code
+		 , a.client_name
+		 , a.province_code
+		 , a.province_name
+		 , a.city_code
+		 , a.city_name
+		 , a.county_code
+		 , a.county_name
+		 , a.final_client_code
+		 , a.final_client_name
+		 , a.mr_name
+		 , a.mr_code
+		 , a.mr_is_substitute
+		 , a.mr_type
+		 , a.brand_code
+		 , a.brand_name_en
+		 , a.product_code
+		 --  , b.client_code
+		 , a.product_name_en
+		 , a.target_qty
+		 , a.all_target_qty
+		 , a.is_supplement
+		 , a.supplement_flag
+		 , a.vbp_version
+		 , a.price_start_date
+		 , a.price_end_date
+		 , a.evaluation_price
+		 , b.sales_date
+		 , NVL(
+				  product_price_1.price
+				, product_price_2.price
+				, product_price_3.price
+				, product_price_4.price
+				, product_price_5.price
+				, product_price_6.price
+			  )                                                       AS actual_price
+		 , CASE a.is_supplement
+			   WHEN TRUE THEN
+				   0
+			   ELSE
+				   b.quantity
+		   END                                                        AS sales_original_qty
+		 , actual_price * sales_original_qty                          AS sales_original_amount
+		 , NVL(a.final_split_rate, 1) * sales_original_qty            AS sales_qty
+		 , sales_qty::decimal(38, 15) * actual_price::decimal(38, 15) AS sales_amount
+		 , a.target_amount
+		 , a.is_share_terminal
+		 , a.target_split_ratio
+		 , NVL(a.target_split_rate, 1)                                AS target_split_rate
+		 , a.behave_split_ratio
+		 , a.dsm_split_rate
+		 , a.is_split_fixed
+		 , a.fixed_final_split_rate
+		 , NVL(a.final_split_rate, 1)                                 AS final_split_rate
+		 , a.last_year_share_territory_split_rate
+		 , a.hospital_level_code
+		 , a.hospital_level_name
+		 , a.extend_field_1
+		 , a.extend_field_2
+		 , a.extend_field_3
+		 , a.extend_field_4
+		 , a.extend_field_5
+		 , a.extend_field_6
+		 , a.insert_dt
+		 , a.insert_user
+		 , a.update_dt
+		 , a.update_user
+	from #sci_data_territory_detail_level_target a
+	LEFT JOIN
+    (
+        SELECT
+			  year
+            , month
+            , year_month
+            , sales_date
+            , client_code
+            , product_code
+            , SUM(quantity) AS quantity
+        FROM #sci_data_in_market_sales_online_pharmacy
+        WHERE sales_date IS NOT NULL
+        GROUP BY year
+            , month
+            , year_month
+            , sales_date
+            , client_code
+            , product_code
+    )                                                                                 b
+        ON a.year = b.year
+           AND a.month = b.month
+           AND a.client_code = b.client_code
+           AND a.product_code = b.product_code
+           AND b.sales_date::date
+           BETWEEN a.price_start_date::date AND a.price_end_date::date
+	  LEFT JOIN model_sci.v_sci_market_city_territory_type_name_product_price_w_vbp     product_price_1
+        ON 1 = 1 --【salesdate &产品&终端城市&辖区类型& Market编码】
+           AND product_price_1.price_type = 3
+           AND product_price_1.price_date_rank = 1
+           AND a.product_code = product_price_1.product_code
+           AND a.territory_code = product_price_1.territory_code
+           AND a.client_code = product_price_1.client_code
+           -- AND a.province_code = product_price_1.province_code
+           AND a.city_code = product_price_1.city_code
+           AND a.territory_type_name = product_price_1.territory_type_name
+           AND a.market_code = product_price_1.market_code
+           AND b.sales_date::date -- 这个还要吗？
+           BETWEEN product_price_1.effective_date::date AND product_price_1.expired_date::date
+    LEFT JOIN model_sci.v_sci_market_province_territory_type_name_product_price_w_vbp product_price_2
+        ON 1 = 1 --【salesdate &产品&终端省份&辖区类型& Market编码】
+           AND product_price_2.price_type = 3
+           AND product_price_2.price_date_rank = 1
+           AND a.product_code = product_price_2.product_code
+           AND a.territory_code = product_price_2.territory_code
+           AND a.client_code = product_price_2.client_code
+           AND a.province_code = product_price_2.province_code
+           -- AND a.city_code = product_price_2.city_code
+           AND a.territory_type_name = product_price_2.territory_type_name
+           AND a.market_code = product_price_2.market_code
+           AND b.sales_date::date
+           BETWEEN product_price_2.effective_date::date AND product_price_2.expired_date::date
+           AND product_price_1.price IS NULL
+    LEFT JOIN model_sci.v_sci_market_city_product_price_w_vbp                         product_price_3
+        ON 1 = 1 --【salesdate &产品&终端城市& Market编码】
+           AND product_price_3.price_type = 3
+           AND product_price_3.price_date_rank = 1
+           AND a.product_code = product_price_3.product_code
+           AND a.territory_code = product_price_3.territory_code
+           AND a.client_code = product_price_3.client_code
+           -- AND a.province_code = product_price_3.province_code
+           AND a.city_code = product_price_3.city_code
+           -- AND a.territory_type_name = product_price_3.territory_type_name
+           AND a.market_code = product_price_3.market_code
+           AND b.sales_date::date
+           BETWEEN product_price_3.effective_date::date AND product_price_3.expired_date::date
+           AND product_price_1.price IS NULL
+           AND product_price_2.price IS NULL
+    LEFT JOIN model_sci.v_sci_market_province_product_price_w_vbp                     product_price_4
+        ON 1 = 1 --【salesdate &产品&终端省份& Market编码】
+           AND product_price_4.price_type = 3
+           AND product_price_4.price_date_rank = 1
+           AND a.product_code = product_price_4.product_code
+           AND a.territory_code = product_price_4.territory_code
+           AND a.client_code = product_price_4.client_code
+           AND a.province_code = product_price_4.province_code
+           -- AND a.city_code = product_price_4.city_code
+           -- AND a.territory_type_name = product_price_4.territory_type_name
+           AND a.market_code = product_price_4.market_code
+           AND b.sales_date::date
+           BETWEEN product_price_4.effective_date::date AND product_price_4.expired_date::date
+           AND product_price_1.price IS NULL
+           AND product_price_2.price IS NULL
+           AND product_price_3.price IS NULL
+    LEFT JOIN model_sci.v_sci_market_product_price_w_vbp                              product_price_5
+        ON 1 = 1 --【salesdate &产品& Market编码】
+           AND product_price_5.price_type = 3
+           AND product_price_5.price_date_rank = 1
+           AND a.product_code = product_price_5.product_code
+           AND a.territory_code = product_price_5.territory_code
+           AND a.client_code = product_price_5.client_code
+           -- AND a.province_code = product_price_5.province_code
+           -- AND a.city_code = product_price_5.city_code
+           -- AND a.territory_type_name = product_price_5.territory_type_name
+           AND a.market_code = product_price_5.market_code
+           AND b.sales_date::date
+           BETWEEN product_price_5.effective_date::date AND product_price_5.expired_date::date
+           AND product_price_1.price IS NULL
+           AND product_price_2.price IS NULL
+           AND product_price_3.price IS NULL
+           AND product_price_4.price IS NULL
+    LEFT JOIN model_sci.v_sci_product_price_w_vbp                                     product_price_6
+        ON 1 = 1 --【salesdate &产品】
+           AND product_price_6.price_type = 3
+           AND product_price_6.price_date_rank = 1
+           AND a.product_code = product_price_6.product_code
+           AND a.territory_code = product_price_6.territory_code
+           AND a.client_code = product_price_6.client_code
+           -- AND a.province_code = product_price_6.province_code
+           -- AND a.city_code = product_price_6.city_code
+           -- AND a.territory_type_name = product_price_6.territory_type_name
+           -- AND a.market_code = product_price_6.market_code
+           AND b.sales_date::date
+           BETWEEN product_price_6.effective_date::date AND product_price_6.expired_date::date
+           AND product_price_1.price IS NULL
+           AND product_price_2.price IS NULL
+           AND product_price_3.price IS NULL
+           AND product_price_4.price IS NULL
+           AND product_price_5.price IS NULL;
+
+	-- 插入考核买方日维度数据
+	truncate table analytical_sci.sci_data_online_pharmacy_buyer_sales_daily;
+	insert into analytical_sci.sci_data_online_pharmacy_buyer_sales_daily(
+		year
+		 , month
+		 , year_month
+		 , division_code
+		 , market_code
+		 , market_name
+		 , cluster_code
+		 , cluster_name
+		 , cluster_head_code
+		 , cluster_head_name
+		 , cluster_is_substitute
+		 , region_code
+		 , region_name
+		 , rsm_code
+		 , rsm_name
+		 , rsm_is_substitute
+		 , district_code
+		 , district_name
+		 , dsm_code
+		 , dsm_name
+		 , dsm_is_substitute
+		 , territory_code
+		 , territory_name
+		 , territory_type_name
+		 , client_type
+		 , client_code
+		 , client_name
+		 , province_code
+		 , province_name
+		 , city_code
+		 , city_name
+		 , county_code
+		 , county_name
+		 , final_client_code
+		 , final_client_name
+		 , mr_name
+		 , mr_code
+		 , mr_is_substitute
+		 , mr_type
+		 , brand_code
+		 , brand_name_en
+		 , product_code
+		 --, b.client_code
+		 , product_name_en
+		 , target_qty
+		 , all_target_qty
+		 , is_supplement
+		 , supplement_flag
+		 , vbp_version
+		 , price_start_date
+		 , price_end_date
+		 , evaluation_price
+		 , sales_date
+		 , actual_price
+		 , sales_original_qty
+		 , sales_original_amount
+		 , sales_qty
+		 , sales_amount
+		 , target_amount
+		 , is_share_terminal
+		 , target_split_ratio
+		 , target_split_rate
+		 , behave_split_ratio
+		 , dsm_split_rate
+		 , is_split_fixed
+		 , fixed_final_split_rate
+		 , final_split_rate
+		 , last_year_share_territory_split_rate
+		 , hospital_level_code
+		 , hospital_level_name
+		 , extend_field_1
+		 , extend_field_2
+		 , extend_field_3
+		 , extend_field_4
+		 , extend_field_5
+		 , extend_field_6
+		 , insert_dt
+		 , insert_user
+		 , update_dt
+		 , update_user
+	)
+	select
+		year
+		 , month
+		 , year_month
+		 , division_code
+		 , market_code
+		 , market_name
+		 , cluster_code
+		 , cluster_name
+		 , cluster_head_code
+		 , cluster_head_name
+		 , cluster_is_substitute
+		 , region_code
+		 , region_name
+		 , rsm_code
+		 , rsm_name
+		 , rsm_is_substitute
+		 , district_code
+		 , district_name
+		 , dsm_code
+		 , dsm_name
+		 , dsm_is_substitute
+		 , territory_code
+		 , territory_name
+		 , territory_type_name
+		 , client_type
+		 , client_code
+		 , client_name
+		 , province_code
+		 , province_name
+		 , city_code
+		 , city_name
+		 , county_code
+		 , county_name
+		 , final_client_code
+		 , final_client_name
+		 , mr_name
+		 , mr_code
+		 , mr_is_substitute
+		 , mr_type
+		 , brand_code
+		 , brand_name_en
+		 , product_code
+		 --, b.client_code
+		 , product_name_en
+		 , target_qty
+		 , all_target_qty
+		 , is_supplement
+		 , supplement_flag
+		 , vbp_version
+		 , price_start_date
+		 , price_end_date
+		 , evaluation_price
+		 , sales_date
+		 , actual_price
+		 , sales_original_qty
+		 , sales_original_amount
+		 , sales_qty
+		 , sales_amount
+		 , target_amount
+		 , is_share_terminal
+		 , target_split_ratio
+		 , target_split_rate
+		 , behave_split_ratio
+		 , dsm_split_rate
+		 , is_split_fixed
+		 , fixed_final_split_rate
+		 , final_split_rate
+		 , last_year_share_territory_split_rate
+		 , hospital_level_code
+		 , hospital_level_name
+		 , extend_field_1
+		 , extend_field_2
+		 , extend_field_3
+		 , extend_field_4
+		 , extend_field_5
+		 , extend_field_6
+		 , getdate()
+		 , 'bayer_cdp_sci'
+		 , getdate()
+		 , 'bayer_cdp_sci'
+	from #sci_data_online_pharmacy_buyer_sales_daily;
+
+	-- 汇总到月 -- 可以抄daily_n_monthly
+	create temp table #sci_data_online_pharmacy_buyer_sales_monthly as
+	select
+			a.year
+		 , a.month
+		 , a.year_month
+		 , a.division_code
+		 , a.market_code
+		 , a.market_name
+		 , a.cluster_code
+		 , a.cluster_name
+		 , a.cluster_head_code
+		 , a.cluster_head_name
+		 , a.cluster_is_substitute
+		 , a.region_code
+		 , a.region_name
+		 , a.rsm_code
+		 , a.rsm_name
+		 , a.rsm_is_substitute
+		 , a.district_code
+		 , a.district_name
+		 , a.dsm_code
+		 , a.dsm_name
+		 , a.dsm_is_substitute
+		 , a.territory_code
+		 , a.territory_name
+		 , a.territory_type_name
+		 , a.client_type
+		 , a.client_code
+		 , a.client_name
+		 , a.province_code
+		 , a.province_name
+		 , a.city_code
+		 , a.city_name
+		 , a.county_code
+		 , a.county_name
+		 , a.final_client_code
+		 , a.final_client_name
+		 , a.mr_name
+		 , a.mr_code
+		 , a.mr_is_substitute
+		 , a.mr_type
+		 , a.brand_code
+		 , a.brand_name_en
+		 , a.product_code
+		 , a.product_name_en
+		 , a.target_qty
+		 , a.all_target_qty
+		 , a.is_supplement
+		 , a.supplement_flag
+		 , a.vbp_version
+		 , a.price_start_date
+		 , a.price_end_date
+		 , a.evaluation_price
+		 , NULL::datetime                                                              AS sales_date
+		 , NULL 																	   as actual_price
+		 , NVL(daily.sales_original_qty, 0) 									       AS sales_original_qty
+		 , NVL(daily.sales_original_amount, 0) 										   AS sales_original_amount
+		 , NVL(daily.sales_qty, 0)								                       AS sales_qty
+		 , NVL(daily.sales_amount, 0)								                   AS sales_amount
+		 , a.target_amount
+		 , a.is_share_terminal
+		 , a.target_split_ratio
+		 , NVL(a.target_split_rate, 1)                                                 AS target_split_rate
+		 , a.behave_split_ratio
+		 , a.dsm_split_rate
+		 , a.is_split_fixed
+		 , a.fixed_final_split_rate
+		 , NVL(a.final_split_rate, 1)                                                  AS final_split_rate
+		 , a.last_year_share_territory_split_rate
+		 , a.hospital_level_code
+		 , a.hospital_level_name
+		 , a.extend_field_1
+		 , a.extend_field_2
+		 , a.extend_field_3
+		 , a.extend_field_4
+		 , a.extend_field_5
+		 , a.extend_field_6
+		 , a.insert_dt
+		 , a.insert_user
+		 , a.update_dt
+		 , a.update_user
+	FROM #sci_data_territory_detail_level_target                            a
+    LEFT JOIN
+    (
+        SELECT year_month
+             , territory_code
+             , client_code
+             , final_client_code
+             , product_code
+             , vbp_version
+             , SUM(sales_original_qty)    AS sales_original_qty
+             , SUM(sales_original_amount) AS sales_original_amount
+             , SUM(sales_qty)             AS sales_qty
+             , SUM(sales_amount)          AS sales_amount
+        FROM analytical_sci.sci_data_online_pharmacy_buyer_sales_daily
+        GROUP BY year_month
+               , territory_code
+               , client_code
+               , final_client_code
+               , product_code
+               , vbp_version
+    )                                                                                 daily
+        ON a.year_month = daily.year_month
+           AND a.client_code = daily.client_code
+           AND a.final_client_code = daily.final_client_code
+           AND a.territory_code = daily.territory_code
+           AND a.product_code = daily.product_code
+           AND a.vbp_version = daily.vbp_version;
+
+	-- 插入考核买方月维度数据
+	truncate table analytical_sci.sci_data_online_pharmacy_buyer_sales_monthly;
+	insert into analytical_sci.sci_data_online_pharmacy_buyer_sales_monthly(
+				year
+		 , month
+		 , year_month
+		 , division_code
+		 , market_code
+		 , market_name
+		 , cluster_code
+		 , cluster_name
+		 , cluster_head_code
+		 , cluster_head_name
+		 , cluster_is_substitute
+		 , region_code
+		 , region_name
+		 , rsm_code
+		 , rsm_name
+		 , rsm_is_substitute
+		 , district_code
+		 , district_name
+		 , dsm_code
+		 , dsm_name
+		 , dsm_is_substitute
+		 , territory_code
+		 , territory_name
+		 , territory_type_name
+		 , client_type
+		 , client_code
+		 , client_name
+		 , province_code
+		 , province_name
+		 , city_code
+		 , city_name
+		 , county_code
+		 , county_name
+		 , final_client_code
+		 , final_client_name
+		 , mr_name
+		 , mr_code
+		 , mr_is_substitute
+		 , mr_type
+		 , brand_code
+		 , brand_name_en
+		 , product_code
+		 , product_name_en
+		 , target_qty
+		 , all_target_qty
+		 , is_supplement
+		 , supplement_flag
+		 , vbp_version
+		 , price_start_date
+		 , price_end_date
+		 , evaluation_price
+		 , sales_date
+		 , actual_price
+		 , sales_original_qty
+		 , sales_original_amount
+		 , sales_qty
+		 , sales_amount
+		 , target_amount
+		 , is_share_terminal
+		 , target_split_ratio
+		 , target_split_rate
+		 , behave_split_ratio
+		 , dsm_split_rate
+		 , is_split_fixed
+		 , fixed_final_split_rate
+		 , final_split_rate
+		 , last_year_share_territory_split_rate
+		 , hospital_level_code
+		 , hospital_level_name
+		 , extend_field_1
+		 , extend_field_2
+		 , extend_field_3
+		 , extend_field_4
+		 , extend_field_5
+		 , extend_field_6
+		 , insert_dt
+		 , insert_user
+		 , update_dt
+		 , update_user
+	)
+	select
+			year
+		 , month
+		 , year_month
+		 , division_code
+		 , market_code
+		 , market_name
+		 , cluster_code
+		 , cluster_name
+		 , cluster_head_code
+		 , cluster_head_name
+		 , cluster_is_substitute
+		 , region_code
+		 , region_name
+		 , rsm_code
+		 , rsm_name
+		 , rsm_is_substitute
+		 , district_code
+		 , district_name
+		 , dsm_code
+		 , dsm_name
+		 , dsm_is_substitute
+		 , territory_code
+		 , territory_name
+		 , territory_type_name
+		 , client_type
+		 , client_code
+		 , client_name
+		 , province_code
+		 , province_name
+		 , city_code
+		 , city_name
+		 , county_code
+		 , county_name
+		 , final_client_code
+		 , final_client_name
+		 , mr_name
+		 , mr_code
+		 , mr_is_substitute
+		 , mr_type
+		 , brand_code
+		 , brand_name_en
+		 , product_code
+		 , product_name_en
+		 , target_qty
+		 , all_target_qty
+		 , is_supplement
+		 , supplement_flag
+		 , vbp_version
+		 , price_start_date
+		 , price_end_date
+		 , evaluation_price
+		 , sales_date
+		 , actual_price
+		 , sales_original_qty
+		 , sales_original_amount
+		 , sales_qty
+		 , sales_amount
+		 , target_amount
+		 , is_share_terminal
+		 , target_split_ratio
+		 , target_split_rate
+		 , behave_split_ratio
+		 , dsm_split_rate
+		 , is_split_fixed
+		 , fixed_final_split_rate
+		 , final_split_rate
+		 , last_year_share_territory_split_rate
+		 , hospital_level_code
+		 , hospital_level_name
+		 , extend_field_1
+		 , extend_field_2
+		 , extend_field_3
+		 , extend_field_4
+		 , extend_field_5
+		 , extend_field_6
+		 , getdate()
+		 , 'bayer_cdp_sci'
+		 , getdate()
+		 , 'bayer_cdp_sci'
+	from #sci_data_online_pharmacy_buyer_sales_monthly;
+
+	-- 考核卖方
+		-- 获取卖方架构
+	create temp table #sci_data_territory_detail_level_target_seller as
+	select
+		b.*
+	from (
+		-- 去重
+		select
+			*
+		from(
+			SELECT
+				distinct
+				start_year_month
+				,nvl(end_year_month, (LEFT(CAST(start_year_month AS VARCHAR), 4) || '12')::INT) as end_year_month
+				,market_code
+				,product_code
+				,ROW_NUMBER() OVER (PARTITION BY market_code, product_code
+								   ORDER BY (end_year_month - start_year_month) DESC, start_year_month ASC) AS rn
+			FROM model_sci.sci_data_online_pharmacy_config
+			where is_cal_seller = 'TRUE')
+		where rn = 1
+	)a
+	join analytical_sci.sci_data_territory_detail_level_target b on b.year_month between a.start_year_month and a.end_year_month
+	and a.market_code = b.market_code and a.product_code = b.product_code;
+
+	-- 挂日维度的销量  考核卖方
+	create temp table #sci_data_online_pharmacy_seller_sales_daily as
+	select
+			a.year
+		 , a.month
+		 , a.year_month
+		 , a.division_code
+		 , a.market_code
+		 , a.market_name
+		 , a.cluster_code
+		 , a.cluster_name
+		 , a.cluster_head_code
+		 , a.cluster_head_name
+		 , a.cluster_is_substitute
+		 , a.region_code
+		 , a.region_name
+		 , a.rsm_code
+		 , a.rsm_name
+		 , a.rsm_is_substitute
+		 , a.district_code
+		 , a.district_name
+		 , a.dsm_code
+		 , a.dsm_name
+		 , a.dsm_is_substitute
+		 , a.territory_code
+		 , a.territory_name
+		 , a.territory_type_name
+		 , a.client_type
+		 , a.client_code
+		 , a.client_name
+		 , a.province_code
+		 , a.province_name
+		 , a.city_code
+		 , a.city_name
+		 , a.county_code
+		 , a.county_name
+		 , a.final_client_code
+		 , a.final_client_name
+		 , b.p_seller_code
+		 , c.partner_name                     	-- 取自其他表
+		 , a.mr_name
+		 , a.mr_code
+		 , a.mr_is_substitute
+		 , a.mr_type
+		 , a.brand_code
+		 , a.brand_name_en
+		 , a.product_code
+		 --  , b.client_code
+		 , a.product_name_en
+		 , null as target_qty 					-- 考核卖方的时候留空
+		 , a.all_target_qty
+		 , a.is_supplement
+		 , a.supplement_flag
+		 , a.vbp_version
+		 , a.price_start_date
+		 , a.price_end_date
+		 , null as evaluation_price  			-- 考核卖方的时候留空
+		 , b.sales_date
+		 , NVL(
+				  product_price_1.price
+				, product_price_2.price
+				, product_price_3.price
+				, product_price_4.price
+				, product_price_5.price
+				, product_price_6.price
+			  )                                                       AS actual_price
+		 , CASE a.is_supplement
+			   WHEN TRUE THEN
+				   0
+			   ELSE
+				   b.quantity
+		   END                                                        AS sales_original_qty
+		 , actual_price * sales_original_qty                          AS sales_original_amount
+		 , NVL(a.final_split_rate, 1) * sales_original_qty            AS sales_qty
+		 , sales_qty::decimal(38, 15) * actual_price::decimal(38, 15) AS sales_amount
+		 , null as target_amount    			 -- 考核卖方的时候留空
+		 , a.is_share_terminal
+		 , a.target_split_ratio
+		 , NVL(a.target_split_rate, 1)                                AS target_split_rate
+		 , a.behave_split_ratio
+		 , a.dsm_split_rate
+		 , a.is_split_fixed
+		 , a.fixed_final_split_rate
+		 , NVL(a.final_split_rate, 1)                                 AS final_split_rate
+		 , a.last_year_share_territory_split_rate
+		 , a.hospital_level_code
+		 , a.hospital_level_name
+		 , a.extend_field_1
+		 , a.extend_field_2
+		 , a.extend_field_3
+		 , a.extend_field_4
+		 , a.extend_field_5
+		 , a.extend_field_6
+		 , a.insert_dt
+		 , a.insert_user
+		 , a.update_dt
+		 , a.update_user
+	from #sci_data_territory_detail_level_target_seller a
+	LEFT JOIN
+    (
+        SELECT
+			  year
+            , month
+            , year_month
+            , sales_date
+            , client_code
+            , product_code
+			, p_seller_code
+            , SUM(quantity) AS quantity
+        FROM #sci_data_in_market_sales_online_pharmacy
+        WHERE sales_date IS NOT NULL
+        GROUP BY year
+            , month
+            , year_month
+            , sales_date
+            , client_code
+            , product_code
+			, p_seller_code
+    )                                                                                 b
+        ON a.year = b.year
+           AND a.month = b.month
+           AND a.client_code = b.client_code
+           AND a.product_code = b.product_code
+           AND b.sales_date::date
+           BETWEEN a.price_start_date::date AND a.price_end_date::date
+	  left join model_sci.sci_data_partners c
+		on b.year = c.year and b.month = c.month and b.p_seller_code = c.partner_code
+	  LEFT JOIN model_sci.v_sci_market_city_territory_type_name_product_price_w_vbp     product_price_1
+        ON 1 = 1 --【salesdate &产品&终端城市&辖区类型& Market编码】
+           AND product_price_1.price_type = 3
+           AND product_price_1.price_date_rank = 1
+           AND a.product_code = product_price_1.product_code
+           AND a.territory_code = product_price_1.territory_code
+           AND a.client_code = product_price_1.client_code
+           -- AND a.province_code = product_price_1.province_code
+           AND a.city_code = product_price_1.city_code
+           AND a.territory_type_name = product_price_1.territory_type_name
+           AND a.market_code = product_price_1.market_code
+           AND b.sales_date::date -- 这个还要吗？
+           BETWEEN product_price_1.effective_date::date AND product_price_1.expired_date::date
+    LEFT JOIN model_sci.v_sci_market_province_territory_type_name_product_price_w_vbp product_price_2
+        ON 1 = 1 --【salesdate &产品&终端省份&辖区类型& Market编码】
+           AND product_price_2.price_type = 3
+           AND product_price_2.price_date_rank = 1
+           AND a.product_code = product_price_2.product_code
+           AND a.territory_code = product_price_2.territory_code
+           AND a.client_code = product_price_2.client_code
+           AND a.province_code = product_price_2.province_code
+           -- AND a.city_code = product_price_2.city_code
+           AND a.territory_type_name = product_price_2.territory_type_name
+           AND a.market_code = product_price_2.market_code
+           AND b.sales_date::date
+           BETWEEN product_price_2.effective_date::date AND product_price_2.expired_date::date
+           AND product_price_1.price IS NULL
+    LEFT JOIN model_sci.v_sci_market_city_product_price_w_vbp                         product_price_3
+        ON 1 = 1 --【salesdate &产品&终端城市& Market编码】
+           AND product_price_3.price_type = 3
+           AND product_price_3.price_date_rank = 1
+           AND a.product_code = product_price_3.product_code
+           AND a.territory_code = product_price_3.territory_code
+           AND a.client_code = product_price_3.client_code
+           -- AND a.province_code = product_price_3.province_code
+           AND a.city_code = product_price_3.city_code
+           -- AND a.territory_type_name = product_price_3.territory_type_name
+           AND a.market_code = product_price_3.market_code
+           AND b.sales_date::date
+           BETWEEN product_price_3.effective_date::date AND product_price_3.expired_date::date
+           AND product_price_1.price IS NULL
+           AND product_price_2.price IS NULL
+    LEFT JOIN model_sci.v_sci_market_province_product_price_w_vbp                     product_price_4
+        ON 1 = 1 --【salesdate &产品&终端省份& Market编码】
+           AND product_price_4.price_type = 3
+           AND product_price_4.price_date_rank = 1
+           AND a.product_code = product_price_4.product_code
+           AND a.territory_code = product_price_4.territory_code
+           AND a.client_code = product_price_4.client_code
+           AND a.province_code = product_price_4.province_code
+           -- AND a.city_code = product_price_4.city_code
+           -- AND a.territory_type_name = product_price_4.territory_type_name
+           AND a.market_code = product_price_4.market_code
+           AND b.sales_date::date
+           BETWEEN product_price_4.effective_date::date AND product_price_4.expired_date::date
+           AND product_price_1.price IS NULL
+           AND product_price_2.price IS NULL
+           AND product_price_3.price IS NULL
+    LEFT JOIN model_sci.v_sci_market_product_price_w_vbp                              product_price_5
+        ON 1 = 1 --【salesdate &产品& Market编码】
+           AND product_price_5.price_type = 3
+           AND product_price_5.price_date_rank = 1
+           AND a.product_code = product_price_5.product_code
+           AND a.territory_code = product_price_5.territory_code
+           AND a.client_code = product_price_5.client_code
+           -- AND a.province_code = product_price_5.province_code
+           -- AND a.city_code = product_price_5.city_code
+           -- AND a.territory_type_name = product_price_5.territory_type_name
+           AND a.market_code = product_price_5.market_code
+           AND b.sales_date::date
+           BETWEEN product_price_5.effective_date::date AND product_price_5.expired_date::date
+           AND product_price_1.price IS NULL
+           AND product_price_2.price IS NULL
+           AND product_price_3.price IS NULL
+           AND product_price_4.price IS NULL
+    LEFT JOIN model_sci.v_sci_product_price_w_vbp                                     product_price_6
+        ON 1 = 1 --【salesdate &产品】
+           AND product_price_6.price_type = 3
+           AND product_price_6.price_date_rank = 1
+           AND a.product_code = product_price_6.product_code
+           AND a.territory_code = product_price_6.territory_code
+           AND a.client_code = product_price_6.client_code
+           -- AND a.province_code = product_price_6.province_code
+           -- AND a.city_code = product_price_6.city_code
+           -- AND a.territory_type_name = product_price_6.territory_type_name
+           -- AND a.market_code = product_price_6.market_code
+           AND b.sales_date::date
+           BETWEEN product_price_6.effective_date::date AND product_price_6.expired_date::date
+           AND product_price_1.price IS NULL
+           AND product_price_2.price IS NULL
+           AND product_price_3.price IS NULL
+           AND product_price_4.price IS NULL
+           AND product_price_5.price IS NULL;
+
+	-- 插入考核卖方日维度数据
+	truncate table analytical_sci.sci_data_online_pharmacy_seller_sales_daily;
+	insert into analytical_sci.sci_data_online_pharmacy_seller_sales_daily(
+				year
+		 , month
+		 , year_month
+		 , division_code
+		 , market_code
+		 , market_name
+		 , cluster_code
+		 , cluster_name
+		 , cluster_head_code
+		 , cluster_head_name
+		 , cluster_is_substitute
+		 , region_code
+		 , region_name
+		 , rsm_code
+		 , rsm_name
+		 , rsm_is_substitute
+		 , district_code
+		 , district_name
+		 , dsm_code
+		 , dsm_name
+		 , dsm_is_substitute
+		 , territory_code
+		 , territory_name
+		 , territory_type_name
+		 , client_type
+		 , client_code
+		 , client_name
+		 , province_code
+		 , province_name
+		 , city_code
+		 , city_name
+		 , county_code
+		 , county_name
+		 , final_client_code
+		 , final_client_name
+		 , seller_code
+		 , seller_name                     -- 取自其他表
+		 , mr_name
+		 , mr_code
+		 , mr_is_substitute
+		 , mr_type
+		 , brand_code
+		 , brand_name_en
+		 , product_code
+		 --, b.client_code
+		 , product_name_en
+		 , target_qty
+		 , all_target_qty
+		 , is_supplement
+		 , supplement_flag
+		 , vbp_version
+		 , price_start_date
+		 , price_end_date
+		 , evaluation_price
+		 , sales_date
+		 , actual_price
+		 , sales_original_qty
+		 , sales_original_amount
+		 , sales_qty
+		 , sales_amount
+		 , target_amount
+		 , is_share_terminal
+		 , target_split_ratio
+		 , target_split_rate
+		 , behave_split_ratio
+		 , dsm_split_rate
+		 , is_split_fixed
+		 , fixed_final_split_rate
+		 , final_split_rate
+		 , last_year_share_territory_split_rate
+		 , hospital_level_code
+		 , hospital_level_name
+		 , extend_field_1
+		 , extend_field_2
+		 , extend_field_3
+		 , extend_field_4
+		 , extend_field_5
+		 , extend_field_6
+		 , insert_dt
+		 , insert_user
+		 , update_dt
+		 , update_user
+	)
+	select
+			year
+		 , month
+		 , year_month
+		 , division_code
+		 , market_code
+		 , market_name
+		 , cluster_code
+		 , cluster_name
+		 , cluster_head_code
+		 , cluster_head_name
+		 , cluster_is_substitute
+		 , region_code
+		 , region_name
+		 , rsm_code
+		 , rsm_name
+		 , rsm_is_substitute
+		 , district_code
+		 , district_name
+		 , dsm_code
+		 , dsm_name
+		 , dsm_is_substitute
+		 , territory_code
+		 , territory_name
+		 , territory_type_name
+		 , client_type
+		 , client_code
+		 , client_name
+		 , province_code
+		 , province_name
+		 , city_code
+		 , city_name
+		 , county_code
+		 , county_name
+		 , final_client_code
+		 , final_client_name
+		 , p_seller_code
+		 , partner_name                     -- 取自其他表
+		 , mr_name
+		 , mr_code
+		 , mr_is_substitute
+		 , mr_type
+		 , brand_code
+		 , brand_name_en
+		 , product_code
+		 --, b.client_code
+		 , product_name_en
+		 , target_qty
+		 , all_target_qty
+		 , is_supplement
+		 , supplement_flag
+		 , vbp_version
+		 , price_start_date
+		 , price_end_date
+		 , evaluation_price
+		 , sales_date
+		 , actual_price
+		 , sales_original_qty
+		 , sales_original_amount
+		 , sales_qty
+		 , sales_amount
+		 , target_amount
+		 , is_share_terminal
+		 , target_split_ratio
+		 , target_split_rate
+		 , behave_split_ratio
+		 , dsm_split_rate
+		 , is_split_fixed
+		 , fixed_final_split_rate
+		 , final_split_rate
+		 , last_year_share_territory_split_rate
+		 , hospital_level_code
+		 , hospital_level_name
+		 , extend_field_1
+		 , extend_field_2
+		 , extend_field_3
+		 , extend_field_4
+		 , extend_field_5
+		 , extend_field_6
+		 , getdate()
+		 , 'bayer_cdp_sci'
+		 , getdate()
+		 , 'bayer_cdp_sci'
+	from #sci_data_online_pharmacy_seller_sales_daily;
+
+	create temp table #sci_data_online_pharmacy_seller_sales_monthly as
+	-- 汇总到月
+	select
+			a.year
+		 , a.month
+		 , a.year_month
+		 , a.division_code
+		 , a.market_code
+		 , a.market_name
+		 , a.cluster_code
+		 , a.cluster_name
+		 , a.cluster_head_code
+		 , a.cluster_head_name
+		 , a.cluster_is_substitute
+		 , a.region_code
+		 , a.region_name
+		 , a.rsm_code
+		 , a.rsm_name
+		 , a.rsm_is_substitute
+		 , a.district_code
+		 , a.district_name
+		 , a.dsm_code
+		 , a.dsm_name
+		 , a.dsm_is_substitute
+		 , a.territory_code
+		 , a.territory_name
+		 , a.territory_type_name
+		 , a.client_type
+		 , a.client_code
+		 , a.client_name
+		 , a.province_code
+		 , a.province_name
+		 , a.city_code
+		 , a.city_name
+		 , a.county_code
+		 , a.county_name
+		 , a.final_client_code
+		 , a.final_client_name
+		 , daily.seller_code                       as seller_code
+		 , daily.seller_name                     -- 取自其他表
+		 , a.mr_name
+		 , a.mr_code
+		 , a.mr_is_substitute
+		 , a.mr_type
+		 , a.brand_code
+		 , a.brand_name_en
+		 , a.product_code
+		 , a.product_name_en
+		 , a.target_qty
+		 , a.all_target_qty
+		 , a.is_supplement
+		 , a.supplement_flag
+		 , a.vbp_version
+		 , a.price_start_date
+		 , a.price_end_date
+		 , a.evaluation_price
+		 , NULL::datetime                                                              AS sales_date
+		 , NULL 																	   as actual_price
+		 , NVL(daily.sales_original_qty, 0) 									       AS sales_original_qty
+		 , NVL(daily.sales_original_amount, 0) 										   AS sales_original_amount
+		 , NVL(daily.sales_qty, 0)								                       AS sales_qty
+		 , NVL(daily.sales_amount, 0)								                   AS sales_amount
+		 , a.target_amount
+		 , a.is_share_terminal
+		 , a.target_split_ratio
+		 , NVL(a.target_split_rate, 1)                                                 AS target_split_rate
+		 , a.behave_split_ratio
+		 , a.dsm_split_rate
+		 , a.is_split_fixed
+		 , a.fixed_final_split_rate
+		 , NVL(a.final_split_rate, 1)                                                  AS final_split_rate
+		 , a.last_year_share_territory_split_rate
+		 , a.hospital_level_code
+		 , a.hospital_level_name
+		 , a.extend_field_1
+		 , a.extend_field_2
+		 , a.extend_field_3
+		 , a.extend_field_4
+		 , a.extend_field_5
+		 , a.extend_field_6
+		 , a.insert_dt
+		 , a.insert_user
+		 , a.update_dt
+		 , a.update_user
+	FROM #sci_data_territory_detail_level_target_seller                            a
+    LEFT JOIN
+    (
+        SELECT year_month
+             , territory_code
+             , client_code
+             , product_code
+             , vbp_version
+			 , seller_code
+			 , seller_name
+             , SUM(sales_original_qty)    AS sales_original_qty
+             , SUM(sales_original_amount) AS sales_original_amount
+             , SUM(sales_qty)             AS sales_qty
+             , SUM(sales_amount)          AS sales_amount
+        FROM analytical_sci.sci_data_online_pharmacy_seller_sales_daily
+        GROUP BY year_month
+               , territory_code
+               , client_code
+               , product_code
+               , vbp_version
+			   , seller_code
+			   , seller_name
+    )                                                                                 daily
+        ON a.year_month = daily.year_month
+           AND a.client_code = daily.client_code
+           AND a.territory_code = daily.territory_code
+           AND a.product_code = daily.product_code
+           AND a.vbp_version = daily.vbp_version
+	;
+
+	-- 插入卖方月维度数据
+	truncate table analytical_sci.sci_data_online_pharmacy_seller_sales_monthly;
+	insert into analytical_sci.sci_data_online_pharmacy_seller_sales_monthly(
+				year
+		 , month
+		 , year_month
+		 , division_code
+		 , market_code
+		 , market_name
+		 , cluster_code
+		 , cluster_name
+		 , cluster_head_code
+		 , cluster_head_name
+		 , cluster_is_substitute
+		 , region_code
+		 , region_name
+		 , rsm_code
+		 , rsm_name
+		 , rsm_is_substitute
+		 , district_code
+		 , district_name
+		 , dsm_code
+		 , dsm_name
+		 , dsm_is_substitute
+		 , territory_code
+		 , territory_name
+		 , territory_type_name
+		 , client_type
+		 , client_code
+		 , client_name
+		 , province_code
+		 , province_name
+		 , city_code
+		 , city_name
+		 , county_code
+		 , county_name
+		 , final_client_code
+		 , final_client_name
+		 , seller_code
+		 , seller_name                     -- 取自其他表
+		 , mr_name
+		 , mr_code
+		 , mr_is_substitute
+		 , mr_type
+		 , brand_code
+		 , brand_name_en
+		 , product_code
+		 , product_name_en
+		 , target_qty
+		 , all_target_qty
+		 , is_supplement
+		 , supplement_flag
+		 , vbp_version
+		 , price_start_date
+		 , price_end_date
+		 , evaluation_price
+		 , sales_date
+		 , actual_price
+		 , sales_original_qty
+		 , sales_original_amount
+		 , sales_qty
+		 , sales_amount
+		 , target_amount
+		 , is_share_terminal
+		 , target_split_ratio
+		 , target_split_rate
+		 , behave_split_ratio
+		 , dsm_split_rate
+		 , is_split_fixed
+		 , fixed_final_split_rate
+		 , final_split_rate
+		 , last_year_share_territory_split_rate
+		 , hospital_level_code
+		 , hospital_level_name
+		 , extend_field_1
+		 , extend_field_2
+		 , extend_field_3
+		 , extend_field_4
+		 , extend_field_5
+		 , extend_field_6
+		 , insert_dt
+		 , insert_user
+		 , update_dt
+		 , update_user
+	)
+	select
+			year
+		 , month
+		 , year_month
+		 , division_code
+		 , market_code
+		 , market_name
+		 , cluster_code
+		 , cluster_name
+		 , cluster_head_code
+		 , cluster_head_name
+		 , cluster_is_substitute
+		 , region_code
+		 , region_name
+		 , rsm_code
+		 , rsm_name
+		 , rsm_is_substitute
+		 , district_code
+		 , district_name
+		 , dsm_code
+		 , dsm_name
+		 , dsm_is_substitute
+		 , territory_code
+		 , territory_name
+		 , territory_type_name
+		 , client_type
+		 , client_code
+		 , client_name
+		 , province_code
+		 , province_name
+		 , city_code
+		 , city_name
+		 , county_code
+		 , county_name
+		 , final_client_code
+		 , final_client_name
+		 , seller_code
+		 , seller_name                     -- 取自其他表
+		 , mr_name
+		 , mr_code
+		 , mr_is_substitute
+		 , mr_type
+		 , brand_code
+		 , brand_name_en
+		 , product_code
+		 , product_name_en
+		 , target_qty
+		 , all_target_qty
+		 , is_supplement
+		 , supplement_flag
+		 , vbp_version
+		 , price_start_date
+		 , price_end_date
+		 , evaluation_price
+		 , sales_date
+		 , actual_price
+		 , sales_original_qty
+		 , sales_original_amount
+		 , sales_qty
+		 , sales_amount
+		 , target_amount
+		 , is_share_terminal
+		 , target_split_ratio
+		 , target_split_rate
+		 , behave_split_ratio
+		 , dsm_split_rate
+		 , is_split_fixed
+		 , fixed_final_split_rate
+		 , final_split_rate
+		 , last_year_share_territory_split_rate
+		 , hospital_level_code
+		 , hospital_level_name
+		 , extend_field_1
+		 , extend_field_2
+		 , extend_field_3
+		 , extend_field_4
+		 , extend_field_5
+		 , extend_field_6
+		 , getdate()
+		 , 'bayer_cdp_sci'
+		 , getdate()
+		 , 'bayer_cdp_sci'
+	from #sci_data_online_pharmacy_seller_sales_monthly;
+END;
+$$

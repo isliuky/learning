@@ -1,0 +1,239 @@
+1. in market sales 的数据
+    year_month	p_seller_code
+    202407	PHSDHQ818769
+    202407	PH00076735
+    202408	PHSDHQ818769
+    202408	PH00076735
+    202409	PHSDHQ818769
+    202409	PH00076735
+    202410	PHBJ8782909
+2. 准备配置表
+测试点	start_year_month	end_year_month	market_code	p_seller_code	product_code	province_name	city_name	online_or_offline	limit_method	quantity	is_cal_seller	is_cal_buyer
+选填部分都填	202407		7	PHSDHQ818769	9	广东省	广州市	线上	上限	12	TRUE	TRUE
+选填部分都不填	202407		7	PHSDHQ818769	1						TRUE	TRUE
+除了省份其他都不填, 考核卖方	202407		7	PHSDHQ818769	66	安徽省					TRUE	FALSE
+考核买方和考核卖方都是false	202407		7	PHSDHQ818769	88	河南省					FALSE	FALSE
+数量限制为下限	202407		7	PHSDHQ818769	70	新疆维吾尔自治区	新疆维吾尔自治区直辖县级行政单位	线上	下限	2	TRUE	TRUE
+考核线下	202407		7	PHSDHQ818769	83			线下			TRUE	TRUE
+考核买方	202407		7	PHSDHQ818769	13	河北省	石家庄市	线上			FALSE	TRUE
+
+3. 数据
+   1.
+        select * from analytical_sci.sci_data_in_market_sales
+        where p_seller_code = 'PHSDHQ818769'
+        and product_code = '9'
+        and province_name = '广东省'
+        and city_name = '广州市'
+        and online_or_offline ='线上'
+        and quantity <= 12
+   2.
+        select * from analytical_sci.sci_data_in_market_sales
+        where p_seller_code = 'PHSDHQ818769'
+        and product_code = '1'
+        and year_month >=202407
+   3.
+        select * from analytical_sci.sci_data_in_market_sales
+        where p_seller_code = 'PHSDHQ818769'
+        and product_code = '66'
+        and year_month >=202407
+        and province_name ='安徽省'
+    4.
+        select * from analytical_sci.sci_data_in_market_sales
+        where p_seller_code = 'PHSDHQ818769'
+        and product_code = '70'
+        and year_month >=202407
+        and province_name ='新疆维吾尔自治区'
+        and city_name = '新疆维吾尔自治区直辖县级行政单位'
+        and online_or_offline='线上'
+        and quantity>=2
+    5.
+        select * from analytical_sci.sci_data_in_market_sales
+        where p_seller_code = 'PHSDHQ818769'
+        and product_code = '83'
+        and year_month >=202407
+        and online_or_offline='线下'
+    6.
+        select * from analytical_sci.sci_data_in_market_sales
+        where p_seller_code = 'PHSDHQ818769'
+        and product_code = '13'
+        and year_month >=202407
+        and province_name ='河北省'
+        and city_name = '石家庄市'
+        and online_or_offline='线上'
+4. 验证
+    select count(*) from (
+select * from #sci_data_in_market_sales_online_retail
+        where p_seller_code = 'PHSDHQ818769'
+        and product_code = '9'
+        and province_name = '广东省'
+        and city_name = '广州市'
+        and online_or_offline ='线上'
+        and quantity <= 12
+		union all
+        select * from #sci_data_in_market_sales_online_retail
+        where p_seller_code = 'PHSDHQ818769'
+        and product_code = '1'
+        and year_month >=202407
+		union all
+        select * from #sci_data_in_market_sales_online_retail
+        where p_seller_code = 'PHSDHQ818769'
+        and product_code = '66'
+        and year_month >=202407
+        and province_name ='安徽省'
+		union all
+        select * from #sci_data_in_market_sales_online_retail
+        where p_seller_code = 'PHSDHQ818769'
+        and product_code = '70'
+        and year_month >=202407
+        and province_name ='新疆维吾尔自治区'
+        and city_name = '新疆维吾尔自治区直辖县级行政单位'
+        and online_or_offline='线上'
+        and quantity>=2
+		union all
+        select * from #sci_data_in_market_sales_online_retail
+        where p_seller_code = 'PHSDHQ818769'
+        and product_code = '83'
+        and year_month >=202407
+        and online_or_offline='线下'
+		union all
+        select * from #sci_data_in_market_sales_online_retail
+        where p_seller_code = 'PHSDHQ818769'
+        and product_code = '13'
+        and year_month >=202407
+        and province_name ='河北省'
+        and city_name = '石家庄市'
+        and online_or_offline='线上');
+5. 准备配置表数据
+    INSERT INTO enriched_mttm.sci_data_online_pharmacy_config (
+    start_year_month,
+    end_year_month,
+    market_code,
+    p_seller_code,
+    product_code,
+    province_name,
+    city_name,
+    online_or_offline,
+    limit_method,
+    quantity,
+    is_cal_seller,
+    is_cal_buyer,
+    load_id,
+    insert_dt,
+    insert_user,
+    update_dt,
+    update_user
+) VALUES
+('202407', NULL, '7', 'PHBJ9953264', '1', NULL, NULL, NULL, NULL, NULL, true, true, '20241126113100', NULL, NULL, NULL, NULL),
+('202407', NULL, '7', 'PH00076735', '66', '安徽省', NULL, NULL, NULL, NULL, true, false, '20241126113100', NULL, NULL, NULL, NULL),
+('202407', NULL, '7', 'PHSDHQ818769', '88', '河南省', NULL, NULL, NULL, NULL, false, false, '20241126113100', NULL, NULL, NULL, NULL),
+('202407', NULL, '7', 'PHSDHQ818769', '70', '新疆维吾尔自治区', '新疆维吾尔自治区直辖县级行政单位', '线上', '下限', 2, true, true, '20241126113100', NULL, NULL, NULL, NULL),
+('202407', NULL, '7', 'PHSDHQ818769', '13', '河北省', '石家庄市', '线上', NULL, NULL, false, true, '20241126113100', NULL, NULL, NULL, NULL),
+('202407', NULL, '7', 'PHSDHQ818769', '9', '广东省', '广州市', '线上', '上限', 12, true, true, '20241126113100', NULL, NULL, NULL, NULL),
+('202407', NULL, '1', 'PHSDHQ818769', '83', NULL, NULL, '线下', NULL, NULL, true, true, '20241126113100', NULL, NULL, NULL, NULL),
+('202408', NULL, '7', 'PHSDHQ818769', '9', '江苏省', NULL, '线上', NULL, NULL, true, true, '20241126113100', NULL, NULL, NULL, NULL)
+;
+
+挑选数据
+    select
+    distinct
+    a.year
+    ,a.month
+    ,a.client_code
+    ,a.product_code
+from (
+select
+    year
+    ,month
+    ,market_code
+    ,client_code
+    ,final_client_code
+    ,product_code
+    ,final_split_rate
+from (select
+		b.*
+	from (
+		SELECT
+			distinct
+			start_year_month
+			,nvl(end_year_month, (LEFT(CAST(start_year_month AS VARCHAR), 4) || '12')::INT) as end_year_month
+			,market_code,
+			product_code
+		FROM  enriched_mttm.sci_data_online_pharmacy_config
+		where load_id = (select max(load_id) from enriched_mttm.sci_data_online_pharmacy_config) and is_cal_buyer = 'TRUE' or is_cal_seller = 'TRUE'
+	)a
+	join analytical_sci.sci_data_territory_detail_level_target b on b.year_month between a.start_year_month and a.end_year_month
+	and a.market_code = b.market_code and a.product_code = b.product_code)
+where year_month >= 202407 and product_code in(9,1,66,88,70,83,13) and client_code in(687558,743923,688130,680847,671551,671562,687562,744052,743831,522085,1217)
+) a
+join
+(  SELECT
+            SUM(quantity) AS quantity
+			,  year
+            , month
+            , year_month
+            , sales_date
+            , client_code
+            , product_code
+        FROM (select * from analytical_sci.sci_data_in_market_sales
+        where  product_code in(9,1,66,88,70,83,13)
+       )
+        WHERE sales_date IS NOT NULL AND year_month IN (202407, 202408)
+        GROUP BY year
+            , month
+            , year_month
+            , sales_date
+            , client_code
+            , product_code
+        order by sales_date
+        )b on a.year = b.year and a.month=b.month and a.client_code =b.client_code and a.product_code =b.product_code
+;
+
+7. unload
+
+        unload ('select * from analytical_sci.sci_data_in_market_sales
+where        year_month in(202407,202408,202409)
+    and ((product_code in(1) and client_code in(687558,743923))
+        or(product_code in(9) and client_code in(687555,680847)and((province_name = $$广东省$$and city_name = $$广州市$$ and online_or_offline = $$线上$$ and quantity <=12)
+    or province_name =$$江苏省$$and online_or_offline = $$线上$$))
+        or(product_code in(13) and client_code in(687562,687555)and (province_name = $$河北省$$and city_name = $$石家庄市$$ and online_or_offline = $$线上$$))
+        or(product_code in(66) and client_code in(687562)and (province_name = $$安徽省$$))
+        or(product_code in(70) and client_code in(687555,687562)and(province_name = $$新疆维吾尔自治区$$and city_name = $$新疆维吾尔自治区直辖县级行政单位$$ and online_or_offline = $$线上$$)and quantity >=2)
+        or(product_code in(83) and client_code in(694472,696454,696456,701205)and (online_or_offline = $$线下$$)))
+order by product_code,client_code,month,sales_date;')
+    to 's3://ph-cdp-nprod-dev-cn-north-1/cn_cdp_init/data_output/dim_inventory_offline_distributorlist_2.csv'
+    iam_role 'arn:aws-cn:iam::268754486553:role/ph-cdp-dev-redshift-spectrum'
+    parallel off
+    delimiter ','
+    HEADER;
+
+            unload ('SELECT  year
+    ,month
+    ,market_code
+    ,client_code
+    ,final_client_code
+    ,seller_code
+    ,seller_name
+    ,product_code
+    ,evaluation_price
+    ,sales_date
+    ,actual_price
+    ,sales_qty
+    ,sales_amount
+    ,sales_original_qty
+    ,sales_original_amount
+    ,target_split_rate
+    ,final_split_rate
+FROM analytical_sci.sci_data_online_retail_seller_sales_daily
+where year_month in(202407,202408,202409)
+    and ((product_code in(1) and client_code in(687558,743923))
+        or(product_code in(9) and client_code in(687555,680847))
+        or(product_code in(13) and client_code in(687562,687555))
+        or(product_code in(66) and client_code in(687562))
+        or(product_code in(70) and client_code in(687555,687562))
+        or(product_code in(83) and client_code in(694472,696454,696456,701205)))
+      order by product_code,client_code,sales_date;')
+    to 's3://ph-cdp-nprod-dev-cn-north-1/cn_cdp_init/data_output/sci_data_online_retail_seller_sales_daily.csv'
+    iam_role 'arn:aws-cn:iam::268754486553:role/ph-cdp-dev-redshift-spectrum'
+    parallel off
+    delimiter ','
+    HEADER;

@@ -1,0 +1,132 @@
+CREATE OR REPLACE PROCEDURE model_sci.sp_sci_pharmeyes_monthly_w_special_drug()
+ LANGUAGE plpgsql
+AS $$
+
+BEGIN
+
+SET timezone to 'Asia/Shanghai';
+
+truncate table model_sci.sci_pharmeyes_monthly_w_special_drug;
+
+-- 插入月流向独有的
+insert into model_sci.sci_pharmeyes_monthly_w_special_drug
+(
+    year
+  , month
+  , year_month
+  , record_num
+  , record_type
+  , sales_date
+  , p_seller_code
+  , seller_code
+  , p_buyer_code
+  , buyer_code
+  , raw_buyer_name
+  , raw_product_name
+  , raw_product_unit
+  , file_version
+  , p_product_code
+  , product_code
+  , product_specification
+  , product_unit
+  , batch_num
+  , quantity
+  , unit_price_with_vat
+  , total_amount_with_vat
+  , remark
+  , ddi_or_manual
+  , buyer_property
+  , is_target_terminal
+  , data_type
+  , data_sub_type
+  , version_no
+  , load_id
+  , insert_dt
+  , insert_user
+  , update_dt
+  , update_user
+)
+select a.year
+     , a.month
+     , a.year_month
+     , a.record_num
+     , a.record_type
+     , a.sales_date
+     , a.p_seller_code
+     , a.seller_code
+     , a.p_buyer_code
+     , a.buyer_code
+     , a.raw_buyer_name
+     , a.raw_product_name
+     , a.raw_product_unit
+     , a.file_version
+     , a.p_product_code
+     , a.product_code
+     , a.product_specification
+     , a.product_unit
+     , a.batch_num
+     , a.quantity
+     , a.unit_price_with_vat
+     , a.total_amount_with_vat
+     , a.remark
+     , a.ddi_or_manual
+     , a.buyer_property
+     , a.is_target_terminal
+     , a.data_type
+     , data_sub_type
+     , a.version_no
+     , a.load_id
+     , getdate()       as insert_dt
+     , 'bayer_cdp_sci' as insert_user
+     , getdate()       as update_dt
+     , 'bayer_cdp_sci' as update_user
+from model_sci.sci_data_sales_monthly         a
+    left join model_sci.sci_data_special_drug b
+        on a.year_month = b.year_month
+           and a.buyer_code = b.buyer_code
+           and a.product_code = b.product_code
+where b.year_month is null;
+
+-- 插入特药的
+insert into model_sci.sci_pharmeyes_monthly_w_special_drug
+(
+    year
+  , month
+  , year_month
+  , sales_date
+  , buyer_code
+  , raw_buyer_name
+  , raw_product_name
+  , product_code
+  , quantity
+  , data_type
+  , data_sub_type
+  , version_no
+  , load_id
+  , insert_dt
+  , insert_user
+  , update_dt
+  , update_user
+)
+select year
+     , month
+     , year_month
+     , sales_date
+     , buyer_code
+     , raw_buyer_name
+     , raw_product_name
+     , product_code
+     , quantity
+     , 1               as data_type
+     , 1               as data_sub_type
+     , version_no
+     , load_id
+     , getdate()       as insert_dt
+     , 'bayer_cdp_sci' as insert_user
+     , getdate()       as update_dt
+     , 'bayer_cdp_sci' as update_user
+from model_sci.sci_data_special_drug;
+
+END;
+
+$$

@@ -1,0 +1,121 @@
+CREATE OR REPLACE PROCEDURE analytical_sci.sp_sci_data_in_market_sales()
+ LANGUAGE plpgsql
+AS $$
+
+BEGIN
+
+SET timezone to 'Asia/Shanghai';
+drop table if exists #target_supplement;
+--8. 生成in market salse的逻辑
+select
+    year_month
+    -- ,final_client_code
+    ,client_code
+    ,product_code
+into #target_supplement
+from model_sci.sci_data_territory_target_supplement
+union
+select
+    year_month
+    -- ,final_client_code
+    ,client_code
+    ,product_code
+from model_sci.sci_data_territory_target;
+
+delete from analytical_sci.sci_data_in_market_sales
+where year_month in (
+                        select year_month from model_sci.sci_calculated_year_month
+                    );
+
+insert into analytical_sci.sci_data_in_market_sales
+(
+    year
+  , month
+  , year_month
+  , record_num
+  , record_type
+  , sales_date
+  , p_seller_code
+  , seller_code
+  , p_buyer_code
+  , client_code
+  , final_client_code
+  , raw_buyer_name
+  , raw_product_name
+  , raw_product_unit
+  , file_version
+  , p_product_code
+  , product_code
+  , product_specification
+  , product_unit
+  , batch_num
+  , unit_price_with_vat
+  , total_amount_with_vat
+  , remark
+  , ddi_or_manual
+  , buyer_property
+  , is_target_terminal
+  , quantity
+  , data_type
+  , data_sub_type
+  , version_no
+  , extend_field_1
+  , extend_field_2
+  , extend_field_3
+  , province_name
+  , city_name
+  , online_or_offline
+  , insert_dt
+  , insert_user
+  , update_dt
+  , update_user
+)
+select a.year
+     , a.month
+     , a.year_month
+     , a.record_num
+     , a.record_type
+     , a.sales_date
+     , a.p_seller_code
+     , a.seller_code
+     , a.p_buyer_code
+     , a.client_code
+     , a.final_client_code
+     , a.raw_buyer_name
+     , a.raw_product_name
+     , a.raw_product_unit
+     , a.file_version
+     , a.p_product_code
+     , a.product_code
+     , a.product_specification
+     , a.product_unit
+     , a.batch_num
+     , a.unit_price_with_vat
+     , a.total_amount_with_vat
+     , a.remark
+     , a.ddi_or_manual
+     , a.buyer_property
+     , a.is_target_terminal
+     , a.quantity
+     , a.data_type
+     , a.data_sub_type
+     , a.version_no
+	 , a.extend_field_1
+	 , a.extend_field_2
+	 , a.extend_field_3
+	 , a.province_name
+	 , a.city_name
+	 , a.online_or_offline
+     , getdate()       as insert_dt
+     , 'bayer_cdp_sci' as insert_user
+     , getdate()       as update_dt
+     , 'bayer_cdp_sci' as update_user
+from analytical_sci.sci_pef_in_market_sales a
+    inner join #target_supplement           b
+        on a.year_month = b.year_month
+        --    and a.final_client_code = b.final_client_code
+           and a.client_code = b.client_code
+           and a.product_code = b.product_code;
+END;
+
+$$
