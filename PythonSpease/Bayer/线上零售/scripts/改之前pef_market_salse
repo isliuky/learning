@@ -1,0 +1,258 @@
+CREATE OR REPLACE PROCEDURE analytical_sci.sp_sci_pef_in_market_sales()
+ LANGUAGE plpgsql
+AS $$
+    
+BEGIN
+
+SET timezone to 'Asia/Shanghai';
+
+drop table if exists #sales_month_daily;
+drop table if exists #target_supplement;
+
+--4.合并日月数据到analytical层作为输入  第3步跟日流向union all
+delete from analytical_sci.sci_pef_in_market_sales
+where year_month in (
+                        select distinct year_month from model_sci.sci_calculated_year_month
+                    );
+
+select year
+     , month
+     , year_month
+     , record_num
+     , record_type
+     , sales_date
+     , p_seller_code
+     , seller_code
+     , p_buyer_code
+     , buyer_code           as client_code
+     , raw_buyer_name
+     , raw_product_name
+     , raw_product_unit
+     , file_version
+     , p_product_code
+     , product_code
+     , product_specification
+     , product_unit
+     , batch_num
+     , quantity
+     , unit_price_with_vat
+     , total_amount_with_vat
+     , remark
+     , ddi_or_manual
+     , buyer_property
+     , is_target_terminal
+     , data_type
+     , data_sub_type
+     , version_no
+     , load_id
+     , insert_dt
+     , insert_user
+     , update_dt
+     , update_user
+into #sales_month_daily
+from model_sci.sci_pharmeyes_monthly_w_special_drug
+union all
+select year
+     , month
+     , year_month
+     , record_num
+     , record_type
+     , sales_date
+     , p_seller_code
+     , seller_code
+     , p_buyer_code
+     , buyer_code           as client_code
+     , raw_buyer_name
+     , raw_product_name
+     , raw_product_unit
+     , file_version
+     , p_product_code
+     , product_code
+     , product_specification
+     , product_unit
+     , batch_num
+     , quantity
+     , unit_price_with_vat
+     , total_amount_with_vat
+     , remark
+     , ddi_or_manual
+     , buyer_property
+     , is_target_terminal
+     , data_type
+     , data_sub_type
+     , version_no
+     , load_id
+     , insert_dt
+     , insert_user
+     , update_dt
+     , update_user
+from model_sci.sci_data_sales_daily;
+
+--5. 基于步骤3中的数据和关联关系join,能匹配上的就将data_sub_type 0变为1,3变为4
+insert into analytical_sci.sci_pef_in_market_sales
+(
+    year
+  , month
+  , year_month
+  , record_num
+  , record_type
+  , sales_date
+  , p_seller_code
+  , seller_code
+  , p_buyer_code
+  , client_code
+  , final_client_code
+  , raw_buyer_name
+  , raw_product_name
+  , raw_product_unit
+  , file_version
+  , p_product_code
+  , product_code
+  , product_specification
+  , product_unit
+  , batch_num
+  , unit_price_with_vat
+  , total_amount_with_vat
+  , remark
+  , ddi_or_manual
+  , buyer_property
+  , is_target_terminal
+  , quantity
+  , data_type
+  , data_sub_type
+  , version_no
+  , insert_dt
+  , insert_user
+  , update_dt
+  , update_user
+)
+select a.year
+     , a.month
+     , a.year_month
+     , a.record_num
+     , a.record_type
+     , a.sales_date
+     , a.p_seller_code
+     , a.seller_code
+     , a.p_buyer_code
+     , a.client_code
+     , NVL(b.final_client_code, a.client_code) AS final_client_code
+     , a.raw_buyer_name
+     , a.raw_product_name
+     , a.raw_product_unit
+     , a.file_version
+     , a.p_product_code
+     , a.product_code
+     , a.product_specification
+     , a.product_unit
+     , a.batch_num
+     , a.unit_price_with_vat
+     , a.total_amount_with_vat
+     , a.remark
+     , a.ddi_or_manual
+     , a.buyer_property
+     , a.is_target_terminal
+     , a.quantity
+     , a.data_type
+     , case
+           when b.year_month is not null
+                and a.data_sub_type = 0 then
+               3
+           when b.year_month is not null
+                and a.data_sub_type = 1 then
+               4
+           else
+               a.data_sub_type
+       end         as data_sub_type
+     , a.version_no
+     , getdate()       as insert_dt
+     , 'bayer_cdp_sci' as insert_user
+     , getdate()       as update_dt
+     , 'bayer_cdp_sci' as update_user
+from #sales_month_daily                               a
+    join model_sci.sci_calculated_year_month          c
+        on a.year_month = c.year_month
+    left join model_sci.sci_data_related_relationship b
+        on a.year_month = b.year_month
+           and a.client_code = b.client_code
+           and a.product_code = b.product_code;
+
+--6. 基于上述数据将修正数据 直接insert 进来,并落地analytical
+insert into analytical_sci.sci_pef_in_market_sales
+(
+    year
+  , month
+  , year_month
+  , record_num
+  , record_type
+  , sales_date
+  , p_seller_code
+  , seller_code
+  , p_buyer_code
+  , client_code
+  , final_client_code
+  , raw_buyer_name
+  , raw_product_name
+  , raw_product_unit
+  , file_version
+  , p_product_code
+  , product_code
+  , product_specification
+  , product_unit
+  , batch_num
+  , unit_price_with_vat
+  , total_amount_with_vat
+  , remark
+  , ddi_or_manual
+  , buyer_property
+  , is_target_terminal
+  , quantity
+  , data_type
+  , data_sub_type
+  , version_no
+  , insert_dt
+  , insert_user
+  , update_dt
+  , update_user
+)
+select a.year
+     , a.month
+     , b.year_month
+     , null             as record_num
+     , null             as record_type
+     , sales_date       as sales_date
+     , null             as p_seller_code
+     , null             as seller_code
+     , null             as p_buyer_code
+     , in_code          as client_code
+     , out_code         as final_client_code
+     , null             as raw_buyer_name
+     , null             as raw_product_name
+     , null             as raw_product_unit
+     , null             as file_version
+     , null             as p_product_code
+     , product_code     as product_code
+     , null             as product_specification
+     , null             as product_unit
+     , null             as batch_num
+     , null             as unit_price_with_vat
+     , null             as total_amount_with_vat
+     , null             as remark
+     , null             as ddi_or_manual
+     , null             as buyer_property
+     , null             as is_target_terminal
+     , quantity         as quantity
+     , 2                as data_type
+     , 2                as data_sub_type
+     , a.version_no     as version_no
+     , getdate()        as insert_dt
+     , 'bayer_cdp_sci'  as insert_user
+     , getdate()        as update_dt
+     , 'bayer_cdp_sci'  as update_user
+from model_sci.sci_data_pharmeyes_sales_fix  a
+    join model_sci.sci_calculated_year_month b
+        on a.year_month = b.year_month;
+
+END;
+
+$$

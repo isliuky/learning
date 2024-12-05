@@ -1,0 +1,9 @@
+1. 更改DDL, 添加字段
+    ALTER TABLE analytical_sci.sci_sales_calculation_log_retail
+ADD COLUMN mtm_lastupdatedate__c VARCHAR(34) ENCODE lzo;
+
+    ALTER TABLE analytical_sci.sci_sales_calculation_log
+ADD COLUMN mtm_lastupdatedate__c VARCHAR(34) ENCODE lzo;
+2. 更改SP
+3. 更改view
+4. 测试
