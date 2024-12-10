@@ -1,0 +1,2267 @@
+CREATE OR REPLACE PROCEDURE analytical_sci.sp_analytical_sci_sales_publish_newstruct()
+ LANGUAGE plpgsql
+AS $$
+
+declare p_verion_year_month int;
+
+begin
+
+    SET timezone TO 'Asia/Shanghai';
+
+    p_verion_year_month := (select to_char(getdate(),'yyyymm')::int);
+
+    drop table if exists #sci_sales_publish_after_transfer_vbp_1_ym;
+-- 生成当前看历史的架构临时表
+    -- 根据当前年月从业绩认定调量表中取出架构做为当前年月架构临时表 24
+    select
+        a.year_month
+        ,a.year
+        ,a.month
+        ,a.division
+        ,a.market_code
+        ,a.market_name
+        ,a.cluster_code
+        ,a.cluster_name
+        ,a.cluster_head_code
+        ,a.cluster_head_name
+        ,a.cluster_is_substitute
+        ,a.region_code
+        ,a.region_name
+        ,a.rsm_code
+        ,a.rsm_name
+        ,a.rsm_is_substitute
+        ,a.district_code
+        ,a.district_name
+        ,a.dsm_code
+        ,a.dsm_name
+        ,a.dsm_is_substitute
+        ,a.territory_code
+        ,a.territory_name
+        ,a.territory_type_name
+        ,a.mr_code
+        ,a.mr_name
+        ,a.mr_is_substitute
+        ,a.mr_type
+        ,a.client_type
+        ,a.client_code
+        ,a.client_name
+        ,a.province_code
+        ,a.province_name
+        ,a.city_code
+        ,a.city_name
+        ,a.county_code
+        ,a.county_name
+        ,a.final_client_code
+        ,a.final_client_name
+        ,a.brand_code
+        ,a.brand_name_en
+        ,a.product_code
+        ,a.product_name_en
+        ,a.supplement_flag
+        ,a.is_share_terminal
+        ,a.target_split_rate
+        ,a.final_split_rate
+        ,a.medical_institution_level_name
+        ,a.medical_institution_level_code
+        ,a.last_year_share_territory_split_rate
+        ,a.extend_field_1
+        ,a.extend_field_2
+        ,a.extend_field_3
+        ,a.extend_field_4
+        ,a.extend_field_5
+        ,a.extend_field_6
+        ,a.target_qty
+        ,a.evaluation_price
+        ,a.sales_qty
+        ,a.is_supplement
+        ,a.vbp_version
+    into #sci_sales_publish_after_transfer_vbp_1_ym
+    from
+    (
+        select
+            a.year_month
+            ,a.year
+            ,a.month
+            ,a.division
+            ,a.market_code
+            ,a.market_name
+            ,a.cluster_code
+            ,a.cluster_name
+            ,a.cluster_head_code
+            ,a.cluster_head_name
+            ,a.cluster_is_substitute
+            ,a.region_code
+            ,a.region_name
+            ,a.rsm_code
+            ,a.rsm_name
+            ,a.rsm_is_substitute
+            ,a.district_code
+            ,a.district_name
+            ,a.dsm_code
+            ,a.dsm_name
+            ,a.dsm_is_substitute
+            ,a.territory_code
+            ,a.territory_name
+            ,a.territory_type_name
+            ,a.mr_code
+            ,a.mr_name
+            ,a.mr_is_substitute
+            ,a.mr_type
+            ,a.client_type
+            ,a.client_code
+            ,a.client_name
+            ,a.province_code
+            ,a.province_name
+            ,a.city_code
+            ,a.city_name
+            ,a.county_code
+            ,a.county_name
+            ,a.final_client_code
+            ,a.final_client_name
+            ,a.brand_code
+            ,a.brand_name as brand_name_en
+            ,a.product_code
+            ,a.product_name as product_name_en
+            ,a.supplement_flag
+            ,a.is_share_terminal
+            ,a.target_split_rate
+            ,a.final_split_rate
+            ,a.hospital_level_name as medical_institution_level_name
+            ,a.hospital_level_code as medical_institution_level_code
+            ,a.last_split_rate as last_year_share_territory_split_rate
+            ,a.extend_field_1
+            ,a.extend_field_2
+            ,a.extend_field_3
+            ,a.extend_field_4
+            ,a.extend_field_5
+            ,a.extend_field_6
+            ,a.is_supplement
+            ,a.target_qty
+            ,a.evaluation_price
+            ,a.sales_qty
+            ,a.vbp_version
+            ,row_number() over(partition by year_month,client_code,final_client_code,product_code,territory_type_name order by vbp_version desc nulls last) as vbp_rn
+        from analytical_sci.sci_sales_publish_after_transfer a
+        where year_month = p_verion_year_month
+        -- year = date_part(year,getdate())
+        -- and month = date_part(month,getdate())
+        and vbp_version <> '0' -- 指定发生vbp
+    ) a where a.vbp_rn = 1  -- vbp_version =  1 , 2 指定但发生vbp_version 倒序取第一个
+    union all
+    select
+        a.year_month
+        ,a.year
+        ,a.month
+        ,a.division
+        ,a.market_code
+        ,a.market_name
+        ,a.cluster_code
+        ,a.cluster_name
+        ,a.cluster_head_code
+        ,a.cluster_head_name
+        ,a.cluster_is_substitute
+        ,a.region_code
+        ,a.region_name
+        ,a.rsm_code
+        ,a.rsm_name
+        ,a.rsm_is_substitute
+        ,a.district_code
+        ,a.district_name
+        ,a.dsm_code
+        ,a.dsm_name
+        ,a.dsm_is_substitute
+        ,a.territory_code
+        ,a.territory_name
+        ,a.territory_type_name
+        ,a.mr_code
+        ,a.mr_name
+        ,a.mr_is_substitute
+        ,a.mr_type
+        ,a.client_type
+        ,a.client_code
+        ,a.client_name
+        ,a.province_code
+        ,a.province_name
+        ,a.city_code
+        ,a.city_name
+        ,a.county_code
+        ,a.county_name
+        ,a.final_client_code
+        ,a.final_client_name
+        ,a.brand_code
+        ,a.brand_name as brand_name_en
+        ,a.product_code
+        ,a.product_name as product_name_en
+        ,a.supplement_flag
+        ,a.is_share_terminal
+        ,a.target_split_rate
+        ,a.final_split_rate
+        ,a.hospital_level_name as medical_institution_level_name
+        ,a.hospital_level_code as medical_institution_level_code
+        ,a.last_split_rate as last_year_share_territory_split_rate
+        ,a.extend_field_1
+        ,a.extend_field_2
+        ,a.extend_field_3
+        ,a.extend_field_4
+        ,a.extend_field_5
+        ,a.extend_field_6
+        ,a.target_qty
+        ,a.evaluation_price
+        ,a.sales_qty
+        ,a.is_supplement
+        ,a.vbp_version
+    from analytical_sci.sci_sales_publish_after_transfer a
+    where year_month = p_verion_year_month
+    -- year = date_part(year,getdate())
+    -- and month = date_part(month,getdate())
+    and vbp_version = '0'; -- vbp_version = 0 指定未发生vbp
+
+drop table if exists #sci_sales_publish_after_transfer_vbp_5_ym;
+    -- 根据年月copy出历史4年月的架构加当前年月的架构 20 21 22 23 24 当前年his_year = year
+    select
+        a.*,b.his_year,b.his_month,b.his_year_month
+    into #sci_sales_publish_after_transfer_vbp_5_ym
+    from #sci_sales_publish_after_transfer_vbp_1_ym a
+    left join (select distinct year_number as his_year,month_number as his_month,year_month_number as his_year_month from model_sci.date_dimension) b
+    on b.his_year_month between a.year*100+1 and a.year*100+a.month
+    union all
+    select
+        a.*,b.his_year,b.his_month,b.his_year_month
+    from #sci_sales_publish_after_transfer_vbp_1_ym a
+    left join (select distinct year_number as his_year,month_number as his_month,year_month_number as his_year_month from model_sci.date_dimension) b
+    on b.his_year_month between (a.year-4)*100+1 and (a.year-1)*100+12
+    where a.supplement_flag = 'false'
+    union all
+    select
+        a.*,b.his_year,b.his_month,b.his_year_month
+    from #sci_sales_publish_after_transfer_vbp_1_ym a
+    left join (select distinct year_number as his_year,month_number as his_month,year_month_number as his_year_month from model_sci.date_dimension) b
+    on b.his_year_month between (a.year-4)*100+1 and (a.year-2)*100+12
+    where a.supplement_flag = 'true'
+    union all
+    select a.*
+    from
+    (
+        select
+            a.*,b.his_year,b.his_month,b.his_year_month
+        from #sci_sales_publish_after_transfer_vbp_1_ym a
+        left join (select distinct year_number as his_year,month_number as his_month,year_month_number as his_year_month from model_sci.date_dimension) b
+        on b.his_year_month between (a.year-1)*100+1 and (a.year-1)*100+12
+        where a.supplement_flag = 'true'
+    ) a
+    left join model_sci.sci_data_related_relationship b
+    on a.his_year = b.year
+    and a.his_month = b.month
+    and a.client_code = b.client_code
+    and a.product_code = b.product_code
+    and a.final_client_code = b.final_client_code;
+
+     -- KA分区，分KA架构和非KA架构
+    drop table if exists #sci_sales_publish_after_transfer_vbp_5_ym_del_KA;
+    drop table if exists #sci_sales_publish_after_transfer_vbp_5_ym_KA;
+    select a.* into #sci_sales_publish_after_transfer_vbp_5_ym_del_KA from #sci_sales_publish_after_transfer_vbp_5_ym a where upper(territory_type_name) <> 'KA';
+    select a.* into #sci_sales_publish_after_transfer_vbp_5_ym_KA from #sci_sales_publish_after_transfer_vbp_5_ym a where upper(territory_type_name) = 'KA';
+
+------------------ 历史年逻辑 20 21 22 23 --------------------------
+-- partner 需按年月取最新一条数据
+drop table if exists #partner;
+select *
+into #partner
+from (
+    select year,month,partner_code,scise_code,row_number() over(PARTITION by partner_code order by year desc,month desc) as rn
+    from model_sci.sci_data_partners
+) where rn = 1;
+
+    -- 倍通去年全年流向
+drop table if exists #last_year_sales_ym_tm;
+    select a.year,a.month,(a.year*100+a.month) as year_month,b.scise_code as client_code,a.sfe_product_code as product_code,sum(a.quantity) as ym_sales_qty
+    into #last_year_sales_ym_tm
+    from model_sci.sci_data_mapped_sales_supplement a
+    left join #partner b
+    on a.buyer_code = b.partner_code
+    where a.year >= date_part(year,getdate()) - 4
+    group by a.year,a.month,(a.year*100+a.month),b.scise_code,a.sfe_product_code;
+
+    -- 倍通日月流向销量
+drop table if exists #lasy_day_month_sales_ym_tm;
+    select a.year,a.month,(a.year*100+a.month) as year_month,b.scise_code as client_code,a.product_code,sum(quantity) as ym_sales_qty
+    into #lasy_day_month_sales_ym_tm
+    from analytical_sci.sci_pef_in_market_sales a
+    left join #partner b
+    on a.p_buyer_code = b.partner_code
+    where a.year >= date_part(year,getdate()) - 4
+    group by a.year,a.month,(a.year*100+a.month),b.scise_code,a.product_code;
+
+    -- 业绩认定调量表汇总 按year month client_code product_code 汇总销量
+drop table if exists #sales_publish_after_transfer_ym_tm;
+        select year,month,(year*100+month) as year_month,client_code,product_code,sum(sales_qty) as ym_sales_qty
+        into #sales_publish_after_transfer_ym_tm
+        from analytical_sci.sci_sales_publish_after_transfer
+        where territory_type_name <> 'KA' and is_supplement = 'false'
+        and year >= date_part(year,getdate()) - 4
+        group by year,month,(year*100+month),client_code,product_code;
+
+drop table if exists #last_year_sales_ym;
+-- 判断倍通去年全年流向有无数据，有使用倍通去年全年流向，无使用日月流向
+    IF EXISTS (
+        select top 1 * from model_sci.sci_data_mapped_sales_supplement
+        where year = date_part(year,getdate()) - 1
+        )
+     then
+        select *
+        into #last_year_sales_ym
+        from #last_year_sales_ym_tm
+        where year between date_part(year,getdate())-4 and date_part(year,getdate())-1;
+      ELSE
+        select *
+        into #last_year_sales_ym
+        from #last_year_sales_ym_tm
+        where year between date_part(year,getdate())-4 and date_part(year,getdate())-2
+        union all
+        select *
+        from #lasy_day_month_sales_ym_tm
+        where year = date_part(year,getdate())-1;
+    end if;
+
+--从去年架构中提取yearmonth和去年yearmonth的mapping关系，再通过mapping关系将yearmonth加到销量的数据中
+    --提取了今年计算的年月market
+    drop table if exists #this_year_last_year_mapping;
+    select distinct year,month,his_year as last_year,his_month as last_month
+    into #this_year_last_year_mapping
+    from #sci_sales_publish_after_transfer_vbp_5_ym_del_KA
+    ;
+
+    --提取销量中去年的年月和终端
+    drop table if exists #last_year_client;
+    select distinct year,month,client_code
+    into #last_year_client
+    from #last_year_sales_ym_tm
+    union all
+    select distinct year,month,client_code
+    from #sales_publish_after_transfer_ym_tm
+    ;
+
+    --合并去年旧终端与新终端的mapping
+    drop table if exists #last_year_client_mapping;
+    select distinct a.last_year,a.last_month,b.client_code,tm.mapped_to_sfe_code
+    into #last_year_client_mapping
+    from #this_year_last_year_mapping a
+    join #last_year_client b
+    on a.last_year = b.year
+    and a.last_month = b.month
+    left join model_sci.sci_data_terminal tm --关联终端获取以往的终端
+    on a.year = tm.year
+    and a.month = tm.month
+    and b.client_code = tm.terminal_code
+    ;
+
+    -- 匹配上，使用倍通去年全年流向销量  匹配不上使用业绩认定调量实体表的销量 或 匹配不上的同时终端+产品不存在，使用倍通去年全年流向的销量
+    drop table if exists #sci_sales_publish_after_transfer_vbp_5_sales;
+        select a.year,a.month,a.year_month,a.his_year,a.his_month,a.his_year_month,a.market_code,a.territory_code,a.client_code,a.product_code
+        ,case when b.product_code is not null then c.ym_sales_qty else nvl(d.ym_sales_qty,c.ym_sales_qty) end as ym_sales_qty
+        into #sci_sales_publish_after_transfer_vbp_5_sales
+        from #sci_sales_publish_after_transfer_vbp_5_ym_del_KA a
+        left join model_sci.sci_back_tracking_sales_province b
+        on a.his_year_month between b.year_month_start and nvl(b.year_month_end,'299912')
+        and a.market_code = b.market_code
+        and a.territory_type_name = b.territory_type_name
+        and a.province_code = b.province_code
+        and a.product_code = b.product_code
+        and b.is_cvh = 1
+        left join
+        (
+            select year,month,nvl(b.mapped_to_sfe_code,a.client_code) as client_code,a.product_code,sum(ym_sales_qty) as ym_sales_qty
+            from #last_year_sales_ym a
+            left join #last_year_client_mapping b
+            on a.year = b.last_year
+            and a.month = b.last_month
+            and a.client_code = b.client_code
+            group by year,month,nvl(b.mapped_to_sfe_code,a.client_code),a.product_code
+        ) c
+        on a.his_year = c.year
+        and a.his_month = c.month
+        and a.client_code = c.client_code
+        and a.product_code = c.product_code
+        left join
+        (
+            select year,month,nvl(b.mapped_to_sfe_code,a.client_code) as client_code,a.product_code,sum(ym_sales_qty) as ym_sales_qty
+            from #sales_publish_after_transfer_ym_tm a
+            left join #last_year_client_mapping b
+            on a.year = b.last_year
+            and a.month = b.last_month
+            and a.client_code = b.client_code
+            group by year,month,nvl(b.mapped_to_sfe_code,a.client_code),a.product_code
+        ) d
+        on a.his_year = d.year
+        and a.his_month = d.month
+        and a.client_code = d.client_code
+        and a.product_code = d.product_code
+        where a.his_year between date_part(year,getdate())-4 and date_part(year,getdate())-1;  -- 20 21 22 23 当前年销量 = 21 22 23 24 去年销量
+
+    -- 先获取到所有的父终端,再根据获取到的父终端获取所有的子终端，client_code 变成 child_code  （这里是与定制终端拆分匹配上的，需要回更)
+    drop table if exists #sci_sales_publish_after_transfer_vbp_5_sales_split;
+        select a.year_month,a.his_year,a.his_month,a.his_year_month,a.market_code,a.territory_code,a.client_code,a.product_code,b.parent_code,b.f_split_ratio as split_ratio,b.is_cal_return_goods,a.ym_sales_qty
+        into #sci_sales_publish_after_transfer_vbp_5_sales_split
+        from #sci_sales_publish_after_transfer_vbp_5_sales a
+        join -- 更新终端
+        (
+            select a.year,a.month,a.year_month,nvl(b.mapped_to_sfe_code,a.parent_code) as parent_code,a.product_code,a.is_cal_return_goods,sum(a.f_split_ratio) as f_split_ratio
+            from (
+                    select a.year,a.month,(a.year*100+a.month) as year_month,a.parent_code,a.product_code,a.is_cal_return_goods,1-sum(a.split_ratio) as f_split_ratio
+                    from model_sci.sci_data_customer_terminal_split a
+                    group by a.year,a.month,(a.year*100+a.month),a.parent_code,a.product_code,a.is_cal_return_goods
+                ) a
+            left join #last_year_client_mapping b
+            on a.year = b.last_year
+            and a.month = b.last_month
+            and a.parent_code = b.client_code
+            group by a.year,a.month,a.year_month,nvl(b.mapped_to_sfe_code,a.parent_code),a.product_code,a.is_cal_return_goods
+        ) b
+        on a.his_year = b.year
+        and a.his_month = b.month
+        and a.client_code = b.parent_code
+        and a.product_code = b.product_code
+        union all
+        select a.year_month,a.his_year,a.his_month,a.his_year_month,a.market_code,a.territory_code,nvl(b.child_code,a.client_code) as client_code,a.product_code,b.parent_code,b.split_ratio,b.is_cal_return_goods,a.ym_sales_qty
+        from #sci_sales_publish_after_transfer_vbp_5_sales a
+        join
+            (
+                select a.year,a.month,(a.year*100+a.month) as year_month,nvl(b.mapped_to_sfe_code,a.child_code) as child_code,a.product_code,nvl(c.mapped_to_sfe_code,a.parent_code) as parent_code,sum(a.split_ratio) as split_ratio,a.is_cal_return_goods
+                from model_sci.sci_data_customer_terminal_split a
+                left join #last_year_client_mapping b
+                on a.year = b.last_year
+                and a.month = b.last_month
+                and a.child_code = b.client_code
+                left join #last_year_client_mapping c
+                on a.year = c.last_year
+                and a.month = c.last_month
+                and a.parent_code = c.client_code
+                group by a.year,a.month,(a.year*100+a.month) ,nvl(b.mapped_to_sfe_code,a.child_code) ,a.product_code,nvl(c.mapped_to_sfe_code,a.parent_code),a.is_cal_return_goods
+            ) b
+        on a.his_year = b.year
+        and a.his_month = b.month
+        and a.client_code = b.child_code
+        and a.product_code = b.product_code
+        ;
+
+--- 生成当前年销量临时表
+-- 当前月不区分是否补充架构，历史月取非补充架构
+drop table if exists #this_year_sales;
+select year,month,year_month,client_code,product_code,sum(sales_qty) as sales_qty,'业绩认定销量' as flag
+into #this_year_sales
+from analytical_sci.sci_sales_publish_after_transfer
+where territory_type_name <> 'KA'
+and year_month = p_verion_year_month
+group by year,month,year_month,client_code,product_code
+union all
+select year,month,year_month,client_code,product_code,sum(ym_sales_qty) as sales_qty,'日月流向' as flag
+from #lasy_day_month_sales_ym_tm
+where year_month = p_verion_year_month
+group by year,month,year_month,client_code,product_code
+union all
+select year,month,year_month,client_code,product_code,sum(sales_qty) as sales_qty,'业绩认定销量' as flag
+from analytical_sci.sci_sales_publish_after_transfer
+where territory_type_name <> 'KA' and is_supplement = 'false'
+and year_month between (date_part(year,getdate())*100)+1 and p_verion_year_month-1
+group by year,month,year_month,client_code,product_code
+union all
+select year,month,year_month,client_code,product_code,sum(ym_sales_qty) as sales_qty,'日月流向' as flag
+from #lasy_day_month_sales_ym_tm
+where year_month between (date_part(year,getdate())*100)+1 and p_verion_year_month-1
+group by year,month,year_month,client_code,product_code;
+
+    -- 自己跟自己关联判断是否优先取业绩认定
+drop table if exists #this_year_sales_map;
+select a.year,a.month,nvl(b.mapped_to_sfe_code,a.client_code) as client_code,a.product_code,sum(sales_qty) as all_sales_qty
+into #this_year_sales_map
+from (
+    select distinct a.year,a.month,a.client_code,a.product_code,nvl(b.sales_qty,c.sales_qty) as sales_qty from #this_year_sales a
+    left join (select * from #this_year_sales where flag = '业绩认定销量') b
+    on a.year = b.year
+    and a.month = b.month
+    and a.client_code = b.client_code
+    and a.product_code = b.product_code
+    left join (select * from #this_year_sales where flag = '日月流向') c
+    on a.year = c.year
+    and a.month = c.month
+    and a.client_code = c.client_code
+    and a.product_code = c.product_code
+) a
+left join #last_year_client_mapping b    -- 更新终端
+on a.year = b.last_year
+and a.month = b.last_month
+and a.client_code = b.client_code
+group by a.year,a.month,nvl(b.mapped_to_sfe_code,a.client_code),a.product_code;
+
+    -- 当前年销量用
+drop table if exists #this_year_sales_nosplit;
+select distinct a.year_month,a.his_year,a.his_month,a.his_year_month,a.client_code,a.product_code,b.all_sales_qty
+into #this_year_sales_nosplit
+from #sci_sales_publish_after_transfer_vbp_5_ym_del_KA  a
+left join #this_year_sales_map b
+on a.his_year = b.year
+and a.his_month = b.month
+and a.client_code = b.client_code
+and a.product_code = b.product_code
+where a.his_year = date_part(year,getdate());
+
+    -- 定制终端拆分用 （加territory_code ,market_code)
+drop table if exists #this_year_sales_split;
+select a.year_month,a.his_year,a.his_month,a.his_year_month,a.client_code,a.product_code,a.territory_code,a.market_code,b.all_sales_qty
+into #this_year_sales_split
+from #sci_sales_publish_after_transfer_vbp_5_ym_del_KA  a
+left join #this_year_sales_map b
+on a.his_year = b.year
+and a.his_month = b.month
+and a.client_code = b.client_code
+and a.product_code = b.product_code
+where a.his_year = date_part(year,getdate());
+
+    -- 历史年按公式重新计算去年销量分院/总院并挂指标销量
+    drop table if exists #ym_cl_prod_province_sales_split_list_all_last_sales;
+        select
+            a.year_month
+            ,a.his_year
+            ,a.his_month
+            ,a.his_year_month
+            ,a.market_code
+            ,a.territory_code
+            ,a.client_code
+            ,a.product_code
+            ,a.ym_sales_qty
+            ,c.y_real_sales_qty,c.y_last_sales_qty,(a.ym_sales_qty - (c.y_real_sales_qty-c.y_last_sales_qty)::decimal(38,15) * b.split_ratio) as all_last_sales_qty  -- 更新后的历史年共坑销量
+        into #ym_cl_prod_province_sales_split_list_all_last_sales
+        from #sci_sales_publish_after_transfer_vbp_5_sales a -- 23
+        join #sci_sales_publish_after_transfer_vbp_5_sales_split b -- 22
+        on a.his_year = b.his_year+1
+        and a.his_month = b.his_month
+        and a.client_code = b.client_code
+        and a.product_code = b.product_code
+        and a.territory_code = b.territory_code
+        join
+        (
+            select year_month,his_year_month,parent_code,product_code,sum(real_sales_qty) as y_real_sales_qty,sum(ym_last_sales_qty) as y_last_sales_qty
+            from
+            (
+                select
+                    a.year_month,a.his_year,a.his_month,a.his_year_month,b.parent_code,a.product_code
+                    ,a.ym_sales_qty as real_sales_qty,nvl(b.ym_sales_qty,0) as ym_last_sales_qty
+                from #sci_sales_publish_after_transfer_vbp_5_sales a -- 23
+                join #sci_sales_publish_after_transfer_vbp_5_sales_split b -- 22
+                on a.his_year = b.his_year+1
+                and a.his_month = b.his_month
+                and a.client_code = b.client_code
+                and a.product_code = b.product_code
+                and a.territory_code = b.territory_code
+            )
+            group by year_month,his_year_month,parent_code,product_code
+        ) c
+        on a.his_year_month = b.his_year_month
+        and b.parent_code = c.parent_code
+        and a.product_code = b.product_code
+        union all
+        select
+            a.year_month
+            ,b.his_year
+            ,b.his_month
+            ,b.his_year_month
+            ,a.market_code
+            ,a.territory_code
+            ,a.client_code
+            ,a.product_code
+            ,a.all_sales_qty
+            ,c.y_real_sales_qty,c.y_last_sales_qty,(a.all_sales_qty - (c.y_real_sales_qty-c.y_last_sales_qty)::decimal(38,15) * b.split_ratio) as all_last_sales_qty  -- 更新后的历史年共坑销量
+        from #this_year_sales_split a
+        join #sci_sales_publish_after_transfer_vbp_5_sales_split b
+        on a.his_year = b.his_year+1
+        and a.his_month = b.his_month
+        and a.client_code = b.client_code
+        and a.product_code = b.product_code
+        and a.territory_code = b.territory_code
+        left join
+        (
+            select year_month,his_year_month,parent_code,product_code,sum(real_sales_qty) as y_real_sales_qty,sum(ym_last_sales_qty) as y_last_sales_qty
+            from
+            (
+                select
+                    a.year_month,a.his_year,a.his_month,a.his_year_month,a.client_code,b.parent_code,a.product_code
+                    ,a.all_sales_qty as real_sales_qty,nvl(b.ym_sales_qty,0) as ym_last_sales_qty
+                from #this_year_sales_split a
+                join #sci_sales_publish_after_transfer_vbp_5_sales_split b
+                on a.his_year = b.his_year+1
+                and a.his_month = b.his_month
+                and a.client_code = b.client_code
+                and a.product_code = b.product_code
+                and a.territory_code = b.territory_code
+            )
+            group by year_month,his_year_month,parent_code,product_code
+        ) c
+        on a.his_year_month = c.his_year_month
+        and b.parent_code = c.parent_code
+        and a.product_code = c.product_code;
+
+    -- 汇总当前年指标销量 同 扩充年的指标销量
+    drop table if exists #ym_target_qty_1;
+    select a.year,a.month,a.year_month,nvl(b.mapped_to_sfe_code,a.client_code) as client_code,a.product_code,sum(target_qty) as ym_target_qty
+    into #ym_target_qty_1
+    from analytical_sci.sci_sales_publish_after_transfer a
+    left join #last_year_client_mapping b    -- 更新终端
+    on a.year = b.last_year
+    and a.month = b.last_month
+    and a.client_code = b.client_code
+    where a.territory_type_name <> 'KA'
+    and a.year_month between ((date_part(year,getdate())-4)*100)+1 and (date_part(year,getdate())*100)+date_part(month,getdate())
+    group by a.year,a.month,a.year_month,nvl(b.mapped_to_sfe_code,a.client_code),a.product_code
+    ;
+
+-- 往架构上挂销量和指标
+drop table if exists #sci_sales_publish_after_transfer_vbp_5_ym_target;
+    select a.*,
+        d.ym_target_qty as all_target_qty, -- 更新后的当前年共坑指标指标
+        e.ym_target_qty as all_last_target_qty -- 更新后的历史年共坑指标销量
+    into #sci_sales_publish_after_transfer_vbp_5_ym_target
+    from #sci_sales_publish_after_transfer_vbp_5_ym_del_KA a
+    left join #ym_target_qty_1 d
+    on a.his_year = d.year
+    and a.his_month = d.month
+    and a.client_code = d.client_code
+    and a.product_code = d.product_code
+    left join #ym_target_qty_1 e
+    on a.his_year = e.year+1
+    and a.his_month = e.month
+    and a.client_code = e.client_code
+    and a.product_code = e.product_code;
+
+--24当前年补充架构
+drop table if exists #sci_sales_publish_after_transfer_vbp_5_ym_target_all;
+ select a.*,
+    case when a.is_supplement = 'true' then 0
+    else c.all_sales_qty end  as all_sales_qty,
+    case when r.year is null then 0 else nvl(e.all_last_sales_qty,f.ym_sales_qty) end as all_last_sales_qty
+    into #sci_sales_publish_after_transfer_vbp_5_ym_target_all
+    from
+    (select * from #sci_sales_publish_after_transfer_vbp_5_ym_target where his_year=date_part(year,getdate()) and supplement_flag = 'true') a
+    left join #this_year_sales_nosplit c
+    on a.his_year = c.his_year
+    and a.his_month = c.his_month
+    and a.client_code = c.client_code
+    and a.product_code = c.product_code
+    left join #ym_cl_prod_province_sales_split_list_all_last_sales e -- 定制终端拆分结果表
+    on a.his_year = e.his_year+1
+    and a.his_month = e.his_month
+    and a.client_code = e.client_code
+    and a.product_code = e.product_code
+    and a.market_code = e.market_code
+    and a.territory_code = e.territory_code
+    left join #sci_sales_publish_after_transfer_vbp_5_sales f -- 去年销量总表
+    on a.his_year = f.his_year+1
+    and a.his_month = f.his_month
+    and a.client_code = f.client_code
+    and a.product_code = f.product_code
+    and a.market_code = f.market_code
+    and a.territory_code = f.territory_code
+    left join model_sci.sci_data_related_relationship r
+    on a.his_year = r.year+1
+    and a.his_month = r.month
+    and a.client_code = r.client_code
+    and a.product_code = r.product_code
+    and a.final_client_code = r.final_client_code
+    union all
+
+--24当前年非补充架构
+ select a.*,
+    case when a.is_supplement = 'true' then 0
+    else c.all_sales_qty end  as all_sales_qty,
+    nvl(e.all_last_sales_qty,f.ym_sales_qty) as all_last_sales_qty  -- 去年销量：判断有定制终端拆分的优先取，没有的正常取
+    from (select * from #sci_sales_publish_after_transfer_vbp_5_ym_target where his_year=date_part(year,getdate()) and supplement_flag = 'false') a
+    left join #this_year_sales_nosplit c
+    on a.his_year = c.his_year
+    and a.his_month = c.his_month
+    and a.client_code = c.client_code
+    and a.product_code = c.product_code
+    left join #ym_cl_prod_province_sales_split_list_all_last_sales e -- 定制终端拆分结果表
+    on a.his_year = e.his_year+1
+    and a.his_month = e.his_month
+    and a.client_code = e.client_code
+    and a.product_code = e.product_code
+    and a.market_code = e.market_code
+    and a.territory_code = e.territory_code
+    left join #sci_sales_publish_after_transfer_vbp_5_sales f  -- 去年销量总表
+    on a.his_year = f.his_year+1
+    and a.his_month = f.his_month
+    and a.client_code = f.client_code
+    and a.product_code = f.product_code
+    and a.market_code = f.market_code
+    and a.territory_code = f.territory_code
+    union all
+
+-- 22 21 历史年
+   select a.*,
+    d.ym_sales_qty as all_sales_qty,
+    nvl(e.all_last_sales_qty,f.ym_sales_qty) as all_last_sales_qty  -- 去年销量：判断有定制终端拆分的优先取，没有的正常取
+    from
+    (select * from #sci_sales_publish_after_transfer_vbp_5_ym_target where his_year<date_part(year,getdate())-1) a
+    left join #sci_sales_publish_after_transfer_vbp_5_sales d
+    on a.his_year_month = d.his_year_month
+    and a.client_code = d.client_code
+    and a.product_code = d.product_code
+    and a.market_code = d.market_code
+    and a.territory_code = d.territory_code
+    left join #ym_cl_prod_province_sales_split_list_all_last_sales e -- 定制终端拆分结果表
+    on a.his_year = e.his_year+1
+    and a.his_month = e.his_month
+    and a.client_code = e.client_code
+    and a.product_code = e.product_code
+    and a.market_code = e.market_code
+    and a.territory_code = e.territory_code
+    left join #sci_sales_publish_after_transfer_vbp_5_sales f -- 去年销量总表
+    on a.his_year = f.his_year+1
+    and a.his_month = f.his_month
+    and a.client_code = f.client_code
+    and a.product_code = f.product_code
+    and a.market_code = f.market_code
+    and a.territory_code = f.territory_code
+   union all
+
+-- 23  非补充架构
+   select a.*,
+    d.ym_sales_qty as all_sales_qty,
+    nvl(e.all_last_sales_qty,f.ym_sales_qty) as all_last_sales_qty  -- 去年销量：判断有定制终端拆分的优先取，没有的正常取
+    from
+    (select * from #sci_sales_publish_after_transfer_vbp_5_ym_target where his_year=date_part(year,getdate())-1 and supplement_flag = 'false') a
+    left join #sci_sales_publish_after_transfer_vbp_5_sales d
+    on a.his_year_month = d.his_year_month
+    and a.client_code = d.client_code
+    and a.product_code = d.product_code
+    and a.market_code = d.market_code
+    and a.territory_code = d.territory_code
+    left join #ym_cl_prod_province_sales_split_list_all_last_sales e -- 定制终端拆分结果表
+    on a.his_year = e.his_year+1
+    and a.his_month = e.his_month
+    and a.client_code = e.client_code
+    and a.product_code = e.product_code
+    and a.market_code = e.market_code
+    and a.territory_code = e.territory_code
+    left join #sci_sales_publish_after_transfer_vbp_5_sales f -- 去年销量总表
+    on a.his_year = f.his_year+1
+    and a.his_month = f.his_month
+    and a.client_code = f.client_code
+    and a.product_code = f.product_code
+    and a.market_code = f.market_code
+    and a.territory_code = f.territory_code
+   union all
+
+--23 补充架构
+   select a.*,
+    case when r.year is null then 0 else d.ym_sales_qty end as all_sales_qty,
+    nvl(e.all_last_sales_qty,f.ym_sales_qty)  as all_last_sales_qty   -- 去年销量
+    from
+    (select * from #sci_sales_publish_after_transfer_vbp_5_ym_target where his_year=date_part(year,getdate())-1 and supplement_flag = 'true') a
+    left join #sci_sales_publish_after_transfer_vbp_5_sales d
+    on a.his_year_month = d.his_year_month
+    and a.client_code = d.client_code
+    and a.product_code = d.product_code
+    and a.market_code = d.market_code
+    and a.territory_code = d.territory_code
+    left join #ym_cl_prod_province_sales_split_list_all_last_sales e -- 定制终端拆分结果表
+    on a.his_year = e.his_year+1
+    and a.his_month = e.his_month
+    and a.client_code = e.client_code
+    and a.product_code = e.product_code
+    and a.market_code = e.market_code
+    and a.territory_code = e.territory_code
+    left join #sci_sales_publish_after_transfer_vbp_5_sales f -- 去年销量总表
+    on a.his_year = f.his_year+1
+    and a.his_month = f.his_month
+    and a.client_code = f.client_code
+    and a.product_code = f.product_code
+    and a.market_code = f.market_code
+    and a.territory_code = f.territory_code
+    left join model_sci.sci_data_related_relationship r --关联关系
+    on a.his_year = r.year
+    and a.his_month = r.month
+    and a.client_code = r.client_code
+    and a.product_code = r.product_code
+    and a.final_client_code = r.final_client_code;
+
+-- 当前年24 和 历史年 20 21 22 23 分别 计算逻辑 共坑拆分 * 拆分率 然后 统计单价 * 销量 获取金额
+ drop table if exists #sci_sales_publish_after_transfer_vbp_5_ym_all_sales_sp;
+    select -- 当前年 2406 sales_qty last_sales_qty * 2406 price = sales_amount last_sales_amount 2405 sales_qty last_sales_qty * 2405price = sales_amount last_sales_amount
+        a.year_month
+        ,a.year
+        ,a.month
+        ,a.division
+        ,a.market_code
+        ,a.market_name
+        ,a.cluster_code
+        ,a.cluster_name
+        ,a.cluster_head_code
+        ,a.cluster_head_name
+        ,a.cluster_is_substitute
+        ,a.region_code
+        ,a.region_name
+        ,a.rsm_code
+        ,a.rsm_name
+        ,a.rsm_is_substitute
+        ,a.district_code
+        ,a.district_name
+        ,a.dsm_code
+        ,a.dsm_name
+        ,a.dsm_is_substitute
+        ,a.territory_code
+        ,a.territory_name
+        ,a.territory_type_name
+        ,a.mr_code
+        ,a.mr_name
+        ,a.mr_is_substitute
+        ,a.mr_type
+        ,a.vbp_version
+        ,a.client_type
+        ,a.client_code
+        ,a.client_name
+        ,a.province_code
+        ,a.province_name
+        ,a.city_code
+        ,a.city_name
+        ,a.county_code
+        ,a.county_name
+        ,a.final_client_code
+        ,a.final_client_name
+        ,a.brand_code
+        ,a.brand_name_en
+        ,a.product_code
+        ,a.product_name_en
+        ,a.supplement_flag
+        ,a.is_share_terminal
+        ,a.target_split_rate
+        ,a.final_split_rate
+        ,a.medical_institution_level_name
+        ,a.medical_institution_level_code
+        ,a.last_year_share_territory_split_rate
+        ,a.extend_field_1
+        ,a.extend_field_2
+        ,a.extend_field_3
+        ,a.extend_field_4
+        ,a.extend_field_5
+        ,a.extend_field_6
+        ,a.is_supplement
+        ,a.his_year
+        ,a.his_month
+        ,a.his_year_month
+        ,a.all_last_sales_qty
+        ,a.all_last_target_qty
+        ,a.all_sales_qty
+        ,a.all_target_qty
+        ,coalesce(b.price,c.price,d.price,e.price,f.price,g.price) as evaluation_price  -- 指标价格
+        ,coalesce(b.price,c.price,d.price,e.price,f.price,g.price) as last_evaluation_price  -- 指标价格
+        ,a.all_last_target_qty::decimal(38,15) * coalesce(b.price,c.price,d.price,e.price,f.price,g.price) as all_last_target_amount -- 历史共坑指标金额
+        ,a.all_last_sales_qty::decimal(38,15) * coalesce(b.price,c.price,d.price,e.price,f.price,g.price) as all_last_sales_amount --
+        ,a.all_target_qty ::decimal(38,15) * coalesce(b.price,c.price,d.price,e.price,f.price,g.price) as all_target_amount -- 共坑指标金额
+        ,a.all_sales_qty ::decimal(38,15) * coalesce(b.price,c.price,d.price,e.price,f.price,g.price) as all_sales_amount -- 共坑实际销售金额
+    into #sci_sales_publish_after_transfer_vbp_5_ym_all_sales_sp
+    from #sci_sales_publish_after_transfer_vbp_5_ym_target_all a
+    left join model_sci.v_sci_market_city_territory_type_name_product_price b  -- 年月产品城市辖区market
+    on  a.city_code = b.city_code
+    and a.territory_type_name = b.territory_type_name
+    and a.market_code = b.market_code
+    and a.product_code = b.product_code
+    and a.his_year = b.year
+    and a.his_month = b.month
+    and b.price_type = 2
+    left join model_sci.v_sci_market_province_territory_type_name_product_price c  -- 年月产品省份辖区market
+    on  a.province_code = c.province_code
+    and a.territory_type_name = c.territory_type_name
+    and a.market_code = c.market_code
+    and a.product_code = c.product_code
+    and a.his_year = c.year
+    and a.his_month = c.month
+    and c.price_type = 2
+    left join model_sci.v_sci_market_city_product_price d  -- 年月产品城市market
+    on  a.city_code = d.city_code
+    and a.market_code = d.market_code
+    and a.product_code = d.product_code
+    and a.his_year = d.year
+    and a.his_month = d.month
+    and d.price_type = 2
+    left join model_sci.v_sci_market_province_product_price e  -- 年月产品省份market
+    on  a.province_code = e.province_code
+    and a.market_code = e.market_code
+    and a.product_code = e.product_code
+    and a.his_year = e.year
+    and a.his_month = e.month
+    and e.price_type = 2
+    left join model_sci.v_sci_market_product_price f  -- 年月产品market
+    on  a.market_code = f.market_code
+    and a.product_code = f.product_code
+    and a.his_year = f.year
+    and a.his_month = f.month
+    and f.price_type = 2
+    left join model_sci.v_sci_product_price g  -- 年月产品
+    on  a.product_code = g.product_code
+    and a.his_year = g.year
+    and a.his_month = g.month
+    and g.price_type = 2
+    where a.his_year = date_part(year,getdate())
+    union all
+    select -- 历史年 2306 sales_qty last_sales_qty * 2401 price = sales_amount last_sales_amount
+        a.year_month
+        ,a.year
+        ,a.month
+        ,a.division
+        ,a.market_code
+        ,a.market_name
+        ,a.cluster_code
+        ,a.cluster_name
+        ,a.cluster_head_code
+        ,a.cluster_head_name
+        ,a.cluster_is_substitute
+        ,a.region_code
+        ,a.region_name
+        ,a.rsm_code
+        ,a.rsm_name
+        ,a.rsm_is_substitute
+        ,a.district_code
+        ,a.district_name
+        ,a.dsm_code
+        ,a.dsm_name
+        ,a.dsm_is_substitute
+        ,a.territory_code
+        ,a.territory_name
+        ,a.territory_type_name
+        ,a.mr_code
+        ,a.mr_name
+        ,a.mr_is_substitute
+        ,a.mr_type
+        ,a.vbp_version
+        ,a.client_type
+        ,a.client_code
+        ,a.client_name
+        ,a.province_code
+        ,a.province_name
+        ,a.city_code
+        ,a.city_name
+        ,a.county_code
+        ,a.county_name
+        ,a.final_client_code
+        ,a.final_client_name
+        ,a.brand_code
+        ,a.brand_name_en
+        ,a.product_code
+        ,a.product_name_en
+        ,a.supplement_flag
+        ,a.is_share_terminal
+        ,a.target_split_rate
+        ,a.final_split_rate
+        ,a.medical_institution_level_name
+        ,a.medical_institution_level_code
+        ,a.last_year_share_territory_split_rate
+        ,a.extend_field_1
+        ,a.extend_field_2
+        ,a.extend_field_3
+        ,a.extend_field_4
+        ,a.extend_field_5
+        ,a.extend_field_6
+        ,a.is_supplement
+        ,a.his_year
+        ,a.his_month
+        ,a.his_year_month
+        ,a.all_last_sales_qty
+        ,a.all_last_target_qty
+        ,a.all_sales_qty
+        ,a.all_target_qty
+        ,coalesce(b.price,c.price,d.price,e.price,f.price,g.price) as evaluation_price  -- 指标价格
+        ,coalesce(b.price,c.price,d.price,e.price,f.price,g.price) as last_evaluation_price  -- 指标价格
+        ,a.all_last_target_qty::decimal(38,15) * coalesce(b.price,c.price,d.price,e.price,f.price,g.price) as all_last_target_amount -- 历史共坑指标金额
+        ,a.all_last_sales_qty::decimal(38,15) * coalesce(b.price,c.price,d.price,e.price,f.price,g.price) as all_last_sales_amount --
+        ,a.all_target_qty ::decimal(38,15) * coalesce(b.price,c.price,d.price,e.price,f.price,g.price) as all_target_amount -- 共坑指标金额
+        ,a.all_sales_qty ::decimal(38,15) * coalesce(b.price,c.price,d.price,e.price,f.price,g.price) as all_sales_amount -- 共坑实际销售金额
+    from #sci_sales_publish_after_transfer_vbp_5_ym_target_all a
+    left join model_sci.v_sci_market_city_territory_type_name_product_price b  -- 年月产品城市辖区market
+    on  a.city_code = b.city_code
+    and a.territory_type_name = b.territory_type_name
+    and a.market_code = b.market_code
+    and a.product_code = b.product_code
+    and b.price_type = 2
+    and b.year*100+b.month = date_part(year,getdate())*100+1
+    left join model_sci.v_sci_market_province_territory_type_name_product_price c  -- 年月产品省份辖区market
+    on  a.province_code = c.province_code
+    and a.territory_type_name = c.territory_type_name
+    and a.market_code = c.market_code
+    and a.product_code = c.product_code
+    and c.price_type = 2
+    and c.year*100+c.month = date_part(year,getdate())*100+1
+    left join model_sci.v_sci_market_city_product_price d  -- 年月产品城市market
+    on  a.city_code = d.city_code
+    and a.market_code = d.market_code
+    and a.product_code = d.product_code
+    and d.price_type = 2
+    and d.year*100+d.month = date_part(year,getdate())*100+1
+    left join model_sci.v_sci_market_province_product_price e  -- 年月产品省份market
+    on  a.province_code = e.province_code
+    and a.market_code = e.market_code
+    and a.product_code = e.product_code
+    and e.price_type = 2
+    and e.year*100+e.month = date_part(year,getdate())*100+1
+    left join model_sci.v_sci_market_product_price f  -- 年月产品market
+    on  a.market_code = f.market_code
+    and a.product_code = f.product_code
+    and f.price_type = 2
+    and f.year*100+f.month = date_part(year,getdate())*100+1
+    left join model_sci.v_sci_product_price g  -- 年月产品
+    on  a.product_code = g.product_code
+    and g.price_type = 2
+    and g.year*100+g.month = date_part(year,getdate())*100+1
+    where a.his_year < date_part(year,getdate());
+
+-- 处理 全年平均 全年指标数量，全年指标金额
+ drop table if exists #sci_sales_publish_after_transfer_vbp_5_ym_all_sales_sp_last_avg;
+    select
+        a.year_month
+        ,a.year
+        ,a.month
+        ,a.his_year
+        ,a.his_month
+        ,a.his_year_month
+        ,a.division as division_code
+        ,a.market_code
+        ,a.market_name
+        ,a.cluster_code
+        ,a.cluster_name
+        ,a.cluster_head_code
+        ,a.cluster_head_name
+        ,a.cluster_is_substitute
+        ,a.region_code
+        ,a.region_name
+        ,a.rsm_code
+        ,a.rsm_name
+        ,a.rsm_is_substitute
+        ,a.district_code
+        ,a.district_name
+        ,a.dsm_code
+        ,a.dsm_name
+        ,a.dsm_is_substitute
+        ,a.territory_code
+        ,a.territory_name
+        ,a.territory_type_name
+        ,a.mr_code
+        ,a.mr_name
+        ,a.mr_is_substitute
+        ,a.mr_type
+        ,a.client_type
+        ,a.client_code
+        ,a.client_name
+        ,a.province_code
+        ,a.province_name
+        ,a.city_code
+        ,a.city_name
+        ,a.county_code
+        ,a.county_name
+        ,a.final_client_code
+        ,a.final_client_name
+        ,a.brand_code
+        ,a.brand_name_en
+        ,a.product_code
+        ,a.product_name_en
+        ,a.supplement_flag
+        ,a.is_share_terminal
+        ,a.target_split_rate
+        ,a.final_split_rate
+        ,a.medical_institution_level_name
+        ,a.medical_institution_level_code
+        ,a.last_year_share_territory_split_rate
+        ,a.extend_field_1
+        ,a.extend_field_2
+        ,a.extend_field_3
+        ,a.extend_field_4
+        ,a.extend_field_5
+        ,a.extend_field_6
+        ,a.all_last_sales_qty
+        ,a.all_last_target_qty
+        ,a.all_sales_qty
+        ,a.all_target_qty
+        ,a.evaluation_price  -- 当前年指标价格
+        ,a.all_target_amount -- 共坑指标金额
+        ,a.all_sales_amount -- 共坑实际销售金额
+        ,a.last_evaluation_price  -- 历史年指标价格
+        ,a.all_last_target_amount -- 历史共坑指标金额
+        ,a.all_last_sales_amount -- 历史共坑销量金额
+        ,c.avg_all_last_target_qty -- 去年共坑平均指标数量
+        ,c.avg_all_last_target_amount -- 去年共坑平均指标金额
+        ,c.avg_all_last_sales_qty -- 去年共坑平均销量
+        ,c.avg_all_last_sales_amount -- 去年共坑平均销量金额
+        ,a.target_split_rate as last_split_rate
+        ,c.all_last_yearly_target_qty -- 去年共坑全年指标数量
+        ,c.all_last_yearly_target_amount -- 去年共坑全年指标金额
+        ,c.all_last_yearly_sales_qty -- 去年共坑全年销量
+        ,c.all_last_yearly_sales_amount -- 去年共坑全年销售金额
+        ,a.is_supplement
+    into #sci_sales_publish_after_transfer_vbp_5_ym_all_sales_sp_last_avg
+    from #sci_sales_publish_after_transfer_vbp_5_ym_all_sales_sp a
+    left join
+    (
+        select
+            year,his_year,client_code,product_code,vbp_version,territory_code
+            ,sum(all_target_qty) as all_last_yearly_target_qty -- 去年共坑全年指标数量
+            ,sum(all_target_amount::decimal(38,15)) as all_last_yearly_target_amount -- 去年共坑全年指标金额
+            ,sum(all_sales_qty::decimal(38,15)) as all_last_yearly_sales_qty -- 去年共坑全年销量
+            ,sum(all_sales_amount::decimal(38,15)) as all_last_yearly_sales_amount -- 去年全年共坑销量金额
+            ,sum(all_target_qty)/12 as avg_all_last_target_qty -- 去年共坑平均指标数量
+            ,sum(all_target_amount::decimal(38,15))/12 as avg_all_last_target_amount -- 去年共坑平均指标金额
+            ,sum(all_sales_qty::decimal(38,15))/12 as avg_all_last_sales_qty -- 去年共坑平均销量
+            ,sum(all_sales_amount::decimal(38,15))/12 as avg_all_last_sales_amount -- 去年共坑平均销量金额
+        from #sci_sales_publish_after_transfer_vbp_5_ym_all_sales_sp
+        group by year,his_year,client_code,product_code,vbp_version,territory_code
+    ) c
+    on a.year = c.year
+    and a.his_year = c.his_year+1
+    and a.territory_code = c.territory_code
+    and a.vbp_version = c.vbp_version
+    and a.client_code = c.client_code
+    and a.product_code = c.product_code;
+
+-- 历史年月处理
+    drop table if exists #sci_sales_publish_after_transfer_vbp_5_ym_all_sales_fur;
+    select
+        a.his_year as year
+        ,a.his_month as month
+        ,a.his_year_month as year_month
+        ,a.division_code
+        ,a.market_code
+        ,a.market_name
+        ,a.cluster_code
+        ,a.cluster_name
+        ,a.cluster_head_code
+        ,a.cluster_head_name
+        ,a.cluster_is_substitute
+        ,a.region_code
+        ,a.region_name
+        ,a.rsm_code
+        ,a.rsm_name
+        ,a.rsm_is_substitute
+        ,a.district_code
+        ,a.district_name
+        ,a.dsm_code
+        ,a.dsm_name
+        ,a.dsm_is_substitute
+        ,a.territory_code
+        ,a.territory_name
+        ,a.territory_type_name
+        ,a.client_type
+        ,a.client_code
+        ,a.client_name
+        ,a.province_code
+        ,a.province_name
+        ,a.city_code
+        ,a.city_name
+        ,a.county_code
+        ,a.county_name
+        ,a.final_client_code
+        ,a.final_client_name
+        ,a.mr_name
+        ,a.mr_code
+        ,a.mr_is_substitute
+        ,a.mr_type
+        ,a.brand_code
+        ,a.brand_name_en
+        ,a.product_code
+        ,a.product_name_en
+        ,a.supplement_flag
+        ,a.is_share_terminal
+        ,a.target_split_rate
+        ,a.final_split_rate
+        ,(a.all_last_yearly_target_qty::decimal(38,12) * a.target_split_rate::decimal(38,12))::decimal(38,15)  as last_yearly_target_qty
+        ,(a.all_last_yearly_target_amount::decimal(38,12) * a.target_split_rate::decimal(38,12))::decimal(38,15) as last_yearly_target_amount
+        ,a.all_last_yearly_target_qty
+        ,a.all_last_yearly_target_amount
+        ,(a.all_last_yearly_sales_qty::decimal(38,12) * a.target_split_rate::decimal(38,12))::decimal(38,15)  as last_yearly_sales_qty
+        ,(a.all_last_yearly_sales_amount::decimal(38,12) * a.target_split_rate::decimal(38,12))::decimal(38,15)  as last_yearly_sales_amount
+        ,a.all_last_yearly_sales_qty
+        ,a.all_last_yearly_sales_amount
+        ,a.medical_institution_level_name
+        ,a.medical_institution_level_code
+        ,a.last_year_share_territory_split_rate
+        ,case
+        -- when a.his_year = date_part(year,getdate()) and a.is_supplement = 'true' then 0  -- 20241031 业务修改不用置0
+        when a.his_year = date_part(year,getdate()) then (a.all_target_qty::decimal(38,12) * a.final_split_rate::decimal(38,12))::decimal(38,15)
+        when a.his_year < date_part(year,getdate()) then (a.all_target_qty::decimal(38,12) * a.target_split_rate::decimal(38,12))::decimal(38,15) else 0 end as target_qty -- 共坑拆分指标销量
+        ,(a.all_sales_qty::decimal(38,12) * a.final_split_rate::decimal(38,12))::decimal(38,15) as sales_qty -- 共坑拆分销量
+        ,a.all_last_sales_qty::decimal(38,15) as all_last_sales_qty -- 历史年共坑拆分销量
+        ,a.all_last_target_qty::decimal(38,15) as all_last_target_qty -- 历史年共坑拆分指标销量
+        ,a.all_sales_qty
+        ,a.all_target_qty
+        ,a.evaluation_price  -- 当前年指标价格
+        ,(a.all_target_amount::decimal(38,12) * a.final_split_rate::decimal(38,12))::decimal(38,15) as target_amount -- 指标金额
+        ,a.all_target_amount -- 共坑指标金额
+        ,(a.all_sales_amount::decimal(38,12) * a.final_split_rate::decimal(38,12))::decimal(38,15) as sales_amount -- 实际销售金额
+        ,a.all_sales_amount -- 共坑实际销售金额
+        ,(a.all_last_target_qty::decimal(38,12) * a.target_split_rate::decimal(38,12))::decimal(38,15) as last_target_qty -- 历史年共坑拆分指标销量
+        ,(a.all_last_sales_qty::decimal(38,12)  * a.target_split_rate::decimal(38,12))::decimal(38,15) as last_sales_qty -- 历史年共坑拆分销量
+        ,a.last_evaluation_price  -- 历史年指标价格
+        ,(a.all_last_target_amount::decimal(38,12) * a.target_split_rate::decimal(38,12))::decimal(38,15) as last_target_amount -- 历史指标金额
+        ,a.all_last_target_amount -- 历史共坑指标金额
+        ,(a.all_last_sales_amount::decimal(38,12) * a.target_split_rate::decimal(38,12))::decimal(38,15) as last_sales_amount -- 历史销量金额
+        ,a.all_last_sales_amount -- 历史共坑销量金额
+        ,(a.avg_all_last_target_qty::decimal(38,12) * a.target_split_rate::decimal(38,12))::decimal(38,15) as avg_last_target_qty  -- 历史年平均指标数量
+        ,(a.avg_all_last_target_amount::decimal(38,12) * a.target_split_rate::decimal(38,12))::decimal(38,15) as avg_last_target_amount -- 历史年平均指标金额
+        ,a.avg_all_last_target_qty -- 历史年共坑平均指标数量
+        ,a.avg_all_last_target_amount -- 历史年共坑平均指标金额
+        ,(a.avg_all_last_sales_qty::decimal(38,12) * a.target_split_rate::decimal(38,12))::decimal(38,15) as avg_last_sales_qty -- 历史年平均销量
+        ,(a.avg_all_last_sales_amount::decimal(38,12) * a.target_split_rate::decimal(38,12))::decimal(38,15) as avg_last_sales_amount -- 历史年平均销量金额
+        ,a.avg_all_last_sales_qty -- 历史年共坑平均销量
+        ,a.avg_all_last_sales_amount -- 历史年共坑平均销量金额
+        ,b.yearly_target_qty -- 全年指标数量
+        ,case when a.his_year = date_part(year,getdate()) then (b.yearly_target_qty::decimal(38,12) * a.evaluation_price::decimal(38,12))::decimal(38,15)
+        else  (b.yearly_target_qty::decimal(38,12) * a.last_evaluation_price::decimal(38,12))::decimal(38,15) end as yearly_target_amount -- 全年指标金额
+        ,a.last_split_rate
+    into #sci_sales_publish_after_transfer_vbp_5_ym_all_sales_fur
+    from #sci_sales_publish_after_transfer_vbp_5_ym_all_sales_sp_last_avg a
+    left join
+    (
+        select year,his_year,territory_code,client_code,product_code,yearly_target_qty
+        from
+        (
+            select year,his_year,territory_code,client_code,product_code,sum(
+                case
+                -- when a.his_year = date_part(year,getdate()) and a.is_supplement = 'true' then 0  -- 20241031 业务修改不用置0
+        when a.his_year = date_part(year,getdate()) then (a.all_target_qty::decimal(38,12) * a.final_split_rate::decimal(38,12))::decimal(38,15)
+        when a.his_year < date_part(year,getdate()) then (a.all_target_qty::decimal(38,12) * a.target_split_rate::decimal(38,12))::decimal(38,15) else 0 end) as yearly_target_qty
+            from #sci_sales_publish_after_transfer_vbp_5_ym_all_sales_sp a
+            group by year,his_year,territory_code,client_code,product_code
+        )
+    ) b
+    on a.year = b.year
+    and a.his_year = b.his_year
+    and a.territory_code = b.territory_code
+    and a.client_code = b.client_code
+    and a.product_code = b.product_code
+    ;
+
+    drop table if exists #sci_sales_publish_after_transfer_vbp_5_ym_KA_fur;
+    -- KA架构挂非KA汇总KPI字段
+    select
+         a.his_year as year
+        ,a.his_month as month
+        ,a.his_year_month as year_month
+        ,a.division as division_code
+        ,a.market_code
+        ,a.market_name
+        ,a.cluster_code
+        ,a.cluster_name
+        ,a.cluster_head_code
+        ,a.cluster_head_name
+        ,a.cluster_is_substitute
+        ,a.region_code
+        ,a.region_name
+        ,a.rsm_code
+        ,a.rsm_name
+        ,a.rsm_is_substitute
+        ,a.district_code
+        ,a.district_name
+        ,a.dsm_code
+        ,a.dsm_name
+        ,a.dsm_is_substitute
+        ,a.territory_code
+        ,a.territory_name
+        ,a.territory_type_name
+        ,a.mr_code
+        ,a.mr_name
+        ,a.mr_is_substitute
+        ,a.mr_type
+        ,a.client_type
+        ,a.client_code
+        ,a.client_name
+        ,a.province_code
+        ,a.province_name
+        ,a.city_code
+        ,a.city_name
+        ,a.county_code
+        ,a.county_name
+        ,a.final_client_code
+        ,a.final_client_name
+        ,a.brand_code
+        ,a.brand_name_en
+        ,a.product_code
+        ,a.product_name_en
+        ,a.supplement_flag
+        ,a.evaluation_price
+        ,nvl(b.target_qty,0) as target_qty
+        ,nvl(b.target_amount,0) as target_amount
+        ,nvl(b.all_target_qty,0) as all_target_qty
+        ,nvl(b.all_target_amount,0) as all_target_amount
+        ,nvl(b.yearly_target_qty,0) as yearly_target_qty
+        ,nvl(b.yearly_target_amount,0) as yearly_target_amount
+        ,nvl(b.sales_qty,0) as sales_qty
+        ,nvl(b.sales_amount,0) as sales_amount
+        ,nvl(b.all_sales_qty,0) as all_sales_qty
+        ,nvl(b.all_sales_amount,0) as all_sales_amount
+        ,a.is_share_terminal
+        ,a.target_split_rate
+        ,a.final_split_rate
+        ,a.target_split_rate as last_split_rate
+        ,null::int as last_evaluation_price
+        ,nvl(b.last_target_qty,0) as last_target_qty
+        ,nvl(b.last_target_amount,0) as last_target_amount
+        ,nvl(b.all_last_target_qty,0) as all_last_target_qty
+        ,nvl(b.all_last_target_amount,0) as all_last_target_amount
+        ,nvl(b.last_sales_qty,0) as last_sales_qty
+        ,nvl(b.last_sales_amount,0) as last_sales_amount
+        ,nvl(b.all_last_sales_qty,0) as all_last_sales_qty
+        ,nvl(b.all_last_sales_amount,0) as all_last_sales_amount
+        ,nvl(b.avg_last_target_qty,0) as avg_last_target_qty
+        ,nvl(b.avg_last_target_amount,0) as avg_last_target_amount
+        ,nvl(b.avg_all_last_target_qty,0) as avg_all_last_target_qty
+        ,nvl(b.avg_all_last_target_amount,0) as avg_all_last_target_amount
+        ,nvl(b.avg_last_sales_qty,0) as avg_last_sales_qty
+        ,nvl(b.avg_last_sales_amount,0) as avg_last_sales_amount
+        ,nvl(b.avg_all_last_sales_qty,0) as avg_all_last_sales_qty
+        ,nvl(b.avg_all_last_sales_amount,0) as avg_all_last_sales_amount
+        ,b.last_yearly_target_qty
+        ,b.last_yearly_target_amount
+        ,b.all_last_yearly_target_qty
+        ,b.all_last_yearly_target_amount
+        ,b.last_yearly_sales_qty
+        ,b.last_yearly_sales_amount
+        ,b.all_last_yearly_sales_qty
+        ,b.all_last_yearly_sales_amount
+        ,a.medical_institution_level_name
+        ,a.medical_institution_level_code
+        ,a.last_year_share_territory_split_rate
+        ,a.extend_field_1
+        ,a.extend_field_2
+        ,a.extend_field_3
+        ,a.extend_field_4
+        ,a.extend_field_5
+        ,a.extend_field_6
+    into #sci_sales_publish_after_transfer_vbp_5_ym_KA_fur
+    from #sci_sales_publish_after_transfer_vbp_5_ym_KA a
+    left join
+    (
+        select year,month,client_code,product_code
+            ,sum(target_qty::decimal(38,15))                    as target_qty
+            ,sum(target_amount::decimal(38,15))                 as target_amount
+            ,sum(all_target_qty::decimal(38,15))                as all_target_qty
+            ,sum(all_target_amount::decimal(38,15))             as all_target_amount
+            ,sum(yearly_target_qty::decimal(38,15))             as yearly_target_qty
+            ,sum(yearly_target_amount::decimal(38,15))          as yearly_target_amount
+            ,sum(sales_qty::decimal(38,15))                     as sales_qty
+            ,sum(sales_amount::decimal(38,15))                  as sales_amount
+            ,sum(all_sales_qty::decimal(38,15))                 as all_sales_qty
+            ,sum(all_sales_amount::decimal(38,15))              as all_sales_amount
+            ,sum(last_evaluation_price::decimal(38,15))         as last_evaluation_price
+            ,sum(last_target_qty::decimal(38,15))               as last_target_qty
+            ,sum(last_target_amount::decimal(38,15))            as last_target_amount
+            ,sum(all_last_target_qty::decimal(38,15))           as all_last_target_qty
+            ,sum(all_last_target_amount::decimal(38,15))        as all_last_target_amount
+            ,sum(last_sales_qty::decimal(38,15))                as last_sales_qty
+            ,sum(last_sales_amount::decimal(38,15))             as last_sales_amount
+            ,sum(all_last_sales_qty::decimal(38,15))            as all_last_sales_qty
+            ,sum(all_last_sales_amount::decimal(38,15))         as all_last_sales_amount
+            ,sum(avg_last_target_qty::decimal(38,15))           as avg_last_target_qty
+            ,sum(avg_last_target_amount::decimal(38,15))        as avg_last_target_amount
+            ,sum(avg_all_last_target_qty::decimal(38,15))       as avg_all_last_target_qty
+            ,sum(avg_all_last_target_amount::decimal(38,15))    as avg_all_last_target_amount
+            ,sum(avg_last_sales_qty::decimal(38,15))            as avg_last_sales_qty
+            ,sum(avg_last_sales_amount::decimal(38,15))         as avg_last_sales_amount
+            ,sum(avg_all_last_sales_qty::decimal(38,15))        as avg_all_last_sales_qty
+            ,sum(avg_all_last_sales_amount::decimal(38,15))     as avg_all_last_sales_amount
+            ,sum(last_yearly_target_qty::decimal(38,15))        as last_yearly_target_qty
+            ,sum(last_yearly_target_amount::decimal(38,15))     as last_yearly_target_amount
+            ,sum(all_last_yearly_target_qty::decimal(38,15))    as all_last_yearly_target_qty
+            ,sum(all_last_yearly_target_amount::decimal(38,15)) as all_last_yearly_target_amount
+            ,sum(last_yearly_sales_qty::decimal(38,15))         as last_yearly_sales_qty
+            ,sum(last_yearly_sales_amount::decimal(38,15))      as last_yearly_sales_amount
+            ,sum(all_last_yearly_sales_qty::decimal(38,15))     as all_last_yearly_sales_qty
+            ,sum(all_last_yearly_sales_amount::decimal(38,15))  as all_last_yearly_sales_amount
+        from #sci_sales_publish_after_transfer_vbp_5_ym_all_sales_fur
+        group by year,month,client_code,product_code
+    ) b
+    on a.his_year = b.year
+    and a.his_month = b.month
+    and a.client_code = b.client_code
+    and a.product_code = b.product_code
+    where a.his_year >= date_part(year,getdate()) - 3
+    ;
+
+
+ -- 插入 业绩认定现在看历史表
+    truncate table analytical_sci.sci_sales_publish_newstruct;
+    insert into analytical_sci.sci_sales_publish_newstruct
+    (
+         year
+        ,month
+        ,year_month
+        ,division_code
+        ,market_code
+        ,market_name
+        ,cluster_code
+        ,cluster_name
+        ,cluster_head_code
+        ,cluster_head_name
+        ,cluster_is_substitute
+        ,region_code
+        ,region_name
+        ,rsm_code
+        ,rsm_name
+        ,rsm_is_substitute
+        ,district_code
+        ,district_name
+        ,dsm_code
+        ,dsm_name
+        ,dsm_is_substitute
+        ,territory_code
+        ,territory_name
+        ,territory_type_name
+        ,mr_code
+        ,mr_name
+        ,mr_is_substitute
+        ,mr_type
+        ,client_type
+        ,client_code
+        ,client_name
+        ,province_code
+        ,province_name
+        ,city_code
+        ,city_name
+        ,county_code
+        ,county_name
+        ,final_client_code
+        ,final_client_name
+        ,brand_code
+        ,brand_name_en
+        ,product_code
+        ,product_name_en
+        ,supplement_flag
+        ,evaluation_price
+        ,target_qty
+        ,target_amount
+        ,all_target_qty
+        ,all_target_amount
+        ,yearly_target_qty
+        ,yearly_target_amount
+        ,sales_qty
+        ,sales_amount
+        ,all_sales_qty
+        ,all_sales_amount
+        ,is_share_terminal
+        ,target_split_rate
+        ,final_split_rate
+        ,last_split_rate
+        ,last_evaluation_price
+        ,last_target_qty
+        ,last_target_amount
+        ,all_last_target_qty
+        ,all_last_target_amount
+        ,last_sales_qty
+        ,last_sales_amount
+        ,all_last_sales_qty
+        ,all_last_sales_amount
+        ,avg_last_target_qty
+        ,avg_last_target_amount
+        ,avg_all_last_target_qty
+        ,avg_all_last_target_amount
+        ,avg_last_sales_qty
+        ,avg_last_sales_amount
+        ,avg_all_last_sales_qty
+        ,avg_all_last_sales_amount
+        -- ,last_yearly_target_qty  -- 暂时放空
+        -- ,last_yearly_target_amount
+        -- ,all_last_yearly_target_qty
+        -- ,all_last_yearly_target_amount
+        -- ,last_yearly_sales_qty
+        -- ,last_yearly_sales_amount
+        -- ,all_last_yearly_sales_qty
+        -- ,all_last_yearly_sales_amount
+        ,medical_institution_level_name
+        ,medical_institution_level_code
+        ,last_year_share_territory_split_rate
+        -- ,extend_field_1
+        -- ,extend_field_2
+        -- ,extend_field_3
+        -- ,extend_field_4
+        -- ,extend_field_5
+        -- ,extend_field_6
+        ,insert_dt
+        ,insert_user
+        ,update_dt
+        ,update_user
+    )
+    select
+         year
+        ,month
+        ,year_month
+        ,division_code
+        ,market_code
+        ,market_name
+        ,cluster_code
+        ,cluster_name
+        ,cluster_head_code
+        ,cluster_head_name
+        ,cluster_is_substitute
+        ,region_code
+        ,region_name
+        ,rsm_code
+        ,rsm_name
+        ,rsm_is_substitute
+        ,district_code
+        ,district_name
+        ,dsm_code
+        ,dsm_name
+        ,dsm_is_substitute
+        ,territory_code
+        ,territory_name
+        ,territory_type_name
+        ,mr_code
+        ,mr_name
+        ,mr_is_substitute
+        ,mr_type
+        ,client_type
+        ,client_code
+        ,client_name
+        ,province_code
+        ,province_name
+        ,city_code
+        ,city_name
+        ,county_code
+        ,county_name
+        ,final_client_code
+        ,final_client_name
+        ,brand_code
+        ,brand_name_en
+        ,product_code
+        ,product_name_en
+        ,supplement_flag
+        ,evaluation_price
+        ,nvl(target_qty,0) as target_qty
+        ,nvl(target_amount,0) as target_amount
+        ,nvl(all_target_qty,0) as all_target_qty
+        ,nvl(all_target_amount,0) as all_target_amount
+        ,nvl(yearly_target_qty,0) as yearly_target_qty
+        ,nvl(yearly_target_amount,0) as yearly_target_amount
+        ,nvl(sales_qty,0) as sales_qty
+        ,nvl(sales_amount,0) as sales_amount
+        ,nvl(all_sales_qty,0) as all_sales_qty
+        ,nvl(all_sales_amount,0) as all_sales_amount
+        ,is_share_terminal
+        ,target_split_rate
+        ,final_split_rate
+        ,last_split_rate
+        ,last_evaluation_price
+        ,nvl(last_target_qty,0) as last_target_qty
+        ,nvl(last_target_amount,0) as last_target_amount
+        ,nvl(all_last_target_qty,0) as all_last_target_qty
+        ,nvl(all_last_target_amount,0) as all_last_target_amount
+        ,nvl(last_sales_qty,0) as last_sales_qty
+        ,nvl(last_sales_amount,0) as last_sales_amount
+        ,nvl(all_last_sales_qty,0) as all_last_sales_qty
+        ,nvl(all_last_sales_amount,0) as all_last_sales_amount
+        ,nvl(avg_last_target_qty,0) as avg_last_target_qty
+        ,nvl(avg_last_target_amount,0) as avg_last_target_amount
+        ,nvl(avg_all_last_target_qty,0) as avg_all_last_target_qty
+        ,nvl(avg_all_last_target_amount,0) as avg_all_last_target_amount
+        ,nvl(avg_last_sales_qty,0) as avg_last_sales_qty
+        ,nvl(avg_last_sales_amount,0) as avg_last_sales_amount
+        ,nvl(avg_all_last_sales_qty,0) as avg_all_last_sales_qty
+        ,nvl(avg_all_last_sales_amount,0) as avg_all_last_sales_amount
+--        ,last_yearly_target_qty
+--        ,last_yearly_target_amount
+--        ,all_last_yearly_target_qty
+--        ,all_last_yearly_target_amount
+--        ,last_yearly_sales_qty
+--        ,last_yearly_sales_amount
+--        ,all_last_yearly_sales_qty
+--        ,all_last_yearly_sales_amount
+        ,medical_institution_level_name
+        ,medical_institution_level_code
+        ,last_year_share_territory_split_rate
+        -- ,extend_field_1
+        -- ,extend_field_2
+        -- ,extend_field_3
+        -- ,extend_field_4
+        -- ,extend_field_5
+        -- ,extend_field_6
+        ,getdate() as insert_dt
+        ,'bayer_cdp_sci' as insert_user
+        ,getdate() as update_dt
+        ,'bayer_cdp_sci' as update_user
+    from #sci_sales_publish_after_transfer_vbp_5_ym_all_sales_fur
+    where year >= date_part(year,getdate()) - 3
+    ;
+
+    -- KA
+    insert into analytical_sci.sci_sales_publish_newstruct
+    (
+         year
+        ,month
+        ,year_month
+        ,division_code
+        ,market_code
+        ,market_name
+        ,cluster_code
+        ,cluster_name
+        ,cluster_head_code
+        ,cluster_head_name
+        ,cluster_is_substitute
+        ,region_code
+        ,region_name
+        ,rsm_code
+        ,rsm_name
+        ,rsm_is_substitute
+        ,district_code
+        ,district_name
+        ,dsm_code
+        ,dsm_name
+        ,dsm_is_substitute
+        ,territory_code
+        ,territory_name
+        ,territory_type_name
+        ,mr_code
+        ,mr_name
+        ,mr_is_substitute
+        ,mr_type
+        ,client_type
+        ,client_code
+        ,client_name
+        ,province_code
+        ,province_name
+        ,city_code
+        ,city_name
+        ,county_code
+        ,county_name
+        ,final_client_code
+        ,final_client_name
+        ,brand_code
+        ,brand_name_en
+        ,product_code
+        ,product_name_en
+        ,supplement_flag
+        ,evaluation_price
+        ,target_qty
+        ,target_amount
+        ,all_target_qty
+        ,all_target_amount
+        ,yearly_target_qty
+        ,yearly_target_amount
+        ,sales_qty
+        ,sales_amount
+        ,all_sales_qty
+        ,all_sales_amount
+        ,is_share_terminal
+        ,target_split_rate
+        ,final_split_rate
+        ,last_split_rate
+        ,last_evaluation_price
+        ,last_target_qty
+        ,last_target_amount
+        ,all_last_target_qty
+        ,all_last_target_amount
+        ,last_sales_qty
+        ,last_sales_amount
+        ,all_last_sales_qty
+        ,all_last_sales_amount
+        ,avg_last_target_qty
+        ,avg_last_target_amount
+        ,avg_all_last_target_qty
+        ,avg_all_last_target_amount
+        ,avg_last_sales_qty
+        ,avg_last_sales_amount
+        ,avg_all_last_sales_qty
+        ,avg_all_last_sales_amount
+        -- ,last_yearly_target_qty  -- 暂时放空
+        -- ,last_yearly_target_amount
+        -- ,all_last_yearly_target_qty
+        -- ,all_last_yearly_target_amount
+        -- ,last_yearly_sales_qty
+        -- ,last_yearly_sales_amount
+        -- ,all_last_yearly_sales_qty
+        -- ,all_last_yearly_sales_amount
+        ,medical_institution_level_name
+        ,medical_institution_level_code
+        ,last_year_share_territory_split_rate
+        -- ,extend_field_1
+        -- ,extend_field_2
+        -- ,extend_field_3
+        -- ,extend_field_4
+        -- ,extend_field_5
+        -- ,extend_field_6
+        ,insert_dt
+        ,insert_user
+        ,update_dt
+        ,update_user
+    )
+    select
+         year
+        ,month
+        ,year_month
+        ,division_code
+        ,market_code
+        ,market_name
+        ,cluster_code
+        ,cluster_name
+        ,cluster_head_code
+        ,cluster_head_name
+        ,cluster_is_substitute
+        ,region_code
+        ,region_name
+        ,rsm_code
+        ,rsm_name
+        ,rsm_is_substitute
+        ,district_code
+        ,district_name
+        ,dsm_code
+        ,dsm_name
+        ,dsm_is_substitute
+        ,territory_code
+        ,territory_name
+        ,territory_type_name
+        ,mr_code
+        ,mr_name
+        ,mr_is_substitute
+        ,mr_type
+        ,client_type
+        ,client_code
+        ,client_name
+        ,province_code
+        ,province_name
+        ,city_code
+        ,city_name
+        ,county_code
+        ,county_name
+        ,final_client_code
+        ,final_client_name
+        ,brand_code
+        ,brand_name_en
+        ,product_code
+        ,product_name_en
+        ,supplement_flag
+        ,evaluation_price
+        ,nvl(target_qty,0) as target_qty
+        ,nvl(target_amount,0) as target_amount
+        ,nvl(all_target_qty,0) as all_target_qty
+        ,nvl(all_target_amount,0) as all_target_amount
+        ,nvl(yearly_target_qty,0) as yearly_target_qty
+        ,nvl(yearly_target_amount,0) as yearly_target_amount
+        ,nvl(sales_qty,0) as sales_qty
+        ,nvl(sales_amount,0) as sales_amount
+        ,nvl(all_sales_qty,0) as all_sales_qty
+        ,nvl(all_sales_amount,0) as all_sales_amount
+        ,is_share_terminal
+        ,target_split_rate
+        ,final_split_rate
+        ,last_split_rate
+        ,last_evaluation_price
+        ,nvl(last_target_qty,0) as last_target_qty
+        ,nvl(last_target_amount,0) as last_target_amount
+        ,nvl(all_last_target_qty,0) as all_last_target_qty
+        ,nvl(all_last_target_amount,0) as all_last_target_amount
+        ,nvl(last_sales_qty,0) as last_sales_qty
+        ,nvl(last_sales_amount,0) as last_sales_amount
+        ,nvl(all_last_sales_qty,0) as all_last_sales_qty
+        ,nvl(all_last_sales_amount,0) as all_last_sales_amount
+        ,nvl(avg_last_target_qty,0) as avg_last_target_qty
+        ,nvl(avg_last_target_amount,0) as avg_last_target_amount
+        ,nvl(avg_all_last_target_qty,0) as avg_all_last_target_qty
+        ,nvl(avg_all_last_target_amount,0) as avg_all_last_target_amount
+        ,nvl(avg_last_sales_qty,0) as avg_last_sales_qty
+        ,nvl(avg_last_sales_amount,0) as avg_last_sales_amount
+        ,nvl(avg_all_last_sales_qty,0) as avg_all_last_sales_qty
+        ,nvl(avg_all_last_sales_amount,0) as avg_all_last_sales_amount
+--        ,last_yearly_target_qty
+--        ,last_yearly_target_amount
+--        ,all_last_yearly_target_qty
+--        ,all_last_yearly_target_amount
+--        ,last_yearly_sales_qty
+--        ,last_yearly_sales_amount
+--        ,all_last_yearly_sales_qty
+--        ,all_last_yearly_sales_amount
+        ,medical_institution_level_name
+        ,medical_institution_level_code
+        ,last_year_share_territory_split_rate
+        -- ,extend_field_1
+        -- ,extend_field_2
+        -- ,extend_field_3
+        -- ,extend_field_4
+        -- ,extend_field_5
+        -- ,extend_field_6
+        ,getdate() as insert_dt
+        ,'bayer_cdp_sci' as insert_user
+        ,getdate() as update_dt
+        ,'bayer_cdp_sci' as update_user
+    from #sci_sales_publish_after_transfer_vbp_5_ym_KA_fur
+    where year >= date_part(year,getdate()) - 3
+    ;
+
+    insert into analytical_sci.sci_sales_publish_newstruct
+    (
+        year
+        ,month
+        ,year_month
+        ,division_code
+        ,market_code
+        ,market_name
+        ,cluster_code
+        ,cluster_name
+        ,cluster_head_code
+        ,cluster_head_name
+        ,cluster_is_substitute
+        ,region_code
+        ,region_name
+        ,rsm_code
+        ,rsm_name
+        ,rsm_is_substitute
+        ,district_code
+        ,district_name
+        ,dsm_code
+        ,dsm_name
+        ,dsm_is_substitute
+        ,territory_code
+        ,territory_name
+        ,territory_type_name
+        ,mr_code
+        ,mr_name
+        ,mr_is_substitute
+        ,mr_type
+        ,client_type
+        ,client_code
+        ,client_name
+        ,province_code
+        ,province_name
+        ,city_code
+        ,city_name
+        ,county_code
+        ,county_name
+        ,final_client_code
+        ,final_client_name
+        ,brand_code
+        ,brand_name_en
+        ,product_code
+        ,product_name_en
+        ,supplement_flag
+        ,evaluation_price
+        ,target_qty
+        ,target_amount
+        ,all_target_qty
+        ,all_target_amount
+        ,yearly_target_qty
+        ,yearly_target_amount
+        ,sales_qty
+        ,sales_amount
+        ,all_sales_qty
+        ,all_sales_amount
+        ,is_share_terminal
+        ,target_split_rate
+        ,final_split_rate
+        ,last_split_rate
+        ,last_evaluation_price
+        ,last_target_qty
+        ,last_target_amount
+        ,all_last_target_qty
+        ,all_last_target_amount
+        ,last_sales_qty
+        ,last_sales_amount
+        ,all_last_sales_qty
+        ,all_last_sales_amount
+        ,avg_last_target_qty
+        ,avg_last_target_amount
+        ,avg_all_last_target_qty
+        ,avg_all_last_target_amount
+        ,avg_last_sales_qty
+        ,avg_last_sales_amount
+        ,avg_all_last_sales_qty
+        ,avg_all_last_sales_amount
+        -- ,last_yearly_target_qty  -- 暂时放空
+        -- ,last_yearly_target_amount
+        -- ,all_last_yearly_target_qty
+        -- ,all_last_yearly_target_amount
+        -- ,last_yearly_sales_qty
+        -- ,last_yearly_sales_amount
+        -- ,all_last_yearly_sales_qty
+        -- ,all_last_yearly_sales_amount
+        ,medical_institution_level_name
+        ,medical_institution_level_code
+        ,last_year_share_territory_split_rate
+        -- ,extend_field_1
+        -- ,extend_field_2
+        -- ,extend_field_3
+        -- ,extend_field_4
+        -- ,extend_field_5
+        -- ,extend_field_6
+        ,insert_dt
+        ,insert_user
+        ,update_dt
+        ,update_user
+    )
+ 	select
+        b.year as year -- 当前年
+        ,b.month as month-- 未来月
+        ,b.year_month  as year_month -- 未来年月
+        ,c.division_code
+        ,c.market_code
+        ,c.market_name
+        ,c.cluster_code
+        ,c.cluster_name
+        ,c.cluster_head_code
+        ,c.cluster_head_name
+        ,c.cluster_is_substitute
+        ,c.region_code
+        ,c.region_name
+        ,c.rsm_code
+        ,c.rsm_name
+        ,c.rsm_is_substitute
+        ,c.district_code
+        ,c.district_name
+        ,c.dsm_code
+        ,c.dsm_name
+        ,c.dsm_is_substitute
+        ,c.territory_code
+        ,c.territory_name
+        ,c.territory_type_name
+        ,c.mr_code
+        ,c.mr_name
+        ,c.mr_is_substitute
+        ,c.mr_type
+        ,c.client_type
+        ,c.client_code
+        ,c.client_name
+        ,c.province_code
+        ,c.province_name
+        ,c.city_code
+        ,c.city_name
+        ,c.county_code
+        ,c.county_name
+        ,c.final_client_code
+        ,c.final_client_name
+        ,c.brand_code
+        ,c.brand_name_en
+        ,c.product_code
+        ,c.product_name_en
+        ,c.supplement_flag
+        ,b.evaluation_price
+        ,b.target_qty --  未来月指标 从辖区指标 获取
+        ,b.target_amount -- 未来月指标金额  辖区指标架构
+        ,b.all_target_qty -- 更新后的未来月共坑销量  辖区指标架构的指标销量
+        ,(b.evaluation_price::decimal(38,12) * b.all_target_qty::decimal(38,12))::decimal(38,15) as all_target_amount -- 未来月共坑指标金额 辖区指标架构
+        ,yt.yearly_target_qty -- 全年指标数量
+        ,(yt.yearly_target_qty::decimal(38,12) * c.evaluation_price::decimal(38,12))::decimal(38,15) as yearly_target_amount -- 全年指标金额
+        ,0 as sales_qty -- 未来月销量
+        ,0 as sales_amount -- 实际销售金额
+        ,0 as all_sales_qty -- 更新后的未来月共坑销量 = 0
+        ,0 as all_sales_amount -- 共坑实际销售金额
+        ,c.is_share_terminal
+        ,c.target_split_rate
+        ,c.final_split_rate
+        ,c.last_split_rate
+        ,c.last_evaluation_price  -- 历史年指标价格
+        ,(c.all_target_qty::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as last_target_qty -- 历史年共坑拆分指标销量
+        ,(c.all_target_amount::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as last_target_amount -- 历史指标金额
+        ,b.all_target_qty as all_last_target_qty -- 更新后的未来年月共坑指标销量   辖区指标架构的指标销量 = 去年指标销量
+        ,c.all_target_amount as all_last_target_amount -- 历史共坑指标金额
+        ,(c.all_sales_qty::decimal(38,12)  * c.target_split_rate::decimal(38,12))::decimal(38,15) as last_sales_qty -- 历史年共坑拆分销量
+        ,(c.all_sales_amount::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as last_sales_amount -- 历史销量金额
+        ,c.all_sales_qty as all_last_sales_qty  -- 更新后的未来年月共坑销量   当前年月销量 = 去年销量
+        ,c.all_sales_amount as all_last_sales_amount -- 历史共坑销量金额
+        ,(d.avg_all_last_target_qty::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as avg_last_target_qty  -- 历史年平均指标数量
+        ,(d.avg_all_last_target_amount::decimal(38,12)  * c.target_split_rate::decimal(38,12))::decimal(38,15) as avg_last_target_amount -- 历史年平均指标金额
+        ,d.avg_all_last_target_qty -- 历史年共坑平均指标数量
+        ,d.avg_all_last_target_amount -- 历史年共坑平均指标金额
+        ,(d.avg_all_last_sales_qty::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as  avg_last_sales_qty -- 历史年平均销量
+        ,(d.avg_all_last_sales_amount::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as avg_last_sales_amount -- 历史年平均销量金额
+        ,d.avg_all_last_sales_qty -- 历史年共坑平均销量
+        ,d.avg_all_last_sales_amount -- 历史年共坑平均销量金额
+        -- ,(c.all_last_yearly_target_qty::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as last_yearly_target_qty
+        -- ,(c.all_last_yearly_target_amount::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as last_yearly_target_amount
+        -- ,c.all_last_yearly_target_qty
+        -- ,c.all_last_yearly_target_amount
+        -- ,(c.all_last_yearly_sales_qty::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as last_yearly_sales_qty
+        -- ,(c.all_last_yearly_sales_amount::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as last_yearly_sales_amount
+        -- ,c.all_last_yearly_sales_qty
+        -- ,c.all_last_yearly_sales_amount
+        ,c.medical_institution_level_name
+        ,c.medical_institution_level_code
+        ,b.last_year_share_territory_split_rate
+        -- ,a.extend_field_1
+        -- ,a.extend_field_2
+        -- ,a.extend_field_3
+        -- ,a.extend_field_4
+        -- ,a.extend_field_5
+        -- ,a.extend_field_6
+        ,getdate() as insert_dt
+        ,'bayer_cdp_sci' as insert_user
+        ,getdate() as update_dt
+        ,'bayer_cdp_sci' as update_user
+    from #sci_sales_publish_after_transfer_vbp_5_ym_all_sales_fur c
+    join model_sci.sci_data_entire_territory_target b
+    on b.year = c.year+1
+    and b.month = c.month
+    and b.client_code = c.client_code
+    and b.product_code = c.product_code
+    and b.market_code = c.market_code
+    and b.territory_code = c.territory_code
+    and b.year_month > p_verion_year_month
+    left join (-- 2024 1031 业务暂时不要未来月的平均KPI
+        select distinct his_year,client_code,product_code,market_code,province_code,city_code,territory_type_name,
+        avg_all_last_target_qty,avg_all_last_target_amount,avg_all_last_sales_qty,avg_all_last_sales_amount
+        from #sci_sales_publish_after_transfer_vbp_5_ym_all_sales_sp_last_avg
+    ) d
+    on b.year = d.his_year
+    and c.client_code = d.client_code
+    and c.product_code = d.product_code
+    and c.market_code = d.market_code
+    and c.province_code = d.province_code
+    and c.city_code = d.city_code
+    and c.territory_type_name = d.territory_type_name
+    left join
+    (
+        select year,his_year,territory_code,client_code,product_code,yearly_target_qty
+        from
+        (
+            select year,his_year,territory_code,client_code,product_code
+                    ,sum(case when a.his_year = date_part(year,getdate()) then (a.all_target_qty::decimal(38,12) * a.final_split_rate::decimal(38,12))::decimal(38,15)
+                        when a.his_year < date_part(year,getdate()) then (a.all_target_qty::decimal(38,12) * a.target_split_rate::decimal(38,12))::decimal(38,15) else 0 end) as yearly_target_qty
+            from #sci_sales_publish_after_transfer_vbp_5_ym_all_sales_sp a
+            group by year,his_year,territory_code,client_code,product_code
+        )
+    ) yt
+    on c.year = yt.year
+    and c.territory_code = yt.territory_code
+    and c.client_code = yt.client_code
+    and c.product_code = yt.product_code;
+
+    -- 未来月KA
+    insert into analytical_sci.sci_sales_publish_newstruct
+    (
+        year
+        ,month
+        ,year_month
+        ,division_code
+        ,market_code
+        ,market_name
+        ,cluster_code
+        ,cluster_name
+        ,cluster_head_code
+        ,cluster_head_name
+        ,cluster_is_substitute
+        ,region_code
+        ,region_name
+        ,rsm_code
+        ,rsm_name
+        ,rsm_is_substitute
+        ,district_code
+        ,district_name
+        ,dsm_code
+        ,dsm_name
+        ,dsm_is_substitute
+        ,territory_code
+        ,territory_name
+        ,territory_type_name
+        ,mr_code
+        ,mr_name
+        ,mr_is_substitute
+        ,mr_type
+        ,client_type
+        ,client_code
+        ,client_name
+        ,province_code
+        ,province_name
+        ,city_code
+        ,city_name
+        ,county_code
+        ,county_name
+        ,final_client_code
+        ,final_client_name
+        ,brand_code
+        ,brand_name_en
+        ,product_code
+        ,product_name_en
+        ,supplement_flag
+        ,evaluation_price
+        ,target_qty
+        ,target_amount
+        ,all_target_qty
+        ,all_target_amount
+        ,yearly_target_qty
+        ,yearly_target_amount
+        ,sales_qty
+        ,sales_amount
+        ,all_sales_qty
+        ,all_sales_amount
+        ,is_share_terminal
+        ,target_split_rate
+        ,final_split_rate
+        ,last_split_rate
+        ,last_evaluation_price
+        ,last_target_qty
+        ,last_target_amount
+        ,all_last_target_qty
+        ,all_last_target_amount
+        ,last_sales_qty
+        ,last_sales_amount
+        ,all_last_sales_qty
+        ,all_last_sales_amount
+        ,avg_last_target_qty
+        ,avg_last_target_amount
+        ,avg_all_last_target_qty
+        ,avg_all_last_target_amount
+        ,avg_last_sales_qty
+        ,avg_last_sales_amount
+        ,avg_all_last_sales_qty
+        ,avg_all_last_sales_amount
+        -- ,last_yearly_target_qty  -- 暂时放空
+        -- ,last_yearly_target_amount
+        -- ,all_last_yearly_target_qty
+        -- ,all_last_yearly_target_amount
+        -- ,last_yearly_sales_qty
+        -- ,last_yearly_sales_amount
+        -- ,all_last_yearly_sales_qty
+        -- ,all_last_yearly_sales_amount
+        ,medical_institution_level_name
+        ,medical_institution_level_code
+        ,last_year_share_territory_split_rate
+        -- ,extend_field_1
+        -- ,extend_field_2
+        -- ,extend_field_3
+        -- ,extend_field_4
+        -- ,extend_field_5
+        -- ,extend_field_6
+        ,insert_dt
+        ,insert_user
+        ,update_dt
+        ,update_user
+    )
+ 	select
+        b.year as year -- 当前年
+        ,b.month as month-- 未来月
+        ,b.year_month  as year_month -- 未来年月
+        ,c.division_code
+        ,c.market_code
+        ,c.market_name
+        ,c.cluster_code
+        ,c.cluster_name
+        ,c.cluster_head_code
+        ,c.cluster_head_name
+        ,c.cluster_is_substitute
+        ,c.region_code
+        ,c.region_name
+        ,c.rsm_code
+        ,c.rsm_name
+        ,c.rsm_is_substitute
+        ,c.district_code
+        ,c.district_name
+        ,c.dsm_code
+        ,c.dsm_name
+        ,c.dsm_is_substitute
+        ,c.territory_code
+        ,c.territory_name
+        ,c.territory_type_name
+        ,c.mr_code
+        ,c.mr_name
+        ,c.mr_is_substitute
+        ,c.mr_type
+        ,c.client_type
+        ,c.client_code
+        ,c.client_name
+        ,c.province_code
+        ,c.province_name
+        ,c.city_code
+        ,c.city_name
+        ,c.county_code
+        ,c.county_name
+        ,c.final_client_code
+        ,c.final_client_name
+        ,c.brand_code
+        ,c.brand_name_en
+        ,c.product_code
+        ,c.product_name_en
+        ,c.supplement_flag
+        ,b.evaluation_price
+        ,b.target_qty --  未来月指标 从辖区指标 获取
+        ,b.target_amount -- 未来月指标金额  辖区指标架构
+        ,b.all_target_qty -- 更新后的未来月共坑销量  辖区指标架构的指标销量
+        ,(b.evaluation_price::decimal(38,12) * b.all_target_qty::decimal(38,12))::decimal(38,15) as all_target_amount -- 未来月共坑指标金额 辖区指标架构
+        ,yt.yearly_target_qty -- 全年指标数量
+        ,(yt.yearly_target_qty::decimal(38,12) * c.evaluation_price::decimal(38,12))::decimal(38,15) as yearly_target_amount -- 全年指标金额
+        ,0 as sales_qty -- 未来月销量
+        ,0 as sales_amount -- 实际销售金额
+        ,0 as all_sales_qty -- 更新后的未来月共坑销量 = 0
+        ,0 as all_sales_amount -- 共坑实际销售金额
+        ,c.is_share_terminal
+        ,c.target_split_rate
+        ,c.final_split_rate
+        ,c.last_split_rate
+        ,c.last_evaluation_price  -- 历史年指标价格
+        ,(c.all_target_qty::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as last_target_qty -- 历史年共坑拆分指标销量
+        ,(c.all_target_amount::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as last_target_amount -- 历史指标金额
+        ,b.all_target_qty as all_last_target_qty -- 更新后的未来年月共坑指标销量   辖区指标架构的指标销量 = 去年指标销量
+        ,c.all_target_amount as all_last_target_amount -- 历史共坑指标金额
+        ,(c.all_sales_qty::decimal(38,12)  * c.target_split_rate::decimal(38,12))::decimal(38,15) as last_sales_qty -- 历史年共坑拆分销量
+        ,(c.all_sales_amount::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as last_sales_amount -- 历史销量金额
+        ,c.all_sales_qty as all_last_sales_qty  -- 更新后的未来年月共坑销量   当前年月销量 = 去年销量
+        ,c.all_sales_amount as all_last_sales_amount -- 历史共坑销量金额
+        ,(d.avg_all_last_target_qty::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as avg_last_target_qty  -- 历史年平均指标数量
+        ,(d.avg_all_last_target_amount::decimal(38,12)  * c.target_split_rate::decimal(38,12))::decimal(38,15) as avg_last_target_amount -- 历史年平均指标金额
+        ,d.avg_all_last_target_qty -- 历史年共坑平均指标数量
+        ,d.avg_all_last_target_amount -- 历史年共坑平均指标金额
+        ,(d.avg_all_last_sales_qty::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as  avg_last_sales_qty -- 历史年平均销量
+        ,(d.avg_all_last_sales_amount::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as avg_last_sales_amount -- 历史年平均销量金额
+        ,d.avg_all_last_sales_qty -- 历史年共坑平均销量
+        ,d.avg_all_last_sales_amount -- 历史年共坑平均销量金额
+        -- ,(c.all_last_yearly_target_qty::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as last_yearly_target_qty
+        -- ,(c.all_last_yearly_target_amount::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as last_yearly_target_amount
+        -- ,c.all_last_yearly_target_qty
+        -- ,c.all_last_yearly_target_amount
+        -- ,(c.all_last_yearly_sales_qty::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as last_yearly_sales_qty
+        -- ,(c.all_last_yearly_sales_amount::decimal(38,12) * c.target_split_rate::decimal(38,12))::decimal(38,15) as last_yearly_sales_amount
+        -- ,c.all_last_yearly_sales_qty
+        -- ,c.all_last_yearly_sales_amount
+        ,c.medical_institution_level_name
+        ,c.medical_institution_level_code
+        ,b.last_year_share_territory_split_rate
+        -- ,a.extend_field_1
+        -- ,a.extend_field_2
+        -- ,a.extend_field_3
+        -- ,a.extend_field_4
+        -- ,a.extend_field_5
+        -- ,a.extend_field_6
+        ,getdate() as insert_dt
+        ,'bayer_cdp_sci' as insert_user
+        ,getdate() as update_dt
+        ,'bayer_cdp_sci' as update_user
+    from #sci_sales_publish_after_transfer_vbp_5_ym_KA_fur c
+    join model_sci.sci_data_entire_territory_target b
+    on b.year = c.year+1
+    and b.month = c.month
+    and b.client_code = c.client_code
+    and b.product_code = c.product_code
+    and b.market_code = c.market_code
+    and b.territory_code = c.territory_code
+    and b.year_month > p_verion_year_month
+    left join (-- 2024 1031 业务暂时不要未来月的平均KPI
+        select distinct his_year,client_code,product_code,market_code,province_code,city_code,territory_type_name,
+        avg_all_last_target_qty,avg_all_last_target_amount,avg_all_last_sales_qty,avg_all_last_sales_amount
+        from #sci_sales_publish_after_transfer_vbp_5_ym_all_sales_sp_last_avg
+    ) d
+    on b.year = d.his_year
+    and c.client_code = d.client_code
+    and c.product_code = d.product_code
+    and c.market_code = d.market_code
+    and c.province_code = d.province_code
+    and c.city_code = d.city_code
+    and c.territory_type_name = d.territory_type_name
+    left join
+    (
+        select year,his_year,territory_code,client_code,product_code,yearly_target_qty
+        from
+        (
+            select year,his_year,territory_code,client_code,product_code
+                    ,sum(case when a.his_year = date_part(year,getdate()) then (a.all_target_qty::decimal(38,12) * a.final_split_rate::decimal(38,12))::decimal(38,15)
+                        when a.his_year < date_part(year,getdate()) then (a.all_target_qty::decimal(38,12) * a.target_split_rate::decimal(38,12))::decimal(38,15) else 0 end) as yearly_target_qty
+            from #sci_sales_publish_after_transfer_vbp_5_ym_all_sales_sp a
+            group by year,his_year,territory_code,client_code,product_code
+        )
+    ) yt
+    on c.year = yt.year
+    and c.territory_code = yt.territory_code
+    and c.client_code = yt.client_code
+    and c.product_code = yt.product_code;
+
+END;
+$$
