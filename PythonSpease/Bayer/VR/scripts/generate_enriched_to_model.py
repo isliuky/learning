@@ -1,60 +1,88 @@
 import streamlit as st
 import re
 
+
+# 解析DDL函数保持不变
 def parse_ddl(ddl):
-    # 提取表名和列名。
-    match = re.search(r'CREATE TABLE (\w+\.?\w*) $', ddl, re.IGNORECASE)
+    match = re.search(r'CREATE TABLE (\w+\.\w+)', ddl)
     if not match:
-        return None, None
-    table_name = match.group(1)
+        raise ValueError("Invalid DDL: Could not find table name.")
 
-    columns_info = {}
-    column_pattern = r'\s*([a-zA-Z_][a-zA-Z0-9_]*)\s+([a-zA-Z]+(?:\([0-9]+$)?)(?:\s+ENCODE\s+\w+)?'
-    for line in ddl.splitlines():
-        match = re.match(column_pattern, line.strip())
-        if match:
-            column_name, _ = match.groups()
-            columns_info[column_name] = True
+    full_table_name = match.group(1)
+    schema_name, table_name = full_table_name.split('.')
 
-    return table_name, list(columns_info.keys())
+    lines = ddl.strip().split('\n')[1:-1]
+    lines = [line.strip() for line in lines]
 
-def generate_sql_statements(ddl_list, source_table_map):
-    sql_statements = []
-    for ddl in ddl_list:
-        target_table, columns = parse_ddl(ddl)
-        if target_table and columns:
-            source_table = source_table_map.get(target_table, 'enriched_stage_airepbi.userinfo')  # 默认源表
-            comment = f"-- {target_table}"
-            truncate_stmt = f"truncate table {target_table};"
-            insert_columns = ",\n\t".join(columns)
-            select_columns = ",\n\t".join(columns)  # 假设源表和目标表具有相同的列结构
-            insert_stmt = (
-                f"insert into {target_table}(\n\t{insert_columns}\n)\n"
-                f"select\n\t{select_columns}\nfrom {source_table};"
-            )
-            sql_statements.append(f"{comment}\n{truncate_stmt}\n{insert_stmt}")
+    columns = []
+    for line in lines:
+        if not line or 'CREATE TABLE' in line or line.endswith(')'):
+            continue
+
+        parts = line.rstrip(',').split(None, 1)
+        if len(parts) < 2:
+            continue
+
+        column_name = parts[0]
+        rest = parts[1]
+
+        column_type_match = re.match(r'(\w+[\s$$\d]*)', rest)
+        if column_type_match:
+            column_type = column_type_match.group(1).strip()
         else:
-            sql_statements.append("-- 无效的 DDL 语句")
-    return "\n\n".join(sql_statements)
+            continue
 
-st.title("批量生成 TRUNCATE 和 INSERT SQL 语句")
+        columns.append({
+            'name': column_name,
+            'type': column_type
+        })
 
-# 文件上传或文本区域用于粘贴多个 DDL 语句
-uploaded_file = st.file_uploader("上传包含多个 DDL 语句的文件", type=['sql', 'txt'])
-if uploaded_file is not None:
-    ddl_input = uploaded_file.read().decode('utf-8')
-else:
-    ddl_input = st.text_area("或在此处粘贴多个 DDL 语句（每个表一个）:", height=300)
+    return {
+        'schema': schema_name,
+        'table': table_name,
+        'columns': columns
+    }
 
-source_table_map_input = st.text_area("指定源表 (格式: 目标表=源表, 每行一个):", height=100)
 
-if st.button('生成 SQL 语句'):
-    # 解析源表映射
-    source_table_map = dict(line.strip().split('=') for line in source_table_map_input.splitlines() if '=' in line)
+def generate_truncate_and_insert_statements(ddl, source_schema):
+    parsed_ddl = parse_ddl(ddl)
 
-    # 将输入分割成单独的 DDL 语句
-    ddl_list = [ddl.strip() for ddl in re.split(r';\s*(--.*)?', ddl_input) if ddl.strip()]
+    target_schema = parsed_ddl['schema']
+    target_table = parsed_ddl['table']
+    columns = parsed_ddl['columns']
 
-    # 生成 SQL 输出
-    sql_output = generate_sql_statements(ddl_list, source_table_map)
-    st.code(sql_output, language='sql')
+    truncate_statement = f"TRUNCATE TABLE {target_schema}.{target_table};"
+
+    column_names = ',\n    '.join([col['name'] for col in columns])
+    insert_statement = (
+        f"INSERT INTO {target_schema}.{target_table} (\n"
+        f"    {column_names}\n"
+        f")\n"
+        f"SELECT\n"
+        f"    {column_names}\n"
+        f"FROM {source_schema}.{target_table};"
+    )
+
+    return truncate_statement, insert_statement
+
+
+# Streamlit 应用程序
+st.title("DDL to SQL Generator")
+
+# 用户输入DDL
+ddl_input = st.text_area("请输入DDL语句:", height=300)
+
+# 用户输入源schema名称
+source_schema = st.text_input("请输入源schema名称:", value="enriched_prestage_radacademy")
+
+# 提交按钮
+if st.button("生成SQL"):
+    try:
+        truncate_stmt, insert_stmt = generate_truncate_and_insert_statements(ddl_input, source_schema)
+
+        # 显示生成的SQL语句
+        st.subheader("生成的SQL语句:")
+        sql_output = f"{truncate_stmt}\n\n{insert_stmt}"
+        st.code(sql_output, language='sql')
+    except Exception as e:
+        st.error(f"发生错误: {e}")
