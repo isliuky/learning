@@ -63,35 +63,34 @@ def generate_truncate_and_insert_statements(ddl, source_schema):
         f"FROM {source_schema}.{target_table};"
     )
 
-    return truncate_stmt, insert_stmt
+    return truncate_statement, insert_statement
 
 
 # Streamlit 应用程序
 st.title("Batch DDL to SQL Generator")
 
 # 用户输入DDL
-ddl_input = st.text_area("请输入多个DDL语句 (每个DDL前一行以 '-- 源schema名称.表名' 开头):", height=400)
+ddl_input = st.text_area("请输入多个DDL语句 (每个DDL前一行以 '-- 源schema名称' 开头):", height=400)
 
 # 提交按钮
 if st.button("批量生成SQL"):
     try:
         # 分割DDL语句
-        ddl_blocks = ddl_input.strip().split('-- ')[1:]  # 忽略第一个空元素
+        ddl_statements = ddl_input.split('-- ')[1:]  # 忽略第一个空元素
 
         sql_outputs = []
-        for block in ddl_blocks:
-            lines = block.strip().split('\n')
-            source_line = lines[0].strip()
+        for statement in ddl_statements:
+            lines = statement.strip().split('\n')
+            source_schema_line = lines[0].strip()
             ddl = '\n'.join(lines[1:]).strip()
 
-            # 提取源schema和表名
-            if not re.match(r'\w+\.\w+', source_line):
-                raise ValueError(f"无效的源schema行格式: {source_line}")
+            # if not source_schema_line.startswith('enriched_prestage_radacademy'):
+            #     raise ValueError(f"无效的源schema行: {source_schema_line}")
 
-            source_schema, _ = source_line.split('.', 1)
+            source_schema = source_schema_line
             truncate_stmt, insert_stmt = generate_truncate_and_insert_statements(ddl, source_schema)
             sql_outputs.append(
-                f"-- Source Schema: {source_line}\n{truncate_stmt}\n\n{insert_stmt}\n\n-- End of statements for this DDL --\n")
+                f"-- Source Schema: {source_schema}\n{truncate_stmt}\n\n{insert_stmt}\n\n-- End of statements for this DDL --\n")
 
         # 合并所有生成的SQL语句
         all_sql_output = '\n'.join(sql_outputs)
