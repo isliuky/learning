@@ -1,0 +1,1053 @@
+{
+  "Comment": "A Hello World example of the Amazon States Language using Pass states",
+  "StartAt": "Truncate Signal Status Return table  and exec_sp_staging_truncate",
+  "States": {
+    "Truncate Signal Status Return table  and exec_sp_staging_truncate": {
+      "Type": "Task",
+      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "ph-cdp-sci-stored-procedure-operator-glue-job-cn-north-1-dev",
+        "Arguments": {
+          "--JOB_NAME": "ph-cdp-sci-stored-procedure-operator-glue-job-cn-north-1-dev",
+          "--RS_DB": "cn_sci_dev",
+          "--SP_NAME": "enriched_sci.sp_staging_truncate",
+          "--RETRY": "90",
+          "--DELAY": "120"
+        }
+      },
+      "Next": "Data Ingestion",
+      "ResultPath": "$.output",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "BackoffRate": 1,
+          "IntervalSeconds": 60,
+          "MaxAttempts": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "Send Task Faild Alert Email",
+          "ResultPath": "$.output"
+        }
+      ]
+    },
+    "Data Ingestion": {
+      "Type": "Parallel",
+      "Next": "Enriched to Model",
+      "Branches": [
+        {
+          "StartAt": "Data Ingestion MTTM Index",
+          "States": {
+            "Data Ingestion MTTM Index": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-mttm_ingestion_reuse",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Data Ingestion MTTM",
+          "States": {
+            "Data Ingestion MTTM": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-mttm_ingestion",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Data Ingestion Pharmeyes",
+          "States": {
+            "Data Ingestion Pharmeyes": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-pharmeyes_ingestion",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Data Ingestion Business Files",
+          "States": {
+            "Data Ingestion Business Files": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-business_files_ingestion",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Data Ingestion Simulation",
+          "States": {
+            "Data Ingestion Simulation": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-simulation_ingestion",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "Update Signal Calculate&Publish Status Failed",
+          "ResultPath": "$.output"
+        }
+      ],
+      "ResultPath": "$.output"
+    },
+    "Enriched to Model": {
+      "Type": "Task",
+      "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+      "Parameters": {
+        "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+        "Payload": {
+          "state_machine_name": "ph-cdp-sci-sm-workflow-cn-enriched2model",
+          "TaskToken.$": "$$.Task.Token"
+        }
+      },
+      "Next": "Parallel InMarketSales&InTerritorySales",
+      "ResultPath": "$.output",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "Update Signal Calculate&Publish Status Failed",
+          "ResultPath": "$.output"
+        }
+      ]
+    },
+    "Parallel InMarketSales&InTerritorySales": {
+      "Type": "Parallel",
+      "Next": "Parallel Sales Publish HVH",
+      "Branches": [
+        {
+          "StartAt": "Sales Publish InMarketSales&InTerritorySales&Goods Return",
+          "States": {
+            "Sales Publish InMarketSales&InTerritorySales&Goods Return": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-salespub_prepare",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "ResultPath": "$.output",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Sales Publish InMarketSales&InTerritorySales Retail",
+          "States": {
+            "Sales Publish InMarketSales&InTerritorySales Retail": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-salespub_prepare_rt",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "ResultPath": "$.output",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Pharmeyes Sales Fix&Special Drug Outliers Valid",
+          "States": {
+            "Pharmeyes Sales Fix&Special Drug Outliers Valid": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-pharmeyes_outliers_valid",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "ResultPath": "$.output",
+              "End": true
+            }
+          }
+        }
+      ],
+      "ResultPath": "$.output",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "Update Signal Calculate&Publish Status Failed",
+          "ResultPath": "$.output"
+        }
+      ]
+    },
+    "Send Task Faild Alert Email": {
+      "Type": "Task",
+      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "ph-cdp-sci-state-machine-email-operator-glue-job-cn-north-1-dev",
+        "Arguments": {
+          "--SUBJECT": "Task CDP_SCI Notification Email Send From Step Function From_dev",
+          "--BODY": "Task Sci Data Control Failed!",
+          "--TO": "yunfeng.yu.ext@bayer.com,connie.gao.ext@bayer.com,kaiyang.liu1.ext@bayer.com,mengru.xiao.ext@bayer.com,mingyong.li.ext@bayer.com,nicole.chen.ext@bayer.com,sally.lu.ext@bayer.com,wenhao.jv.ext@bayer.com,xinyu.lin.ext@bayer.com,xirui.qian.ext@bayer.com,zhiwei.wang3.ext@bayer.com,zou.junyi.ext@bayer.com"
+        }
+      },
+      "Next": "Fail",
+      "ResultPath": "$.error",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "BackoffRate": 1,
+          "IntervalSeconds": 60,
+          "MaxAttempts": 2
+        }
+      ]
+    },
+    "Parallel Sales Publish HVH": {
+      "Type": "Parallel",
+      "Next": "Parallel Sales Publish Derived",
+      "Branches": [
+        {
+          "StartAt": "Sales Publish HVH Retail",
+          "States": {
+            "Sales Publish HVH Retail": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-salespub_rt",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Sales Publish HVH",
+          "States": {
+            "Sales Publish HVH": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-salespub",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Sales Publish Email Notification",
+          "States": {
+            "Sales Publish Email Notification": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-salespub_email_ntfy",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        }
+      ],
+      "ResultPath": "$.output",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "Update Signal Calculate&Publish Status Failed",
+          "ResultPath": "$.output"
+        }
+      ]
+    },
+    "Parallel Sales Publish Derived": {
+      "Type": "Parallel",
+      "Next": "Export start signal",
+      "Branches": [
+        {
+          "StartAt": "Sales Publish Derived Retail",
+          "States": {
+            "Sales Publish Derived Retail": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-salespub_derived_rt",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Sales Publish Derived",
+          "States": {
+            "Sales Publish Derived": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-salespub_derived",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Simulation",
+          "States": {
+            "Simulation": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-simulation",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        }
+      ],
+      "ResultPath": "$.output",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "Update Signal Calculate&Publish Status Failed",
+          "ResultPath": "$.output"
+        }
+      ]
+    },
+    "Export start signal": {
+      "Type": "Parallel",
+      "Next": "Parallel Sales Publish CVH&HVH Export&Dsm Export",
+      "Branches": [
+        {
+          "StartAt": "Retail Export start signal",
+          "States": {
+            "Retail Export start signal": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+              "Parameters": {
+                "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-dev",
+                "Arguments": {
+                  "--RETRY": "60",
+                  "--DELAY": "10",
+                  "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-dev",
+                  "--RS_DB": "cn_sci_dev",
+                  "--SQL": "select 1",
+                  "--S3_URI": "s3://mtm-athena-data-sit/performance/signals/pharmacy_started.csv",
+                  "--SHEET_NAME": "pharmacy_started",
+                  "--FORMAT": "csv",
+                  "--BLANK_FILE": "true"
+                }
+              },
+              "ResultPath": "$.output",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "PH Export start signal",
+          "States": {
+            "PH Export start signal": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+              "Parameters": {
+                "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-dev",
+                "Arguments": {
+                  "--RETRY": "60",
+                  "--DELAY": "10",
+                  "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-dev",
+                  "--RS_DB": "cn_sci_dev",
+                  "--SQL": "select 1",
+                  "--S3_URI": "s3://mtm-athena-data-sit/performance/signals/ph_started.csv",
+                  "--SHEET_NAME": "pharmacy_started",
+                  "--FORMAT": "csv",
+                  "--BLANK_FILE": "true"
+                }
+              },
+              "ResultPath": "$.output",
+              "End": true
+            }
+          }
+        }
+      ],
+      "ResultPath": "$.output",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Update Signal Calculate&Publish Status Failed",
+          "ResultPath": "$.output"
+        }
+      ]
+    },
+    "Parallel Sales Publish CVH&HVH Export&Dsm Export": {
+      "Type": "Parallel",
+      "Next": "Parallel Sales Publish Devired Export&CVH Export",
+      "Branches": [
+        {
+          "StartAt": "Sales Publish CVH Retail",
+          "States": {
+            "Sales Publish CVH Retail": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-salespub_cvh_rt",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Sales Publish CVH",
+          "States": {
+            "Sales Publish CVH": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-salespub_cvh",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Sales Publish HVH Export Retail",
+          "States": {
+            "Sales Publish HVH Export Retail": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-salespub_hvh_rt_export",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Sales Publish HVH Export",
+          "States": {
+            "Sales Publish HVH Export": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-salespub_hvh_export",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Sales Publish Dsm Export",
+          "States": {
+            "Sales Publish Dsm Export": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-salespub_dsm_export",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        }
+      ],
+      "ResultPath": "$.output",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "Update Signal Calculate&Publish Status Failed",
+          "ResultPath": "$.output"
+        }
+      ]
+    },
+    "Parallel Sales Publish Devired Export&CVH Export": {
+      "Type": "Parallel",
+      "Next": "Export complete signal",
+      "Branches": [
+        {
+          "StartAt": "Sales Publish Devried Export Retail",
+          "States": {
+            "Sales Publish Devried Export Retail": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-salespub_derv_rt_export",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Sales Publish Devried Export",
+          "States": {
+            "Sales Publish Devried Export": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-salespub_derived_export",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Sales Publish CVH Export Retail",
+          "States": {
+            "Sales Publish CVH Export Retail": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-salespub_cvh_rt_export",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Sales Publish CVH Export",
+          "States": {
+            "Sales Publish CVH Export": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-model-analytic-sfn-trigger:$LATEST",
+                "Payload": {
+                  "state_machine_name": "ph-cdp-sci-sm-workflow-cn-salespub_cvh_export",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "SP Exec sci data to cdp",
+          "States": {
+            "SP Exec sci data to cdp": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+              "Parameters": {
+                "JobName": "ph-cdp-stored-procedure-operator-glue-job-cn-north-1-dev",
+                "Arguments": {
+                  "--JOB_NAME": "ph-cdp-stored-procedure-operator-glue-job-cn-north-1-dev",
+                  "--RS_DB": "cn_cdp_dev",
+                  "--SP_NAME": "enriched_prestage_phsci.sp_sci2cdp",
+                  "--RETRY": "50",
+                  "--DELAY": "120"
+                }
+              },
+              "End": true,
+              "ResultPath": "$.output"
+            }
+          }
+        },
+        {
+          "StartAt": "export_v_analytical_sales_search_selection_stage",
+          "States": {
+            "export_v_analytical_sales_search_selection_stage": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+              "Parameters": {
+                "JobName": "ph-cdp-sci-sfdc-ingest-glue-job-cn-north-1-dev",
+                "Arguments": {
+                  "--JOB_NAME": "ph-cdp-sci-sfdc-ingest-glue-job-cn-north-1-dev",
+                  "--LOAD_ID.$": "$.load_id",
+                  "--DOMAIN": "sci_mttm",
+                  "--ENTITY": "MTM_PerformanceSearchSelectionStage__c"
+                }
+              },
+              "End": true,
+              "Retry": [
+                {
+                  "ErrorEquals": [
+                    "States.TaskFailed"
+                  ],
+                  "BackoffRate": 1,
+                  "IntervalSeconds": 60,
+                  "MaxAttempts": 2
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "ResultPath": "$.output",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "Update Signal Calculate&Publish Status Failed",
+          "ResultPath": "$.output"
+        }
+      ]
+    },
+    "Export complete signal": {
+      "Type": "Parallel",
+      "Next": "Update Signal Calculate&Publish Status Success",
+      "Branches": [
+        {
+          "StartAt": "Retail Export complete signal",
+          "States": {
+            "Retail Export complete signal": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+              "Parameters": {
+                "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-dev",
+                "Arguments": {
+                  "--RETRY": "60",
+                  "--DELAY": "10",
+                  "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-dev",
+                  "--RS_DB": "cn_sci_dev",
+                  "--SQL": "select 1",
+                  "--S3_URI": "s3://mtm-athena-data-sit/performance/signals/pharmacy_completed.csv",
+                  "--SHEET_NAME": "pharmacy_completed",
+                  "--FORMAT": "csv",
+                  "--BLANK_FILE": "true"
+                }
+              },
+              "ResultPath": "$.output",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "PH Export complete signal",
+          "States": {
+            "PH Export complete signal": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+              "Parameters": {
+                "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-dev",
+                "Arguments": {
+                  "--RETRY": "60",
+                  "--DELAY": "10",
+                  "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-dev",
+                  "--RS_DB": "cn_sci_dev",
+                  "--SQL": "select 1",
+                  "--S3_URI": "s3://mtm-athena-data-sit/performance/signals/ph_completed.csv",
+                  "--SHEET_NAME": "ph_completed",
+                  "--FORMAT": "csv",
+                  "--BLANK_FILE": "true"
+                }
+              },
+              "ResultPath": "$.output",
+              "End": true
+            }
+          }
+        }
+      ],
+      "ResultPath": "$.output",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Update Signal Calculate&Publish Status Failed",
+          "ResultPath": "$.output"
+        }
+      ]
+    },
+    "Update Signal Calculate&Publish Status Success": {
+      "Type": "Task",
+      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "ph-cdp-sci-redshift-statement-executor-glue-job-cn-north-1-dev",
+        "Arguments": {
+          "--JOB_NAME": "ph-cdp-sci-redshift-statement-executor-glue-job-cn-north-1-dev",
+          "--RS_DB": "cn_sci_dev",
+          "--SQL": "insert into model_sci.sci_pfe_publish_index_return select distinct a.id, 'Completed' as MTM_Status__c, to_char(getdate()::timestamp at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') as MTM_LastCalculateDate__c, 'Complete' as MTM_CalculateStatus__c,to_char(a.publish_datetime::timestamp at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') as MTM_LastPublishDate__c, a.publish_status as MTM_PublishStatus__c from model_sci.sci_pfe_publish_index a join model_sci.sci_calculated_year_month b on a.version = b.version_no and a.year_month = b.year_month where a.is_calculated='true';insert into model_sci.sci_pfe_publish_index_return select distinct a.id, 'Completed' as MTM_Status__c, to_char(a.calculate_datetime::timestamp at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') as MTM_LastCalculateDate__c, a.calculate_status as MTM_CalculateStatus__c, to_char(getdate()::timestamp at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') as MTM_LastPublishDate__c, 'Complete' as MTM_PublishStatus__c from model_sci.sci_pfe_publish_index a where a.is_published = 'True' and a.status <> 'Completed';"
+        }
+      },
+      "ResultPath": "$.output",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "BackoffRate": 1,
+          "IntervalSeconds": 60,
+          "MaxAttempts": 2
+        }
+      ],
+      "Next": "Glue Signal Return Table Data Check",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "Send Task Faild Alert Email",
+          "ResultPath": "$.output"
+        }
+      ]
+    },
+    "Glue Signal Return Table Data Check": {
+      "Type": "Task",
+      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "ph-cdp-sci-redshift-condition-branch-glue-job-cn-north-1-dev",
+        "Arguments": {
+          "--JOB_NAME": "ph-cdp-sci-redshift-condition-branch-glue-job-cn-north-1-dev",
+          "--STATE_MACHINE_NAME.$": "$.state_machine_name",
+          "--EXECUTION_NAME.$": "$.execution_name",
+          "--SQL": "select distinct 1 from model_sci.sci_pfe_publish_index_return;",
+          "--CONDITION_KEY": "is_exist_records"
+        }
+      },
+      "ResultPath": "$.output",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "BackoffRate": 1,
+          "IntervalSeconds": 60,
+          "MaxAttempts": 2
+        }
+      ],
+      "Next": "Lambda Glue Signal Return Table Data Check",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "Send Task Faild Alert Email",
+          "ResultPath": "$.output"
+        }
+      ]
+    },
+    "Lambda Glue Signal Return Table Data Check": {
+      "Type": "Task",
+      "Resource": "arn:aws-cn:states:::lambda:invoke",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-state-machine-vars-broker-handler:$LATEST"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Choice Signal Return Table Data",
+      "OutputPath": "$.Payload"
+    },
+    "Choice Signal Return Table Data": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.is_exist_records",
+          "NumericEquals": 1,
+          "Next": "Signal Success Status Return Export"
+        }
+      ],
+      "Default": "Send Task Success Email"
+    },
+    "Signal Success Status Return Export": {
+      "Type": "Task",
+      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "ph-cdp-sci-sfdc-ingest-glue-job-cn-north-1-dev",
+        "Arguments": {
+          "--JOB_NAME": "ph-cdp-sci-sfdc-ingest-glue-job-cn-north-1-dev",
+          "--LOAD_ID.$": "$.load_id",
+          "--DOMAIN": "sci_mttm",
+          "--ENTITY": "MTM_PerformancePublishSignal__c"
+        }
+      },
+      "ResultPath": "$.output",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "BackoffRate": 1,
+          "IntervalSeconds": 60,
+          "MaxAttempts": 2
+        }
+      ],
+      "Next": "Send Task Success Email",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "Send Task Faild Alert Email",
+          "ResultPath": "$.output"
+        }
+      ]
+    },
+    "Send Task Success Email": {
+      "Type": "Task",
+      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "ph-cdp-sci-state-machine-email-operator-glue-job-cn-north-1-dev",
+        "Arguments": {
+          "--SUBJECT": "Task CDP_SCI Notification Email Send From Step Function From_dev",
+          "--BODY": "Task Sci Data Control Success!",
+          "--TO": "yunfeng.yu.ext@bayer.com,connie.gao.ext@bayer.com,kaiyang.liu1.ext@bayer.com,mengru.xiao.ext@bayer.com,mingyong.li.ext@bayer.com,nicole.chen.ext@bayer.com,sally.lu.ext@bayer.com,wenhao.jv.ext@bayer.com,xinyu.lin.ext@bayer.com,xirui.qian.ext@bayer.com,zhiwei.wang3.ext@bayer.com,zou.junyi.ext@bayer.com"
+        }
+      },
+      "Next": "Success",
+      "ResultPath": "$.output",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "BackoffRate": 1,
+          "IntervalSeconds": 60,
+          "MaxAttempts": 2
+        }
+      ]
+    },
+    "Update Signal Calculate&Publish Status Failed": {
+      "Type": "Task",
+      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "ph-cdp-sci-redshift-statement-executor-glue-job-cn-north-1-dev",
+        "Arguments": {
+          "--JOB_NAME": "ph-cdp-sci-redshift-statement-executor-glue-job-cn-north-1-dev",
+          "--RS_DB": "cn_sci_dev",
+          "--SQL": "insert into model_sci.sci_pfe_publish_index_return select distinct a.id, 'Failed' as MTM_Status__c, to_char(getdate()::timestamp at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') as MTM_LastCalculateDate__c, 'Failed' as MTM_CalculateStatus__c, to_char(a.publish_datetime::timestamp at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') as MTM_LastPublishDate__c, a.publish_status as MTM_PublishStatus__c from model_sci.sci_pfe_publish_index a join model_sci.sci_calculated_year_month b on a.version = b.version_no and a.year_month = b.year_month where a.is_calculated='true' ;insert into model_sci.sci_pfe_publish_index_return select distinct a.id, 'Failed' as MTM_Status__c, to_char(a.calculate_datetime::timestamp at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') as MTM_LastCalculateDate__c, a.calculate_status as MTM_CalculateStatus__c, to_char(getdate()::timestamp at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') as MTM_LastPublishDate__c, 'Failed' as MTM_PublishStatus__c from model_sci.sci_pfe_publish_index a where a.is_published = 'True' and a.status <> 'Completed';"
+        }
+      },
+      "Next": "Glue Signal Return Table Data Check (1)",
+      "ResultPath": "$.output",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "BackoffRate": 1,
+          "IntervalSeconds": 60,
+          "MaxAttempts": 2
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "Send Task Faild Alert Email",
+          "ResultPath": "$.output"
+        }
+      ]
+    },
+    "Glue Signal Return Table Data Check (1)": {
+      "Type": "Task",
+      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "ph-cdp-sci-redshift-condition-branch-glue-job-cn-north-1-dev",
+        "Arguments": {
+          "--JOB_NAME": "ph-cdp-sci-redshift-condition-branch-glue-job-cn-north-1-dev",
+          "--STATE_MACHINE_NAME.$": "$.state_machine_name",
+          "--EXECUTION_NAME.$": "$.execution_name",
+          "--SQL": "select distinct 1 from model_sci.sci_pfe_publish_index_return;",
+          "--CONDITION_KEY": "is_exist_records"
+        }
+      },
+      "ResultPath": "$.output",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "BackoffRate": 1,
+          "IntervalSeconds": 60,
+          "MaxAttempts": 2
+        }
+      ],
+      "Next": "Lambda Glue Signal Return Table Data Check (1)",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "Send Task Faild Alert Email",
+          "ResultPath": "$.output"
+        }
+      ]
+    },
+    "Lambda Glue Signal Return Table Data Check (1)": {
+      "Type": "Task",
+      "Resource": "arn:aws-cn:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "arn:aws-cn:lambda:cn-north-1:268754486553:function:ph-cdp-sci-state-machine-vars-broker-handler:$LATEST"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Choice Signal Return Table Data (1)"
+    },
+    "Choice Signal Return Table Data (1)": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.is_exist_records",
+          "NumericEquals": 1,
+          "Next": "Signal Failed Status Return Export"
+        }
+      ],
+      "Default": "Send Task Faild Alert Email"
+    },
+    "Signal Failed Status Return Export": {
+      "Type": "Task",
+      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+      "Parameters": {
+        "JobName": "ph-cdp-sci-sfdc-ingest-glue-job-cn-north-1-dev",
+        "Arguments": {
+          "--JOB_NAME": "ph-cdp-sci-sfdc-ingest-glue-job-cn-north-1-dev",
+          "--LOAD_ID.$": "$.load_id",
+          "--DOMAIN": "sci_mttm",
+          "--ENTITY": "MTM_PerformancePublishSignal__c"
+        }
+      },
+      "ResultPath": "$.output",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "BackoffRate": 1,
+          "IntervalSeconds": 60,
+          "MaxAttempts": 2
+        }
+      ],
+      "Next": "Send Task Faild Alert Email"
+    },
+    "Success": {
+      "Type": "Succeed"
+    },
+    "Fail": {
+      "Type": "Fail"
+    }
+  },
+  "TimeoutSeconds": 36000
+}

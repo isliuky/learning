@@ -1,0 +1,1042 @@
+{
+  "Comment": "A Hello World example of the Amazon States Language using Pass states",
+  "StartAt": "Parallel",
+  "States": {
+    "Parallel": {
+      "Type": "Parallel",
+      "Next": "SendTaskSuccess",
+      "Branches": [
+        {
+          "StartAt": "Retail Layout",
+          "States": {
+            "Retail Layout": {
+              "Type": "Parallel",
+              "Branches": [
+                {
+                  "StartAt": "Archive layout_monthly",
+                  "States": {
+                    "Archive layout_monthly": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-s3-archive-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--SOURCE_PATH": "s3://ph-cdp-nprod-qa-cn-north-1/ph-cdp-sftp-inbound-qa/cdw_file/02_flatdatasource/01_uploadfile/05_sci/sis/retail_sci_daily/",
+                          "--REGEX_MATCH": "[\"^LayoutBasicMainData.*.zip$\"]",
+                          "--TARGET_PATH": "s3://mtm-athena-data-uat/terminal/mtm_trm_pharmacy_terminal_layout_monthly/",
+                          "--IS_ARCHIVE": "true",
+                          "--NEW_FILENAME": "data.csv",
+                          "--FILE_ENCODING": "GB2312",
+                          "--JOB_NAME": "ph-cdp-sci-s3-archive-glue-job-cn-north-1-qa",
+                          "--LOAD_ID.$": "$.load_id",
+                          "--IS_FILE_FLAG": "true"
+                        },
+                        "MaxCapacity": 1
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "ResultPath": "$.output",
+                      "Next": "Archive Job Messege Broker Handler"
+                    },
+                    "Archive Job Messege Broker Handler": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::lambda:invoke",
+                      "OutputPath": "$.Payload",
+                      "Parameters": {
+                        "Payload.$": "$",
+                        "FunctionName": "arn:aws-cn:lambda:cn-north-1:828533277754:function:ph-cdp-sci-state-machine-vars-broker-handler:$LATEST"
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "Lambda.ServiceException",
+                            "Lambda.AWSLambdaException",
+                            "Lambda.SdkClientException",
+                            "Lambda.TooManyRequestsException"
+                          ],
+                          "IntervalSeconds": 1,
+                          "MaxAttempts": 3,
+                          "BackoffRate": 2,
+                          "JitterStrategy": "FULL"
+                        }
+                      ],
+                      "Next": "Choice"
+                    },
+                    "Choice": {
+                      "Type": "Choice",
+                      "Choices": [
+                        {
+                          "Variable": "$.is_file_success_flag",
+                          "IsPresent": true,
+                          "Next": "layout_monthly completed"
+                        }
+                      ],
+                      "Default": "Success (1)"
+                    },
+                    "Success (1)": {
+                      "Type": "Succeed"
+                    },
+                    "layout_monthly completed": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RETRY": "60",
+                          "--DELAY": "10",
+                          "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select 1",
+                          "--S3_URI": "s3://mtm-athena-data-uat/terminal/mtm_trm_pharmacy_terminal_layout_monthly/completed.csv",
+                          "--SHEET_NAME": "completed",
+                          "--FORMAT": "csv",
+                          "--BLANK_FILE": "true"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "Archive layout_monthly_diff",
+                  "States": {
+                    "Archive layout_monthly_diff": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-s3-archive-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--SOURCE_PATH": "s3://ph-cdp-nprod-qa-cn-north-1/ph-cdp-sftp-inbound-qa/cdw_file/02_flatdatasource/01_uploadfile/05_sci/sis/retail_sci_daily/",
+                          "--REGEX_MATCH": "[\"^DiscrepancyData_.*.csv$\"]",
+                          "--TARGET_PATH": "s3://mtm-athena-data-uat/terminal/mtm_trm_pharmacy_terminal_layout_monthly_diff/",
+                          "--IS_ARCHIVE": "true",
+                          "--NEW_FILENAME": "data.csv",
+                          "--JOB_NAME": "ph-cdp-sci-s3-archive-glue-job-cn-north-1-qa",
+                          "--LOAD_ID.$": "$.load_id",
+                          "--IS_FILE_FLAG": "true"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "ResultPath": "$.output",
+                      "Next": "Archive Job Messege Broker Handler (1)"
+                    },
+                    "Archive Job Messege Broker Handler (1)": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::lambda:invoke",
+                      "OutputPath": "$.Payload",
+                      "Parameters": {
+                        "Payload.$": "$",
+                        "FunctionName": "arn:aws-cn:lambda:cn-north-1:828533277754:function:ph-cdp-sci-state-machine-vars-broker-handler:$LATEST"
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "Lambda.ServiceException",
+                            "Lambda.AWSLambdaException",
+                            "Lambda.SdkClientException",
+                            "Lambda.TooManyRequestsException"
+                          ],
+                          "IntervalSeconds": 1,
+                          "MaxAttempts": 3,
+                          "BackoffRate": 2,
+                          "JitterStrategy": "FULL"
+                        }
+                      ],
+                      "Next": "Choice (1)"
+                    },
+                    "Choice (1)": {
+                      "Type": "Choice",
+                      "Choices": [
+                        {
+                          "Variable": "$.is_file_success_flag",
+                          "IsPresent": true,
+                          "Next": "layout_monthly_diff completed"
+                        }
+                      ],
+                      "Default": "Success (2)"
+                    },
+                    "Success (2)": {
+                      "Type": "Succeed"
+                    },
+                    "layout_monthly_diff completed": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RETRY": "60",
+                          "--DELAY": "10",
+                          "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select 1",
+                          "--S3_URI": "s3://mtm-athena-data-uat/terminal/mtm_trm_pharmacy_terminal_layout_monthly_diff/completed.csv",
+                          "--SHEET_NAME": "completed",
+                          "--FORMAT": "csv",
+                          "--BLANK_FILE": "true"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "Archive layout_quarterly",
+                  "States": {
+                    "Archive layout_quarterly": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-s3-archive-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--SOURCE_PATH": "s3://ph-cdp-nprod-qa-cn-north-1/ph-cdp-sftp-inbound-qa/cdw_file/02_flatdatasource/01_uploadfile/05_sci/sis/retail_sci_quarterly_sales_publish/",
+                          "--REGEX_MATCH": "[\"^LayoutBasicMainData.*.zip$\"]",
+                          "--TARGET_PATH": "s3://mtm-athena-data-uat/terminal/mtm_trm_pharmacy_terminal_layout_quarterly/",
+                          "--IS_ARCHIVE": "true",
+                          "--NEW_FILENAME": "data.csv",
+                          "--FILE_ENCODING": "GB2312",
+                          "--JOB_NAME": "ph-cdp-sci-s3-archive-glue-job-cn-north-1-qa",
+                          "--LOAD_ID.$": "$.load_id",
+                          "--IS_FILE_FLAG": "true"
+                        },
+                        "MaxCapacity": 1
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "ResultPath": "$.output",
+                      "Next": "Archive Job Messege Broker Handler (2)"
+                    },
+                    "Archive Job Messege Broker Handler (2)": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::lambda:invoke",
+                      "OutputPath": "$.Payload",
+                      "Parameters": {
+                        "Payload.$": "$",
+                        "FunctionName": "arn:aws-cn:lambda:cn-north-1:828533277754:function:ph-cdp-sci-state-machine-vars-broker-handler:$LATEST"
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "Lambda.ServiceException",
+                            "Lambda.AWSLambdaException",
+                            "Lambda.SdkClientException",
+                            "Lambda.TooManyRequestsException"
+                          ],
+                          "IntervalSeconds": 1,
+                          "MaxAttempts": 3,
+                          "BackoffRate": 2,
+                          "JitterStrategy": "FULL"
+                        }
+                      ],
+                      "Next": "Choice (2)"
+                    },
+                    "Choice (2)": {
+                      "Type": "Choice",
+                      "Choices": [
+                        {
+                          "Variable": "$.is_file_success_flag",
+                          "IsPresent": true,
+                          "Next": "layout_quarterly completed"
+                        }
+                      ],
+                      "Default": "Success (3)"
+                    },
+                    "Success (3)": {
+                      "Type": "Succeed"
+                    },
+                    "layout_quarterly completed": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RETRY": "60",
+                          "--DELAY": "10",
+                          "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select 1",
+                          "--S3_URI": "s3://mtm-athena-data-uat/terminal/mtm_trm_pharmacy_terminal_layout_quarterly/completed.csv",
+                          "--SHEET_NAME": "completed",
+                          "--FORMAT": "csv",
+                          "--BLANK_FILE": "true"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "Archive layout_quarterly_diff",
+                  "States": {
+                    "Archive layout_quarterly_diff": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-s3-archive-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--SOURCE_PATH": "s3://ph-cdp-nprod-qa-cn-north-1/ph-cdp-sftp-inbound-qa/cdw_file/02_flatdatasource/01_uploadfile/05_sci/sis/retail_sci_quarterly_sales_publish/",
+                          "--REGEX_MATCH": "[\"^DiscrepancyData_.*.csv$\"]",
+                          "--TARGET_PATH": "s3://mtm-athena-data-uat/terminal/mtm_trm_pharmacy_terminal_layout_quarterly_diff/",
+                          "--IS_ARCHIVE": "true",
+                          "--NEW_FILENAME": "data.csv",
+                          "--JOB_NAME": "ph-cdp-sci-s3-archive-glue-job-cn-north-1-qa",
+                          "--LOAD_ID.$": "$.load_id",
+                          "--IS_FILE_FLAG": "true"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "ResultPath": "$.output",
+                      "Next": "Archive Job Messege Broker Handler (3)"
+                    },
+                    "Archive Job Messege Broker Handler (3)": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::lambda:invoke",
+                      "OutputPath": "$.Payload",
+                      "Parameters": {
+                        "Payload.$": "$",
+                        "FunctionName": "arn:aws-cn:lambda:cn-north-1:828533277754:function:ph-cdp-sci-state-machine-vars-broker-handler:$LATEST"
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "Lambda.ServiceException",
+                            "Lambda.AWSLambdaException",
+                            "Lambda.SdkClientException",
+                            "Lambda.TooManyRequestsException"
+                          ],
+                          "IntervalSeconds": 1,
+                          "MaxAttempts": 3,
+                          "BackoffRate": 2,
+                          "JitterStrategy": "FULL"
+                        }
+                      ],
+                      "Next": "Choice (3)"
+                    },
+                    "Choice (3)": {
+                      "Type": "Choice",
+                      "Choices": [
+                        {
+                          "Variable": "$.is_file_success_flag",
+                          "IsPresent": true,
+                          "Next": "layout_quarterly_diff completed"
+                        }
+                      ],
+                      "Default": "Success (4)"
+                    },
+                    "Success (4)": {
+                      "Type": "Succeed"
+                    },
+                    "layout_quarterly_diff completed": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RETRY": "60",
+                          "--DELAY": "10",
+                          "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select 1",
+                          "--S3_URI": "s3://mtm-athena-data-uat/terminal/mtm_trm_pharmacy_terminal_layout_quarterly_diff/completed.csv",
+                          "--SHEET_NAME": "completed",
+                          "--FORMAT": "csv",
+                          "--BLANK_FILE": "true"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                }
+              ],
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "call sp_analytical_sci_data_sales_daily_retail",
+          "States": {
+            "call sp_analytical_sci_data_sales_daily_retail": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+              "Parameters": {
+                "JobName": "ph-cdp-sci-stored-procedure-operator-glue-job-cn-north-1-qa",
+                "Arguments": {
+                  "--JOB_NAME": "ph-cdp-sci-stored-procedure-operator-glue-job-cn-north-1-qa",
+                  "--RS_DB": "cn_sci_qa",
+                  "--SP_NAME": "analytical_sci.sp_analytical_sci_data_sales_daily_retail",
+                  "--RETRY": "90",
+                  "--DELAY": "120"
+                }
+              },
+              "Retry": [
+                {
+                  "ErrorEquals": [
+                    "States.TaskFailed"
+                  ],
+                  "BackoffRate": 1,
+                  "IntervalSeconds": 60,
+                  "MaxAttempts": 2
+                }
+              ],
+              "Next": "Athena"
+            },
+            "Athena": {
+              "Type": "Parallel",
+              "Branches": [
+                {
+                  "StartAt": "v_analytical_sci_sales_detail_monthly_district_retail",
+                  "States": {
+                    "v_analytical_sci_sales_detail_monthly_district_retail": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "analytical_sci.v_analytical_sci_sales_detail_monthly_district_retail",
+                          "--S3_PATH": "s3://mtm-athena-data-uat/performance/mtm_prf_pharmacy_sales_district_level",
+                          "--PARTITION_KEYS": "year",
+                          "--FORMAT": "parquet"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "Next": "sales_detail_monthly_district_completed"
+                    },
+                    "sales_detail_monthly_district_completed": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RETRY": "60",
+                          "--DELAY": "10",
+                          "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select 1",
+                          "--S3_URI": "s3://mtm-athena-data-uat/performance/mtm_prf_pharmacy_sales_district_level/completed.csv",
+                          "--SHEET_NAME": "completed",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "Next": "v_analytical_sci_data_sales_store_monthly_retail"
+                    },
+                    "v_analytical_sci_data_sales_store_monthly_retail": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "analytical_sci.v_analytical_sci_data_sales_store_monthly_retail",
+                          "--S3_PATH": "s3://mtm-athena-data-uat/performance/mtm_prf_pharmacy_sales_terminal_store_level",
+                          "--PARTITION_KEYS": "year,month,terminal_hq_code",
+                          "--FORMAT": "parquet"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "Next": "sci_data_sales_store_monthly_retail_completed"
+                    },
+                    "sci_data_sales_store_monthly_retail_completed": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RETRY": "60",
+                          "--DELAY": "10",
+                          "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select 1",
+                          "--S3_URI": "s3://mtm-athena-data-uat/performance/mtm_prf_pharmacy_sales_terminal_store_level/completed.csv",
+                          "--SHEET_NAME": "completed",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "v_analytical_sci_sales_detail_monthly_terminal_retail",
+                  "States": {
+                    "v_analytical_sci_sales_detail_monthly_terminal_retail": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "analytical_sci.v_analytical_sci_sales_detail_monthly_terminal_retail",
+                          "--S3_PATH": "s3://mtm-athena-data-uat/performance/mtm_prf_pharmacy_sales_terminal_level",
+                          "--PARTITION_KEYS": "year,month,cluster_code",
+                          "--FORMAT": "parquet"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "Next": "sales_detail_monthly_teminal_completed"
+                    },
+                    "sales_detail_monthly_teminal_completed": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RETRY": "60",
+                          "--DELAY": "10",
+                          "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select 1",
+                          "--S3_URI": "s3://mtm-athena-data-uat/performance/mtm_prf_pharmacy_sales_terminal_level/completed.csv",
+                          "--SHEET_NAME": "completed",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "Next": "v_analytical_sci_data_sales_daily_retail"
+                    },
+                    "v_analytical_sci_data_sales_daily_retail": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "analytical_sci.v_analytical_sci_data_sales_daily_retail",
+                          "--S3_PATH": "s3://mtm-athena-data-uat/performance/mtm_prf_pharmacy_sales_daily",
+                          "--PARTITION_KEYS": "year,month,terminal_hq_code",
+                          "--FORMAT": "parquet"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "Next": "sci_data_sales_daily_retail_completed"
+                    },
+                    "sci_data_sales_daily_retail_completed": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RETRY": "60",
+                          "--DELAY": "10",
+                          "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select 1",
+                          "--S3_URI": "s3://mtm-athena-data-uat/performance/mtm_prf_pharmacy_sales_daily/completed.csv",
+                          "--SHEET_NAME": "completed",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "v_analytical_sci_sales_detail_monthly_territory_retail",
+                  "States": {
+                    "v_analytical_sci_sales_detail_monthly_territory_retail": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "analytical_sci.v_analytical_sci_sales_detail_monthly_territory_retail",
+                          "--S3_PATH": "s3://mtm-athena-data-uat/performance/mtm_prf_pharmacy_sales_territory_level",
+                          "--PARTITION_KEYS": "year,month,market_code",
+                          "--FORMAT": "parquet"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "Next": "sales_detail_monthly_territory_completed"
+                    },
+                    "sales_detail_monthly_territory_completed": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RETRY": "60",
+                          "--DELAY": "10",
+                          "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select 1",
+                          "--S3_URI": "s3://mtm-athena-data-uat/performance/mtm_prf_pharmacy_sales_territory_level/completed.csv",
+                          "--SHEET_NAME": "completed",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "Next": "v_analytical_sci_data_sales_mh_monthly_retail"
+                    },
+                    "v_analytical_sci_data_sales_mh_monthly_retail": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "analytical_sci.v_analytical_sci_data_sales_mh_monthly_retail",
+                          "--S3_PATH": "s3://mtm-athena-data-uat/performance/mtm_prf_pharmacy_sales_terminal_mh_level",
+                          "--PARTITION_KEYS": "year,month",
+                          "--FORMAT": "parquet"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "Next": "sci_data_sales_mh_monthly_retail_completed"
+                    },
+                    "sci_data_sales_mh_monthly_retail_completed": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RETRY": "60",
+                          "--DELAY": "10",
+                          "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select 1",
+                          "--S3_URI": "s3://mtm-athena-data-uat/performance/mtm_prf_pharmacy_sales_terminal_mh_level/completed.csv",
+                          "--SHEET_NAME": "completed",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                }
+              ],
+              "ResultPath": "$.output",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Sales Force Parallel",
+          "States": {
+            "Sales Force Parallel": {
+              "Type": "Parallel",
+              "End": true,
+              "Branches": [
+                {
+                  "StartAt": "sp_sci_sales_calculation_log_retail",
+                  "States": {
+                    "sp_sci_sales_calculation_log_retail": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-stored-procedure-operator-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--JOB_NAME": "ph-cdp-sci-stored-procedure-operator-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SP_NAME": "analytical_sci.sp_sci_sales_calculation_log_retail",
+                          "--RETRY": "90",
+                          "--DELAY": "120"
+                        }
+                      },
+                      "Next": "v_analytical_sci_sales_calculation_log",
+                      "ResultPath": "$.output"
+                    },
+                    "v_analytical_sci_sales_calculation_log": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-sfdc-ingest-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--JOB_NAME": "ph-cdp-sci-sfdc-ingest-glue-job-cn-north-1-qa",
+                          "--LOAD_ID.$": "$.load_id",
+                          "--DOMAIN": "sci_mttm",
+                          "--ENTITY": "MTM_PerformanceCalculationLog__c_retail"
+                        }
+                      },
+                      "End": true
+                    }
+                  }
+                }
+              ],
+              "ResultPath": "$.output"
+            }
+          }
+        },
+        {
+          "StartAt": "PGSQL Parallel",
+          "States": {
+            "PGSQL Parallel": {
+              "Type": "Parallel",
+              "Branches": [
+                {
+                  "StartAt": "v_analytical_sci_sales_publish_report_retail",
+                  "States": {
+                    "v_analytical_sci_sales_publish_report_retail": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-rdms-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select * from analytical_sci.v_analytical_sci_sales_publish_report_retail;",
+                          "--TARGET_DB": "mtmdb-uat",
+                          "--TARGET_TABLE": "performance.\"TMP_PRF_PharmacyHistoryTerritorySales\"",
+                          "--TARGE_SYSTEM": "pgsql",
+                          "--CONN_ID": "phsci/pgsql/sci",
+                          "--WRITE_MODE": "overwrite"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "Next": "v_sci_sales_publish_report_log_export_hvh_retail"
+                    },
+                    "v_sci_sales_publish_report_log_export_hvh_retail": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-rdms-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select * from analytical_sci.v_sci_sales_publish_report_log_export_hvh_retail;",
+                          "--TARGET_DB": "mtmdb-uat",
+                          "--TARGET_TABLE": "performance.\"MTM_PRF_DataSyncJobLog\"",
+                          "--TARGE_SYSTEM": "pgsql",
+                          "--CONN_ID": "phsci/pgsql/sci",
+                          "--WRITE_MODE": "append"
+                        }
+                      },
+                      "End": true,
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "StartAt": "Pass",
+                  "States": {
+                    "Pass": {
+                      "Type": "Pass",
+                      "End": true
+                    }
+                  }
+                }
+              ],
+              "ResultPath": "$.output",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Share folder",
+          "States": {
+            "Share folder": {
+              "Type": "Parallel",
+              "End": true,
+              "Branches": [
+                {
+                  "StartAt": "sci_data_publish_quarter_retail",
+                  "States": {
+                    "sci_data_publish_quarter_retail": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RETRY": "60",
+                          "--DELAY": "10",
+                          "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select * from analytical_sci.v_analytical_sci_data_publish_quarter_sharefolder_retail;",
+                          "--S3_URI": "s3://ph-cdp-nprod-qa-cn-north-1/ph-cdp-sftp-outbound-qa/sci/retail_salespublish_inactive_quarter/salespublish_inactive_quarter.csv",
+                          "--SHEET_NAME": "salespublish_inactive_quarter",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "salespublish__yearmonth",
+                  "States": {
+                    "salespublish__yearmonth": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "select * from analytical_sci.v_analytical_sci_sales_publish_hvh_sharefolder_retail;",
+                          "--S3_PATH": "s3://ph-cdp-nprod-qa-cn-north-1/ph-cdp-sftp-outbound-qa/sci/retail_salespublish/yearmonth/",
+                          "--PARTITION_KEYS": "year,month",
+                          "--DELIMITER": ",",
+                          "--QUOTE": "\"",
+                          "--ESCAPE": "\\",
+                          "--CSV_FILE_PREFIX": "salespublish_",
+                          "--DYNAMIC_OVERWRITE": "true",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "ResultPath": "$.output",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "SendTaskFailure",
+          "ResultPath": "$.output"
+        }
+      ]
+    },
+    "Success": {
+      "Type": "Succeed"
+    },
+    "SendTaskFailure": {
+      "Type": "Task",
+      "Parameters": {
+        "TaskToken.$": "$.task_token"
+      },
+      "Resource": "arn:aws-cn:states:::aws-sdk:sfn:sendTaskFailure",
+      "Next": "Fail"
+    },
+    "SendTaskSuccess": {
+      "Type": "Task",
+      "Parameters": {
+        "Output": {
+          "status": "success"
+        },
+        "TaskToken.$": "$.task_token"
+      },
+      "Resource": "arn:aws-cn:states:::aws-sdk:sfn:sendTaskSuccess",
+      "Next": "Success"
+    },
+    "Fail": {
+      "Type": "Fail"
+    }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "Comment": "A Hello World example of the Amazon States Language using Pass states",
+  "StartAt": "Parallel",
+  "States": {
+    "Parallel": {
+      "Type": "Parallel",
+      "Next": "SendTaskSuccess",
+      "Branches": [
+        {
+          "StartAt": "Sales Force Parallel",
+          "States": {
+            "Sales Force Parallel": {
+              "Type": "Parallel",
+              "End": true,
+              "Branches": [
+                {
+                  "StartAt": "Pass (1)",
+                  "States": {
+                    "Pass (1)": {
+                      "Type": "Pass",
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "sp_sci_sales_calculation_log",
+                  "States": {
+                    "sp_sci_sales_calculation_log": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-stored-procedure-operator-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--JOB_NAME": "ph-cdp-sci-stored-procedure-operator-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SP_NAME": "analytical_sci.sp_sci_sales_calculation_log",
+                          "--RETRY": "90",
+                          "--DELAY": "120"
+                        }
+                      },
+                      "Next": "v_analytical_sci_sales_calculation_log",
+                      "ResultPath": "$.output"
+                    },
+                    "v_analytical_sci_sales_calculation_log": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-sfdc-ingest-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--JOB_NAME": "ph-cdp-sci-sfdc-ingest-glue-job-cn-north-1-qa",
+                          "--LOAD_ID.$": "$.load_id",
+                          "--DOMAIN": "sci_mttm",
+                          "--ENTITY": "MTM_PerformanceCalculationLog__c"
+                        }
+                      },
+                      "End": true
+                    }
+                  }
+                }
+              ],
+              "ResultPath": "$.output"
+            }
+          }
+        }
+      ],
+      "ResultPath": "$.output",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "SendTaskFailure",
+          "ResultPath": "$.output"
+        }
+      ]
+    },
+    "Success": {
+      "Type": "Succeed"
+    },
+    "SendTaskFailure": {
+      "Type": "Task",
+      "Parameters": {
+        "TaskToken.$": "$.task_token"
+      },
+      "Resource": "arn:aws-cn:states:::aws-sdk:sfn:sendTaskFailure",
+      "Next": "Fail"
+    },
+    "SendTaskSuccess": {
+      "Type": "Task",
+      "Parameters": {
+        "Output": {
+          "status": "success"
+        },
+        "TaskToken.$": "$.task_token"
+      },
+      "Resource": "arn:aws-cn:states:::aws-sdk:sfn:sendTaskSuccess",
+      "Next": "Success"
+    },
+    "Fail": {
+      "Type": "Fail"
+    }
+  }
+}

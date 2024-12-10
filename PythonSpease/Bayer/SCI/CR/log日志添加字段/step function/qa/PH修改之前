@@ -1,0 +1,716 @@
+{
+  "Comment": "A Hello World example of the Amazon States Language using Pass states",
+  "StartAt": "Parallel",
+  "States": {
+    "Parallel": {
+      "Type": "Parallel",
+      "Next": "SendTaskSuccess",
+      "Branches": [
+        {
+          "StartAt": "Exec SP analytical_sci.sp_analytical_hvh_mtm_sales_daily_athena_export",
+          "States": {
+            "Exec SP analytical_sci.sp_analytical_hvh_mtm_sales_daily_athena_export": {
+              "Type": "Task",
+              "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+              "Parameters": {
+                "JobName": "ph-cdp-sci-stored-procedure-operator-glue-job-cn-north-1-qa",
+                "Arguments": {
+                  "--JOB_NAME": "ph-cdp-sci-stored-procedure-operator-glue-job-cn-north-1-qa",
+                  "--RS_DB": "cn_sci_qa",
+                  "--SP_NAME": "analytical_sci.sp_analytical_hvh_mtm_sales_daily_athena_export",
+                  "--RETRY": "90",
+                  "--DELAY": "120"
+                }
+              },
+              "ResultPath": "$.output",
+              "Retry": [
+                {
+                  "ErrorEquals": [
+                    "States.TaskFailed"
+                  ],
+                  "BackoffRate": 1,
+                  "IntervalSeconds": 60,
+                  "MaxAttempts": 2
+                }
+              ],
+              "Next": "Parquet Parallel"
+            },
+            "Parquet Parallel": {
+              "Type": "Parallel",
+              "Branches": [
+                {
+                  "StartAt": "v_analytical_sci_sales_detail_monthly_district",
+                  "States": {
+                    "v_analytical_sci_sales_detail_monthly_district": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "analytical_sci.v_analytical_sci_sales_detail_monthly_district",
+                          "--S3_PATH": "s3://mtm-athena-data-uat/performance/mtm_prf_sales_district_level",
+                          "--PARTITION_KEYS": "year",
+                          "--FORMAT": "parquet"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "Next": "sales_detail_monthly_district_completed"
+                    },
+                    "sales_detail_monthly_district_completed": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RETRY": "60",
+                          "--DELAY": "10",
+                          "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select 1",
+                          "--S3_URI": "s3://mtm-athena-data-uat/performance/mtm_prf_sales_district_level/completed.csv",
+                          "--SHEET_NAME": "completed",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "v_analytical_sci_sales_detail_monthly_teminal",
+                  "States": {
+                    "v_analytical_sci_sales_detail_monthly_teminal": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "analytical_sci.v_analytical_sci_sales_detail_monthly_teminal",
+                          "--S3_PATH": "s3://mtm-athena-data-uat/performance/mtm_prf_sales_terminal_level",
+                          "--PARTITION_KEYS": "year,month,cluster_code",
+                          "--FORMAT": "parquet"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "Next": "sales_detail_monthly_teminal_completed"
+                    },
+                    "sales_detail_monthly_teminal_completed": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RETRY": "60",
+                          "--DELAY": "10",
+                          "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select 1",
+                          "--S3_URI": "s3://mtm-athena-data-uat/performance/mtm_prf_sales_terminal_level/completed.csv",
+                          "--SHEET_NAME": "completed",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "v_analytical_sci_sales_detail_monthly_territory",
+                  "States": {
+                    "v_analytical_sci_sales_detail_monthly_territory": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "analytical_sci.v_analytical_sci_sales_detail_monthly_territory",
+                          "--S3_PATH": "s3://mtm-athena-data-uat/performance/mtm_prf_sales_territory_level",
+                          "--PARTITION_KEYS": "year,month,market_code",
+                          "--FORMAT": "parquet"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "Next": "sales_detail_monthly_territory_completed"
+                    },
+                    "sales_detail_monthly_territory_completed": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RETRY": "60",
+                          "--DELAY": "10",
+                          "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select 1",
+                          "--S3_URI": "s3://mtm-athena-data-uat/performance/mtm_prf_sales_territory_level/completed.csv",
+                          "--SHEET_NAME": "completed",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "v_analytical_sci_data_goods_return_detail",
+                  "States": {
+                    "v_analytical_sci_data_goods_return_detail": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "analytical_sci.v_analytical_sci_data_goods_return_detail",
+                          "--S3_PATH": "s3://mtm-athena-data-uat/performance/mtm_prf_goods_return",
+                          "--PARTITION_KEYS": "year",
+                          "--FORMAT": "parquet"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "Next": "goods_return_detail_completed"
+                    },
+                    "goods_return_detail_completed": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RETRY": "60",
+                          "--DELAY": "10",
+                          "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select 1",
+                          "--S3_URI": "s3://mtm-athena-data-uat/performance/mtm_prf_goods_return/completed.csv",
+                          "--SHEET_NAME": "completed",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "mtm_prf_sales_territory_index",
+                  "States": {
+                    "mtm_prf_sales_territory_index": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "analytical_sci.v_analytical_sci_sales_territory_index",
+                          "--S3_PATH": "s3://mtm-athena-data-uat/performance/mtm_prf_sales_territory_index",
+                          "--PARTITION_KEYS": "year,month,index_type",
+                          "--FORMAT": "parquet"
+                        }
+                      },
+                      "Next": "sales_territory_index_completed"
+                    },
+                    "sales_territory_index_completed": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RETRY": "60",
+                          "--DELAY": "10",
+                          "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select 1",
+                          "--S3_URI": "s3://mtm-athena-data-uat/performance/mtm_prf_sales_territory_index/completed.csv",
+                          "--SHEET_NAME": "completed",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "v_analytical_sci_mtm_sales_daily",
+                  "States": {
+                    "v_analytical_sci_mtm_sales_daily": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "analytical_sci.v_analytical_sci_mtm_sales_daily",
+                          "--S3_PATH": "s3://mtm-athena-data-uat/performance/mtm_prf_sales_daily",
+                          "--PARTITION_KEYS": "year,month,province_code",
+                          "--FORMAT": "parquet"
+                        }
+                      },
+                      "Next": "mtm_sales_daily_completed"
+                    },
+                    "mtm_sales_daily_completed": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RETRY": "60",
+                          "--DELAY": "10",
+                          "--JOB_NAME": "ph-cdp-sci-redshift-to-s3-export-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select 1",
+                          "--S3_URI": "s3://mtm-athena-data-uat/performance/mtm_prf_sales_daily/completed.csv",
+                          "--SHEET_NAME": "completed",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "End": true
+                    }
+                  }
+                }
+              ],
+              "ResultPath": "$.output",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "Sales Force Parallel",
+          "States": {
+            "Sales Force Parallel": {
+              "Type": "Parallel",
+              "End": true,
+              "Branches": [
+                {
+                  "StartAt": "Pass (1)",
+                  "States": {
+                    "Pass (1)": {
+                      "Type": "Pass",
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "sp_sci_sales_calculation_log",
+                  "States": {
+                    "sp_sci_sales_calculation_log": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-stored-procedure-operator-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--JOB_NAME": "ph-cdp-sci-stored-procedure-operator-glue-job-cn-north-1-qa",
+                          "--RS_DB": "cn_sci_qa",
+                          "--SP_NAME": "analytical_sci.sp_sci_sales_calculation_log",
+                          "--RETRY": "90",
+                          "--DELAY": "120"
+                        }
+                      },
+                      "Next": "v_analytical_sci_sales_calculation_log",
+                      "ResultPath": "$.output"
+                    },
+                    "v_analytical_sci_sales_calculation_log": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-sfdc-ingest-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--JOB_NAME": "ph-cdp-sci-sfdc-ingest-glue-job-cn-north-1-qa",
+                          "--LOAD_ID.$": "$.load_id",
+                          "--DOMAIN": "sci_mttm",
+                          "--ENTITY": "MTM_PerformanceCalculationLog__c"
+                        }
+                      },
+                      "End": true
+                    }
+                  }
+                }
+              ],
+              "ResultPath": "$.output"
+            }
+          }
+        },
+        {
+          "StartAt": "PGSQL Parallel",
+          "States": {
+            "PGSQL Parallel": {
+              "Type": "Parallel",
+              "Branches": [
+                {
+                  "StartAt": "v_analytical_sci_sales_publish_report",
+                  "States": {
+                    "v_analytical_sci_sales_publish_report": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-rdms-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select * from analytical_sci.v_analytical_sci_sales_publish_report;",
+                          "--TARGET_DB": "mtmdb-uat",
+                          "--TARGET_TABLE": "performance.\"TMP_PRF_HistoryTerritorySales\"",
+                          "--TARGE_SYSTEM": "pgsql",
+                          "--CONN_ID": "phsci/pgsql/sci",
+                          "--WRITE_MODE": "overwrite"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "Next": "v_sci_sales_publish_report_log_export_hvh"
+                    },
+                    "v_sci_sales_publish_report_log_export_hvh": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-sci-redshift-to-rdms-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--SQL": "select * from analytical_sci.v_sci_sales_publish_report_log_export_hvh;",
+                          "--TARGET_DB": "mtmdb-uat",
+                          "--TARGET_TABLE": "performance.\"MTM_PRF_DataSyncJobLog\"",
+                          "--TARGE_SYSTEM": "pgsql",
+                          "--CONN_ID": "phsci/pgsql/sci",
+                          "--WRITE_MODE": "append"
+                        }
+                      },
+                      "End": true,
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "StartAt": "Pass",
+                  "States": {
+                    "Pass": {
+                      "Type": "Pass",
+                      "End": true
+                    }
+                  }
+                }
+              ],
+              "ResultPath": "$.output",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "CSV Parallel",
+          "States": {
+            "CSV Parallel": {
+              "Type": "Parallel",
+              "Branches": [
+                {
+                  "StartAt": "sci_data_publish_quarter",
+                  "States": {
+                    "sci_data_publish_quarter": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "select * from analytical_sci.v_analytical_sci_data_publish_quarter_sharefolder;",
+                          "--S3_PATH": "s3://ph-cdp-nprod-qa-cn-north-1/ph-cdp-sftp-outbound-qa/sci/salespublish_inactive_quarter/",
+                          "--PARTITION_KEYS": "year,month",
+                          "--CSV_MERGE_KEY": "month",
+                          "--EMPTY_ALLOWED": "true",
+                          "--DELIMITER": ",",
+                          "--QUOTE": "\"",
+                          "--ESCAPE": "\\",
+                          "--CSV_FILE_PREFIX": "salespublish_inactive_quarter",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "HVH year_month",
+                  "States": {
+                    "HVH year_month": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "select * from analytical_sci.v_analytical_sci_sales_publish_hvh_sharefolder;",
+                          "--S3_PATH": "s3://ph-cdp-nprod-qa-cn-north-1/ph-cdp-sftp-outbound-qa/sci/salespublish/yearmonth/",
+                          "--PARTITION_KEYS": "year,month",
+                          "--DELIMITER": ",",
+                          "--QUOTE": "\"",
+                          "--ESCAPE": "\\",
+                          "--CSV_FILE_PREFIX": "salespublish",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "HVH year_month_territory_type_name",
+                  "States": {
+                    "HVH year_month_territory_type_name": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "select * from analytical_sci.v_analytical_sci_sales_publish_hvh_sharefolder;",
+                          "--S3_PATH": "s3://ph-cdp-nprod-qa-cn-north-1/ph-cdp-sftp-outbound-qa/sci/salespublish/territorytype/",
+                          "--PARTITION_KEYS": "territory_type_name,year,month",
+                          "--CSV_MERGE_KEY": "month",
+                          "--DELIMITER": ",",
+                          "--QUOTE": "\"",
+                          "--ESCAPE": "\\",
+                          "--CSV_FILE_PREFIX": "salespublish",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "HVH year_month_marketname",
+                  "States": {
+                    "HVH year_month_marketname": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "select * from analytical_sci.v_analytical_sci_sales_publish_hvh_sharefolder;",
+                          "--S3_PATH": "s3://ph-cdp-nprod-qa-cn-north-1/ph-cdp-sftp-outbound-qa/sci/salespublish/marketname/",
+                          "--PARTITION_KEYS": "market_name,year,month",
+                          "--CSV_MERGE_KEY": "month",
+                          "--DELIMITER": ",",
+                          "--QUOTE": "\"",
+                          "--ESCAPE": "\\",
+                          "--CSV_FILE_PREFIX": "salespublish",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                },
+                {
+                  "StartAt": "HVH year_month_finalclient",
+                  "States": {
+                    "HVH year_month_finalclient": {
+                      "Type": "Task",
+                      "Resource": "arn:aws-cn:states:::glue:startJobRun.sync",
+                      "Parameters": {
+                        "JobName": "ph-cdp-redshift-to-s3-export-partitioned-glue-job-cn-north-1-qa",
+                        "Arguments": {
+                          "--RS_DB": "cn_sci_qa",
+                          "--TABLE": "select * from analytical_sci.v_analytical_sci_sales_publish_hvh_finalclient_sharefolder;",
+                          "--S3_PATH": "s3://ph-cdp-nprod-qa-cn-north-1/ph-cdp-sftp-outbound-qa/sci/salespublish/finalclient/",
+                          "--PARTITION_KEYS": "year,month",
+                          "--CSV_MERGE_KEY": "month",
+                          "--DELIMITER": ",",
+                          "--QUOTE": "\"",
+                          "--ESCAPE": "\\",
+                          "--CSV_FILE_PREFIX": "salespublish",
+                          "--FORMAT": "csv"
+                        }
+                      },
+                      "Retry": [
+                        {
+                          "ErrorEquals": [
+                            "States.TaskFailed"
+                          ],
+                          "BackoffRate": 1,
+                          "IntervalSeconds": 60,
+                          "MaxAttempts": 2
+                        }
+                      ],
+                      "End": true
+                    }
+                  }
+                }
+              ],
+              "ResultPath": "$.output",
+              "End": true
+            }
+          }
+        }
+      ],
+      "ResultPath": "$.output",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "SendTaskFailure",
+          "ResultPath": "$.output"
+        }
+      ]
+    },
+    "Success": {
+      "Type": "Succeed"
+    },
+    "SendTaskFailure": {
+      "Type": "Task",
+      "Parameters": {
+        "TaskToken.$": "$.task_token"
+      },
+      "Resource": "arn:aws-cn:states:::aws-sdk:sfn:sendTaskFailure",
+      "Next": "Fail"
+    },
+    "SendTaskSuccess": {
+      "Type": "Task",
+      "Parameters": {
+        "Output": {
+          "status": "success"
+        },
+        "TaskToken.$": "$.task_token"
+      },
+      "Resource": "arn:aws-cn:states:::aws-sdk:sfn:sendTaskSuccess",
+      "Next": "Success"
+    },
+    "Fail": {
+      "Type": "Fail"
+    }
+  }
+}
