@@ -60,7 +60,7 @@ def generate_truncate_and_insert_statements(ddl, source_schema):
         f")\n"
         f"SELECT\n"
         f"    {column_names}\n"
-        f"FROM {source_schema}.{target_table};"
+        f"FROM {source_schema};"
     )
 
     return truncate_statement, insert_statement
