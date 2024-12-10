@@ -1,0 +1,28 @@
+-- 1. airep
+    call model_dw_airepbi.sp_enriched_to_model();
+
+    select  *from model_dw_airepbi.business_opportunity;
+    select  *from model_dw_airepbi.corpinfo;
+    select  *from model_dw_airepbi.airep_province_mapping;
+    select  *from model_dw_airepbi.hospital_equipment;
+    select  *from model_dw_airepbi.internal_ai_rep_hosp_list;
+    select  *from model_dw_airepbi.userinfo;
+-- 2. radacademy
+    call model_dw_radacademy.sp_enriched_to_model();
+    select  *from model_dw_radacademy.analysis_learn_log;
+    select  *from model_dw_radacademy.analysis_monitor;
+    select  *from model_dw_radacademy.bayer_campain_content;
+    select  *from model_dw_radacademy.bayer_certificate_member;
+    select  *from model_dw_radacademy.bayer_comments;
+    select  *from model_dw_radacademy.bayer_content;
+    select  *from model_dw_radacademy.bayer_form_question_answer;
+    select  *from model_dw_radacademy.bayer_learn_log;
+    select  *from model_dw_radacademy.bayer_learn_times_log;
+    select  *from model_dw_radacademy.bayer_medal_member;
+    select  *from model_dw_radacademy.bayer_meeting_ccmtv_data;
+    select  *from model_dw_radacademy.bayer_meeting_ccmtv_data_log;
+    select  *from model_dw_radacademy.bayer_member;
+    select  *from model_dw_radacademy.bayer_question;
+    select  *from model_dw_radacademy.bayer_question_answer;
+    select  *from model_dw_radacademy.bayer_score_log;
+    select  *from model_dw_radacademy.view_log;
