@@ -1,0 +1,1716 @@
+SELECT ai_rep_name
+,ai_rep_code
+,hospital_name
+,hospital_code
+,hospital_recruitment_time
+,hospital_doctors_num
+,hospital_province
+,important_hospital
+,potential_hospital
+,assessment_hospital
+,target_hospital
+,offline_singles_hospital
+,online_singles_hospital
+,double_hospital
+,not_covered_hospital
+,is_opportunity_point
+,opportunity_point_num
+,recruiting_hospitals
+,hospital_region
+,region_manager
+,hosp_online_representatives
+,hosp_offline_representatives
+,is_cpa
+,decil
+,is_thousand_county_project
+,department_advantages
+,doctor_name
+,doctor_lable
+,doctor_title
+,doctor_department
+,doctor_position
+,doctor_recruitment_time
+,is_speaker
+,user_nickname
+,doctor_phone
+,doctor_hospital
+,online_representatives
+,offline_representatives
+,is_sign
+,follow_users
+,veeva_code
+,is_binding_fusion
+,doctors_interested
+,topic_interststr
+,product_interest
+,system_interest
+,need_improvement
+,doctor_code
+,imaging_academy_registration_time
+,imaging_academy_academic_energy
+,imaging_academy_last_five_reading_time
+,imaging_academy_last_five_reading_type
+,etl_create_by
+,etl_update_by
+,imaging_academy_academic_energy_qtd
+,imaging_academy_academic_energy_rank
+,imaging_academy_total_reading_time_last_6_mtd
+,badge_num
+,certificate_num
+,recruiting_doctor
+,no_h5_recruiting_doctor
+,no_veeva_recruiting_doctor
+,no_wx_recruiting_doctor FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_basic_user_info"
+EXCEPT
+SELECT ai_rep_name
+,ai_rep_code
+,hospital_name
+,hospital_code
+,hospital_recruitment_time
+,hospital_doctors_num
+,hospital_province
+,important_hospital
+,potential_hospital
+,assessment_hospital
+,target_hospital
+,offline_singles_hospital
+,online_singles_hospital
+,double_hospital
+,not_covered_hospital
+,is_opportunity_point
+,opportunity_point_num
+,recruiting_hospitals
+,hospital_region
+,region_manager
+,hosp_online_representatives
+,hosp_offline_representatives
+,is_cpa
+,decil
+,is_thousand_county_project
+,department_advantages
+,doctor_name
+,doctor_lable
+,doctor_title
+,doctor_department
+,doctor_position
+,doctor_recruitment_time
+,is_speaker
+,user_nickname
+,doctor_phone
+,doctor_hospital
+,online_representatives
+,offline_representatives
+,is_sign
+,follow_users
+,veeva_code
+,is_binding_fusion
+,doctors_interested
+,topic_interststr
+,product_interest
+,system_interest
+,need_improvement
+,doctor_code
+,imaging_academy_registration_time
+,imaging_academy_academic_energy
+,imaging_academy_last_five_reading_time
+,imaging_academy_last_five_reading_type
+,etl_create_by
+,etl_update_by
+,imaging_academy_academic_energy_qtd
+,imaging_academy_academic_energy_rank
+,imaging_academy_total_reading_time_last_6_mtd
+,badge_num
+,certificate_num
+,recruiting_doctor
+,no_h5_recruiting_doctor
+,no_veeva_recruiting_doctor
+,no_wx_recruiting_doctor FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_basic_user_info";
+ 
+SELECT ai_rep_name
+,ai_rep_code
+,hospital_name
+,hospital_code
+,hospital_recruitment_time
+,hospital_doctors_num
+,hospital_province
+,important_hospital
+,potential_hospital
+,assessment_hospital
+,target_hospital
+,offline_singles_hospital
+,online_singles_hospital
+,double_hospital
+,not_covered_hospital
+,is_opportunity_point
+,opportunity_point_num
+,recruiting_hospitals
+,hospital_region
+,region_manager
+,hosp_online_representatives
+,hosp_offline_representatives
+,is_cpa
+,decil
+,is_thousand_county_project
+,department_advantages
+,doctor_name
+,doctor_lable
+,doctor_title
+,doctor_department
+,doctor_position
+,doctor_recruitment_time
+,is_speaker
+,user_nickname
+,doctor_phone
+,doctor_hospital
+,online_representatives
+,offline_representatives
+,is_sign
+,follow_users
+,veeva_code
+,is_binding_fusion
+,doctors_interested
+,topic_interststr
+,product_interest
+,system_interest
+,need_improvement
+,doctor_code
+,imaging_academy_registration_time
+,imaging_academy_academic_energy
+,imaging_academy_last_five_reading_time
+,imaging_academy_last_five_reading_type
+,etl_create_by
+,etl_update_by
+,imaging_academy_academic_energy_qtd
+,imaging_academy_academic_energy_rank
+,imaging_academy_total_reading_time_last_6_mtd
+,badge_num
+,certificate_num
+,recruiting_doctor
+,no_h5_recruiting_doctor
+,no_veeva_recruiting_doctor
+,no_wx_recruiting_doctor FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_basic_user_info"
+EXCEPT
+SELECT ai_rep_name
+,ai_rep_code
+,hospital_name
+,hospital_code
+,hospital_recruitment_time
+,hospital_doctors_num
+,hospital_province
+,important_hospital
+,potential_hospital
+,assessment_hospital
+,target_hospital
+,offline_singles_hospital
+,online_singles_hospital
+,double_hospital
+,not_covered_hospital
+,is_opportunity_point
+,opportunity_point_num
+,recruiting_hospitals
+,hospital_region
+,region_manager
+,hosp_online_representatives
+,hosp_offline_representatives
+,is_cpa
+,decil
+,is_thousand_county_project
+,department_advantages
+,doctor_name
+,doctor_lable
+,doctor_title
+,doctor_department
+,doctor_position
+,doctor_recruitment_time
+,is_speaker
+,user_nickname
+,doctor_phone
+,doctor_hospital
+,online_representatives
+,offline_representatives
+,is_sign
+,follow_users
+,veeva_code
+,is_binding_fusion
+,doctors_interested
+,topic_interststr
+,product_interest
+,system_interest
+,need_improvement
+,doctor_code
+,imaging_academy_registration_time
+,imaging_academy_academic_energy
+,imaging_academy_last_five_reading_time
+,imaging_academy_last_five_reading_type
+,etl_create_by
+,etl_update_by
+,imaging_academy_academic_energy_qtd
+,imaging_academy_academic_energy_rank
+,imaging_academy_total_reading_time_last_6_mtd
+,badge_num
+,certificate_num
+,recruiting_doctor
+,no_h5_recruiting_doctor
+,no_veeva_recruiting_doctor
+,no_wx_recruiting_doctor FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_basic_user_info";
+
+
+
+-- 2
+SELECT ai_rep_code
+,ai_rep_name
+,hospital_code
+,active_hospitals
+,doctor_code
+,recruiting_doctor
+,effective_outbound_call_3
+,effective_wechat_visit
+,effective_meeting_20
+,effective_outbound_call_1
+,effective_meeting_1
+,effective_h5
+,effective_meeting
+,wechat_speeches
+,effective_others
+,imaging_academy_active_times
+,speaker_times
+,effective_visits_today
+,accumulated_learning
+,doctor_last_communication_time
+,doctor_last_communication_type
+,source_created_time
+,etl_create_by
+,etl_update_by
+,recruiting_hospitals
+,effective_h5_180
+,wechat_speeches_one_by_one FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_basic_kpi_detail"
+EXCEPT
+SELECT ai_rep_code
+,ai_rep_name
+,hospital_code
+,active_hospitals
+,doctor_code
+,recruiting_doctor
+,effective_outbound_call_3
+,effective_wechat_visit
+,effective_meeting_20
+,effective_outbound_call_1
+,effective_meeting_1
+,effective_h5
+,effective_meeting
+,wechat_speeches
+,effective_others
+,imaging_academy_active_times
+,speaker_times
+,effective_visits_today
+,accumulated_learning
+,doctor_last_communication_time
+,doctor_last_communication_type
+,source_created_time
+,etl_create_by
+,etl_update_by
+,recruiting_hospitals
+,effective_h5_180
+,wechat_speeches_one_by_one FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_basic_kpi_detail";
+
+SELECT ai_rep_code
+,ai_rep_name
+,hospital_code
+,active_hospitals
+,doctor_code
+,recruiting_doctor
+,effective_outbound_call_3
+,effective_wechat_visit
+,effective_meeting_20
+,effective_outbound_call_1
+,effective_meeting_1
+,effective_h5
+,effective_meeting
+,wechat_speeches
+,effective_others
+,imaging_academy_active_times
+,speaker_times
+,effective_visits_today
+,accumulated_learning
+,doctor_last_communication_time
+,doctor_last_communication_type
+,source_created_time
+,etl_create_by
+,etl_update_by
+,recruiting_hospitals
+,effective_h5_180
+,wechat_speeches_one_by_one FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_basic_kpi_detail"
+EXCEPT
+SELECT ai_rep_code
+,ai_rep_name
+,hospital_code
+,active_hospitals
+,doctor_code
+,recruiting_doctor
+,effective_outbound_call_3
+,effective_wechat_visit
+,effective_meeting_20
+,effective_outbound_call_1
+,effective_meeting_1
+,effective_h5
+,effective_meeting
+,wechat_speeches
+,effective_others
+,imaging_academy_active_times
+,speaker_times
+,effective_visits_today
+,accumulated_learning
+,doctor_last_communication_time
+,doctor_last_communication_type
+,source_created_time
+,etl_create_by
+,etl_update_by
+,recruiting_hospitals
+,effective_h5_180
+,wechat_speeches_one_by_one FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_basic_kpi_detail";
+
+--3
+SELECT
+    ai_rep_name,
+    ai_rep_code,
+    effective_visits_today,
+    effective_visits_mtd,
+    potential_hospital_coverage_mtd_rate,
+    active_number_mtd,
+    active_hospital_num_mtd,
+    average_hospital_activity_mtd_rate,
+    effective_visits_qtd,
+    potential_hospital_coverage_qtd_rate,
+    active_number_qtd,
+    active_hospital_num_qtd,
+    average_hospital_activity_qtd_rate,
+    potential_hospital_coverage_last_mtd_rate,
+    active_number_last_mtd,
+    active_hospital_num_last_mtd,
+    average_hospital_activity_last_mtd_rate,
+    effective_visits_last_mtd,
+    hospital_name,
+    active_hospitals,
+    recruiting_hospitals,
+    important_hospital,
+    potential_hospital,
+    assessment_hospital,
+    target_hospital,
+    offline_singles_hospital,
+    double_hospital,
+    online_singles_hospital,
+    not_covered_hospital,
+    opportunity_point_num,
+    hospital_code,
+    hospital_province,
+    hospital_recruitment_time,
+    hospital_doctors_num,
+    hospital_mtd_growth_rate,
+    hospital_qtd_growth_rate,
+    hospital_ytd_growth_rate,
+    hospital_effective_visits_mtd,
+    hospital_effective_outbound_call_mtd,
+    hospital_effective_wechat_mtd,
+    hospital_effective_meeting_mtd,
+    hospital_imaging_schools_activation_mtd,
+    hospital_mtd_achievement_rate,
+    hospital_qtd_achievement_rate,
+    hospital_ytd_achievement_rate,
+    hospital_effective_visits_qtd,
+    hospital_effective_outbound_call_qtd,
+    hospital_effective_wechat_qtd,
+    hospital_effective_meeting_qtd,
+    etl_create_by,
+    etl_update_by,
+    effective_outbound_call_number_month,
+    effective_outbound_call_number_last_month,
+    effective_outbound_call_number_qtd,
+    active_hospital_number_month,
+    active_hospital_number_qtd,
+    h5_last_active_time
+FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_my_customer"
+EXCEPT
+SELECT
+    ai_rep_name,
+    ai_rep_code,
+    effective_visits_today,
+    effective_visits_mtd,
+    potential_hospital_coverage_mtd_rate,
+    active_number_mtd,
+    active_hospital_num_mtd,
+    average_hospital_activity_mtd_rate,
+    effective_visits_qtd,
+    potential_hospital_coverage_qtd_rate,
+    active_number_qtd,
+    active_hospital_num_qtd,
+    average_hospital_activity_qtd_rate,
+    potential_hospital_coverage_last_mtd_rate,
+    active_number_last_mtd,
+    active_hospital_num_last_mtd,
+    average_hospital_activity_last_mtd_rate,
+    effective_visits_last_mtd,
+    hospital_name,
+    active_hospitals,
+    recruiting_hospitals,
+    important_hospital,
+    potential_hospital,
+    assessment_hospital,
+    target_hospital,
+    offline_singles_hospital,
+    double_hospital,
+    online_singles_hospital,
+    not_covered_hospital,
+    opportunity_point_num,
+    hospital_code,
+    hospital_province,
+    hospital_recruitment_time,
+    hospital_doctors_num,
+    hospital_mtd_growth_rate,
+    hospital_qtd_growth_rate,
+    hospital_ytd_growth_rate,
+    hospital_effective_visits_mtd,
+    hospital_effective_outbound_call_mtd,
+    hospital_effective_wechat_mtd,
+    hospital_effective_meeting_mtd,
+    hospital_imaging_schools_activation_mtd,
+    hospital_mtd_achievement_rate,
+    hospital_qtd_achievement_rate,
+    hospital_ytd_achievement_rate,
+    hospital_effective_visits_qtd,
+    hospital_effective_outbound_call_qtd,
+    hospital_effective_wechat_qtd,
+    hospital_effective_meeting_qtd,
+    etl_create_by,
+    etl_update_by,
+    effective_outbound_call_number_month,
+    effective_outbound_call_number_last_month,
+    effective_outbound_call_number_qtd,
+    active_hospital_number_month,
+    active_hospital_number_qtd,
+    h5_last_active_time
+FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_my_customer";
+
+SELECT
+    ai_rep_name,
+    ai_rep_code,
+    effective_visits_today,
+    effective_visits_mtd,
+    potential_hospital_coverage_mtd_rate,
+    active_number_mtd,
+    active_hospital_num_mtd,
+    average_hospital_activity_mtd_rate,
+    effective_visits_qtd,
+    potential_hospital_coverage_qtd_rate,
+    active_number_qtd,
+    active_hospital_num_qtd,
+    average_hospital_activity_qtd_rate,
+    potential_hospital_coverage_last_mtd_rate,
+    active_number_last_mtd,
+    active_hospital_num_last_mtd,
+    average_hospital_activity_last_mtd_rate,
+    effective_visits_last_mtd,
+    hospital_name,
+    active_hospitals,
+    recruiting_hospitals,
+    important_hospital,
+    potential_hospital,
+    assessment_hospital,
+    target_hospital,
+    offline_singles_hospital,
+    double_hospital,
+    online_singles_hospital,
+    not_covered_hospital,
+    opportunity_point_num,
+    hospital_code,
+    hospital_province,
+    hospital_recruitment_time,
+    hospital_doctors_num,
+    hospital_mtd_growth_rate,
+    hospital_qtd_growth_rate,
+    hospital_ytd_growth_rate,
+    hospital_effective_visits_mtd,
+    hospital_effective_outbound_call_mtd,
+    hospital_effective_wechat_mtd,
+    hospital_effective_meeting_mtd,
+    hospital_imaging_schools_activation_mtd,
+    hospital_mtd_achievement_rate,
+    hospital_qtd_achievement_rate,
+    hospital_ytd_achievement_rate,
+    hospital_effective_visits_qtd,
+    hospital_effective_outbound_call_qtd,
+    hospital_effective_wechat_qtd,
+    hospital_effective_meeting_qtd,
+    etl_create_by,
+    etl_update_by,
+    effective_outbound_call_number_month,
+    effective_outbound_call_number_last_month,
+    effective_outbound_call_number_qtd,
+    active_hospital_number_month,
+    active_hospital_number_qtd,
+    h5_last_active_time
+FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_my_customer"
+EXCEPT
+SELECT
+    ai_rep_name,
+    ai_rep_code,
+    effective_visits_today,
+    effective_visits_mtd,
+    potential_hospital_coverage_mtd_rate,
+    active_number_mtd,
+    active_hospital_num_mtd,
+    average_hospital_activity_mtd_rate,
+    effective_visits_qtd,
+    potential_hospital_coverage_qtd_rate,
+    active_number_qtd,
+    active_hospital_num_qtd,
+    average_hospital_activity_qtd_rate,
+    potential_hospital_coverage_last_mtd_rate,
+    active_number_last_mtd,
+    active_hospital_num_last_mtd,
+    average_hospital_activity_last_mtd_rate,
+    effective_visits_last_mtd,
+    hospital_name,
+    active_hospitals,
+    recruiting_hospitals,
+    important_hospital,
+    potential_hospital,
+    assessment_hospital,
+    target_hospital,
+    offline_singles_hospital,
+    double_hospital,
+    online_singles_hospital,
+    not_covered_hospital,
+    opportunity_point_num,
+    hospital_code,
+    hospital_province,
+    hospital_recruitment_time,
+    hospital_doctors_num,
+    hospital_mtd_growth_rate,
+    hospital_qtd_growth_rate,
+    hospital_ytd_growth_rate,
+    hospital_effective_visits_mtd,
+    hospital_effective_outbound_call_mtd,
+    hospital_effective_wechat_mtd,
+    hospital_effective_meeting_mtd,
+    hospital_imaging_schools_activation_mtd,
+    hospital_mtd_achievement_rate,
+    hospital_qtd_achievement_rate,
+    hospital_ytd_achievement_rate,
+    hospital_effective_visits_qtd,
+    hospital_effective_outbound_call_qtd,
+    hospital_effective_wechat_qtd,
+    hospital_effective_meeting_qtd,
+    etl_create_by,
+    etl_update_by,
+    effective_outbound_call_number_month,
+    effective_outbound_call_number_last_month,
+    effective_outbound_call_number_qtd,
+    active_hospital_number_month,
+    active_hospital_number_qtd,
+    h5_last_active_time
+FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_my_customer";
+
+--4 hco
+SELECT ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,recruiting_hospitals
+		,important_hospital
+		,potential_hospital
+		,assessment_hospital
+		,target_hospital
+		,hospital_code
+		,hospital_province
+		,offline_singles_hospital
+		,double_hospital
+		,online_singles_hospital
+		,not_covered_hospital
+		,hospital_region
+		,region_manager
+		,online_representatives
+		,is_cpa
+		,decil
+		,is_thousand_county_project
+		,offline_representatives
+		,recruitment_time
+		,department_advantages
+		,doctor_name
+		,doctor_code
+		,doctor_lable
+		,doctor_title
+		,doctor_department
+		,doctor_position
+		,doctor_recruitment_time
+		,doctor_last_communication_time
+		,doctor_last_communication_type
+		,recruiting_doctor
+		,no_h5_recruiting_doctor
+		,no_veeva_recruiting_doctor
+		,no_wx_recruiting_doctor FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_hco"
+EXCEPT
+SELECT ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,recruiting_hospitals
+		,important_hospital
+		,potential_hospital
+		,assessment_hospital
+		,target_hospital
+		,hospital_code
+		,hospital_province
+		,offline_singles_hospital
+		,double_hospital
+		,online_singles_hospital
+		,not_covered_hospital
+		,hospital_region
+		,region_manager
+		,online_representatives
+		,is_cpa
+		,decil
+		,is_thousand_county_project
+		,offline_representatives
+		,recruitment_time
+		,department_advantages
+		,doctor_name
+		,doctor_code
+		,doctor_lable
+		,doctor_title
+		,doctor_department
+		,doctor_position
+		,doctor_recruitment_time
+		,doctor_last_communication_time
+		,doctor_last_communication_type
+		,recruiting_doctor
+		,no_h5_recruiting_doctor
+		,no_veeva_recruiting_doctor
+		,no_wx_recruiting_doctor FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_hco";
+
+SELECT ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,recruiting_hospitals
+		,important_hospital
+		,potential_hospital
+		,assessment_hospital
+		,target_hospital
+		,hospital_code
+		,hospital_province
+		,offline_singles_hospital
+		,double_hospital
+		,online_singles_hospital
+		,not_covered_hospital
+		,hospital_region
+		,region_manager
+		,online_representatives
+		,is_cpa
+		,decil
+		,is_thousand_county_project
+		,offline_representatives
+		,recruitment_time
+		,department_advantages
+		,doctor_name
+		,doctor_code
+		,doctor_lable
+		,doctor_title
+		,doctor_department
+		,doctor_position
+		,doctor_recruitment_time
+		,doctor_last_communication_time
+		,doctor_last_communication_type
+		,recruiting_doctor
+		,no_h5_recruiting_doctor
+		,no_veeva_recruiting_doctor
+		,no_wx_recruiting_doctor FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_hco"
+EXCEPT
+SELECT ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,recruiting_hospitals
+		,important_hospital
+		,potential_hospital
+		,assessment_hospital
+		,target_hospital
+		,hospital_code
+		,hospital_province
+		,offline_singles_hospital
+		,double_hospital
+		,online_singles_hospital
+		,not_covered_hospital
+		,hospital_region
+		,region_manager
+		,online_representatives
+		,is_cpa
+		,decil
+		,is_thousand_county_project
+		,offline_representatives
+		,recruitment_time
+		,department_advantages
+		,doctor_name
+		,doctor_code
+		,doctor_lable
+		,doctor_title
+		,doctor_department
+		,doctor_position
+		,doctor_recruitment_time
+		,doctor_last_communication_time
+		,doctor_last_communication_type
+		,recruiting_doctor
+		,no_h5_recruiting_doctor
+		,no_veeva_recruiting_doctor
+		,no_wx_recruiting_doctor FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_hco";
+
+--5 -- 比较 customer_360_opportunity_point 表
+SELECT ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,create_time
+		,opportunity_name
+		,business_type
+		,business_stage
+		,product_name
+		,is_submit_application_form FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_opportunity_point"
+EXCEPT
+SELECT ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,create_time
+		,opportunity_name
+		,business_type
+		,business_stage
+		,product_name
+		,is_submit_application_form FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_opportunity_point";
+
+SELECT ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,create_time
+		,opportunity_name
+		,business_type
+		,business_stage
+		,product_name
+		,is_submit_application_form FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_opportunity_point"
+EXCEPT
+SELECT ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,create_time
+		,opportunity_name
+		,business_type
+		,business_stage
+		,product_name
+		,is_submit_application_form FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_opportunity_point";
+-- 6
+-- 比较 customer_360_internal_sales_mtd 表
+SELECT ai_rep_name
+		,ai_rep_code
+		,year_month
+		,hospital_name
+		,hospital_code
+		,product_name
+		,product_code
+		,sales_amount_mtd FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_mtd"
+EXCEPT
+SELECT ai_rep_name
+		,ai_rep_code
+		,year_month
+		,hospital_name
+		,hospital_code
+		,product_name
+		,product_code
+		,sales_amount_mtd FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_mtd";
+
+SELECT ai_rep_name
+		,ai_rep_code
+		,year_month
+		,hospital_name
+		,hospital_code
+		,product_name
+		,product_code
+		,sales_amount_mtd FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_mtd"
+EXCEPT
+SELECT ai_rep_name
+		,ai_rep_code
+		,year_month
+		,hospital_name
+		,hospital_code
+		,product_name
+		,product_code
+		,sales_amount_mtd FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_mtd";
+-- 7-- 比较 customer_360_internal_sales_qtd 表
+SELECT ai_rep_name
+		,ai_rep_code
+		,year_quarter
+		,hospital_name
+		,hospital_code
+		,product_name
+		,product_code
+		,sales_amount_qtd FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_qtd"
+EXCEPT
+SELECT ai_rep_name
+		,ai_rep_code
+		,year_quarter
+		,hospital_name
+		,hospital_code
+		,product_name
+		,product_code
+		,sales_amount_qtd FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_qtd";
+
+SELECT ai_rep_name
+		,ai_rep_code
+		,year_quarter
+		,hospital_name
+		,hospital_code
+		,product_name
+		,product_code
+		,sales_amount_qtd FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_qtd"
+EXCEPT
+SELECT ai_rep_name
+		,ai_rep_code
+		,year_quarter
+		,hospital_name
+		,hospital_code
+		,product_name
+		,product_code
+		,sales_amount_qtd FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_qtd";
+--8-- 比较 customer_360_internal_sales_ytd 表
+SELECT ai_rep_name
+	,ai_rep_code
+	,year
+	,hospital_name
+	,hospital_code
+	,product_name
+	,product_code
+	,sales_amount_ytd FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_ytd"
+EXCEPT
+SELECT ai_rep_name
+	,ai_rep_code
+	,year
+	,hospital_name
+	,hospital_code
+	,product_name
+	,product_code
+	,sales_amount_ytd FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_ytd";
+
+SELECT ai_rep_name
+	,ai_rep_code
+	,year
+	,hospital_name
+	,hospital_code
+	,product_name
+	,product_code
+	,sales_amount_ytd FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_ytd"
+EXCEPT
+SELECT ai_rep_name
+	,ai_rep_code
+	,year
+	,hospital_name
+	,hospital_code
+	,product_name
+	,product_code
+	,sales_amount_ytd FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_ytd";
+
+--9 -- 比较 customer_360_cda_ct_mr_occupancy 表
+SELECT  ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,product_name
+		,product_type
+		,occupancy_rate_3_mtd_ago
+		,occupancy_rate_12_mtd_ago FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_cda_ct_mr_occupancy"
+EXCEPT
+SELECT  ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,product_name
+		,product_type
+		,occupancy_rate_3_mtd_ago
+		,occupancy_rate_12_mtd_ago FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_cda_ct_mr_occupancy";
+
+SELECT  ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,product_name
+		,product_type
+		,occupancy_rate_3_mtd_ago
+		,occupancy_rate_12_mtd_ago FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_cda_ct_mr_occupancy"
+EXCEPT
+SELECT  ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,product_name
+		,product_type
+		,occupancy_rate_3_mtd_ago
+		,occupancy_rate_12_mtd_ago FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_cda_ct_mr_occupancy";
+
+-- 10
+-- 比较 customer_360_hospital_equipment 表
+SELECT ai_rep_name                                         ,
+		ai_rep_code                                    ,
+		hospital_name                                  ,
+		hospital_code                                  ,
+		devices_num                                    ,
+		host_brand                                     ,
+		host_model                                     ,
+		update_time                                    ,
+		high_injection_model                           ,
+		high_injection_brand                           ,
+		host_brand_2                                       FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_hospital_equipment"
+EXCEPT
+SELECT ai_rep_name                                         ,
+		ai_rep_code                                    ,
+		hospital_name                                  ,
+		hospital_code                                  ,
+		devices_num                                    ,
+		host_brand                                     ,
+		host_model                                     ,
+		update_time                                    ,
+		high_injection_model                           ,
+		high_injection_brand                           ,
+		host_brand_2                                    FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_hospital_equipment";
+
+SELECT ai_rep_name                                         ,
+		ai_rep_code                                    ,
+		hospital_name                                  ,
+		hospital_code                                  ,
+		devices_num                                    ,
+		host_brand                                     ,
+		host_model                                     ,
+		update_time                                    ,
+		high_injection_model                           ,
+		high_injection_brand                           ,
+		host_brand_2                                    FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_hospital_equipment"
+EXCEPT
+SELECT ai_rep_name                                         ,
+		ai_rep_code                                    ,
+		hospital_name                                  ,
+		hospital_code                                  ,
+		devices_num                                    ,
+		host_brand                                     ,
+		host_model                                     ,
+		update_time                                    ,
+		high_injection_model                           ,
+		high_injection_brand                           ,
+		host_brand_2                                    FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_hospital_equipment";
+
+--11 -- 比较 customer_360_my_subordinate 表
+SELECT ai_rep_name
+		,ai_rep_code
+		,effective_visits_mtd
+		,effective_outbound_call_number_month
+		,effective_outbound_call_number_qtd
+		,active_hospital_number_month
+		,active_hospital_number_qtd
+		,effective_visits_qtd
+		,potential_hospital_coverage_mtd_rate
+		,potential_hospital_coverage_qtd_rate
+		,average_hospital_activity_mtd_rate
+		,average_hospital_activity_qtd_rate
+		,customer_num
+		,mtd_growth_rate
+		,qtd_growth_rate
+		,hospital_num
+		,double_hospital_num
+		,online_singles_hospital_num
+		,ytd_growth_rate
+		,mtd_achievement_rate
+		,qtd_achievement_rate
+		,ytd_achievement_rate      FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_my_subordinate"
+EXCEPT
+SELECT ai_rep_name
+		,ai_rep_code
+		,effective_visits_mtd
+		,effective_outbound_call_number_month
+		,effective_outbound_call_number_qtd
+		,active_hospital_number_month
+		,active_hospital_number_qtd
+		,effective_visits_qtd
+		,potential_hospital_coverage_mtd_rate
+		,potential_hospital_coverage_qtd_rate
+		,average_hospital_activity_mtd_rate
+		,average_hospital_activity_qtd_rate
+		,customer_num
+		,mtd_growth_rate
+		,qtd_growth_rate
+		,hospital_num
+		,double_hospital_num
+		,online_singles_hospital_num
+		,ytd_growth_rate
+		,mtd_achievement_rate
+		,qtd_achievement_rate
+		,ytd_achievement_rate      FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_my_subordinate";
+
+SELECT ai_rep_name
+		,ai_rep_code
+		,effective_visits_mtd
+		,effective_outbound_call_number_month
+		,effective_outbound_call_number_qtd
+		,active_hospital_number_month
+		,active_hospital_number_qtd
+		,effective_visits_qtd
+		,potential_hospital_coverage_mtd_rate
+		,potential_hospital_coverage_qtd_rate
+		,average_hospital_activity_mtd_rate
+		,average_hospital_activity_qtd_rate
+		,customer_num
+		,mtd_growth_rate
+		,qtd_growth_rate
+		,hospital_num
+		,double_hospital_num
+		,online_singles_hospital_num
+		,ytd_growth_rate
+		,mtd_achievement_rate
+		,qtd_achievement_rate
+		,ytd_achievement_rate      FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_my_subordinate"
+EXCEPT
+SELECT ai_rep_name
+		,ai_rep_code
+		,effective_visits_mtd
+		,effective_outbound_call_number_month
+		,effective_outbound_call_number_qtd
+		,active_hospital_number_month
+		,active_hospital_number_qtd
+		,effective_visits_qtd
+		,potential_hospital_coverage_mtd_rate
+		,potential_hospital_coverage_qtd_rate
+		,average_hospital_activity_mtd_rate
+		,average_hospital_activity_qtd_rate
+		,customer_num
+		,mtd_growth_rate
+		,qtd_growth_rate
+		,hospital_num
+		,double_hospital_num
+		,online_singles_hospital_num
+		,ytd_growth_rate
+		,mtd_achievement_rate
+		,qtd_achievement_rate
+		,ytd_achievement_rate      FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_my_subordinate";
+
+-- 12 -- 比较 customer_360_badge 表
+SELECT ai_rep_name
+	    ,ai_rep_code
+	    ,hospital_name
+	    ,hospital_code
+	    ,doctor_name
+	    ,doctor_code
+	    ,veeva_code
+	    ,badge_num
+	    ,badge_name		 FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_badge"
+EXCEPT
+SELECT ai_rep_name
+	    ,ai_rep_code
+	    ,hospital_name
+	    ,hospital_code
+	    ,doctor_name
+	    ,doctor_code
+	    ,veeva_code
+	    ,badge_num
+	    ,badge_name		 FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_badge";
+
+SELECT ai_rep_name
+	    ,ai_rep_code
+	    ,hospital_name
+	    ,hospital_code
+	    ,doctor_name
+	    ,doctor_code
+	    ,veeva_code
+	    ,badge_num
+	    ,badge_name		 FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_badge"
+EXCEPT
+SELECT ai_rep_name
+	    ,ai_rep_code
+	    ,hospital_name
+	    ,hospital_code
+	    ,doctor_name
+	    ,doctor_code
+	    ,veeva_code
+	    ,badge_num
+	    ,badge_name		 FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_badge";
+
+-- 13
+-- 比较 customer_360_certificate 表
+SELECT  ai_rep_name
+	    ,ai_rep_code
+	    ,hospital_name
+	    ,hospital_code
+	    ,doctor_name
+	    ,doctor_code
+	    ,veeva_code
+	    ,certificate_num
+	    ,certificate_name	 FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_certificate"
+EXCEPT
+SELECT  ai_rep_name
+	    ,ai_rep_code
+	    ,hospital_name
+	    ,hospital_code
+	    ,doctor_name
+	    ,doctor_code
+	    ,veeva_code
+	    ,certificate_num
+	    ,certificate_name	 FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_certificate";
+
+SELECT  ai_rep_name
+	    ,ai_rep_code
+	    ,hospital_name
+	    ,hospital_code
+	    ,doctor_name
+	    ,doctor_code
+	    ,veeva_code
+	    ,certificate_num
+	    ,certificate_name	 FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_certificate"
+EXCEPT
+SELECT  ai_rep_name
+	    ,ai_rep_code
+	    ,hospital_name
+	    ,hospital_code
+	    ,doctor_name
+	    ,doctor_code
+	    ,veeva_code
+	    ,certificate_num
+	    ,certificate_name	 FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_certificate";
+-- 14-- 比较 customer_360_imaging_academy_last_five_reading 表
+SELECT  ai_rep_name
+         ,ai_rep_code
+         ,hospital_name
+         ,hospital_code
+         ,doctor_name
+         ,doctor_code
+         ,veeva_code
+         ,imaging_academy_last_five_reading_time
+         ,imaging_academy_last_five_reading_content
+         ,imaging_academy_last_five_reading_type
+         ,imaging_academy_last_five_reading_duration  FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_imaging_academy_last_five_reading"
+EXCEPT
+SELECT  ai_rep_name
+         ,ai_rep_code
+         ,hospital_name
+         ,hospital_code
+         ,doctor_name
+         ,doctor_code
+         ,veeva_code
+         ,imaging_academy_last_five_reading_time
+         ,imaging_academy_last_five_reading_content
+         ,imaging_academy_last_five_reading_type
+         ,imaging_academy_last_five_reading_duration  FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_imaging_academy_last_five_reading";
+
+SELECT  ai_rep_name
+         ,ai_rep_code
+         ,hospital_name
+         ,hospital_code
+         ,doctor_name
+         ,doctor_code
+         ,veeva_code
+         ,imaging_academy_last_five_reading_time
+         ,imaging_academy_last_five_reading_content
+         ,imaging_academy_last_five_reading_type
+         ,imaging_academy_last_five_reading_duration  FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_imaging_academy_last_five_reading"
+EXCEPT
+SELECT  ai_rep_name
+         ,ai_rep_code
+         ,hospital_name
+         ,hospital_code
+         ,doctor_name
+         ,doctor_code
+         ,veeva_code
+         ,imaging_academy_last_five_reading_time
+         ,imaging_academy_last_five_reading_content
+         ,imaging_academy_last_five_reading_type
+         ,imaging_academy_last_five_reading_duration  FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_imaging_academy_last_five_reading";
+
+
+-- 15
+-- 比较 customer_360_hcp 表中指定字段
+SELECT
+    ai_rep_name,
+    hospital_name,
+    hospital_code,
+    doctor_name,
+    doctor_code,
+    recruitment_time,
+    is_speaker,
+    doctor_title,
+    doctor_lable,
+    doctor_hospital,
+    user_nickname,
+    doctor_department,
+    doctor_position,
+    doctor_phone,
+    online_representatives,
+    offline_representatives,
+    is_sign,
+    follow_users,
+    veeva_code,
+    is_binding_fusion,
+    effective_outbound_call_mtd_3,
+    effective_wechat_visit_mtd,
+    effective_meeting_mtd_20,
+    effective_outbound_call_mtd_1,
+    wechat_speeches_mtd,
+    accumulated_learning_mtd,
+    effective_meeting_mtd,
+    interactions_mtd,
+    imaging_academy_active_times_mtd,
+    speaker_times_mtd,
+    effective_outbound_call_last_mtd_3,
+    effective_wechat_visit_last_mtd,
+    effective_meeting_last_mtd_20,
+    effective_outbound_call_last_mtd_1,
+    wechat_speeches_last_mtd,
+    accumulated_learning_last_mtd,
+    effective_meeting_last_mtd,
+    interactions_last_mtd,
+    imaging_academy_active_times_last_mtd,
+    speaker_times_last_mtd,
+    effective_outbound_call_qtd_3,
+    effective_wechat_visit_qtd,
+    effective_meeting_qtd_20,
+    effective_outbound_call_qtd_1,
+    wechat_speeches_qtd,
+    accumulated_learning_qtd,
+    effective_meeting_qtd,
+    interactions_qtd,
+    imaging_academy_active_times_qtd,
+    speaker_times_qtd,
+    communication_stage,
+    doctors_interested,
+    imaging_academy_registration_time,
+    imaging_academy_academic_energy,
+    imaging_academy_reading_content_last_6_mtd,
+    imaging_academy_last_five_reading_time,
+    imaging_academy_last_five_reading_type,
+    ai_rep_code,
+    imaging_academy_academic_energy_qtd,
+    imaging_academy_academic_energy_rank,
+    imaging_academy_total_reading_time_last_6_mtd,
+    badge_num,
+    certificate_num,
+    imaging_academy_last_five_reading_content,
+    topic_interststr,
+    product_interest,
+    system_interest
+FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_hcp"
+EXCEPT
+SELECT
+    ai_rep_name,
+    hospital_name,
+    hospital_code,
+    doctor_name,
+    doctor_code,
+    recruitment_time,
+    is_speaker,
+    doctor_title,
+    doctor_lable,
+    doctor_hospital,
+    user_nickname,
+    doctor_department,
+    doctor_position,
+    doctor_phone,
+    online_representatives,
+    offline_representatives,
+    is_sign,
+    follow_users,
+    veeva_code,
+    is_binding_fusion,
+    effective_outbound_call_mtd_3,
+    effective_wechat_visit_mtd,
+    effective_meeting_mtd_20,
+    effective_outbound_call_mtd_1,
+    wechat_speeches_mtd,
+    accumulated_learning_mtd,
+    effective_meeting_mtd,
+    interactions_mtd,
+    imaging_academy_active_times_mtd,
+    speaker_times_mtd,
+    effective_outbound_call_last_mtd_3,
+    effective_wechat_visit_last_mtd,
+    effective_meeting_last_mtd_20,
+    effective_outbound_call_last_mtd_1,
+    wechat_speeches_last_mtd,
+    accumulated_learning_last_mtd,
+    effective_meeting_last_mtd,
+    interactions_last_mtd,
+    imaging_academy_active_times_last_mtd,
+    speaker_times_last_mtd,
+    effective_outbound_call_qtd_3,
+    effective_wechat_visit_qtd,
+    effective_meeting_qtd_20,
+    effective_outbound_call_qtd_1,
+    wechat_speeches_qtd,
+    accumulated_learning_qtd,
+    effective_meeting_qtd,
+    interactions_qtd,
+    imaging_academy_active_times_qtd,
+    speaker_times_qtd,
+    communication_stage,
+    doctors_interested,
+    imaging_academy_registration_time,
+    imaging_academy_academic_energy,
+    imaging_academy_reading_content_last_6_mtd,
+    imaging_academy_last_five_reading_time,
+    imaging_academy_last_five_reading_type,
+    ai_rep_code,
+    imaging_academy_academic_energy_qtd,
+    imaging_academy_academic_energy_rank,
+    imaging_academy_total_reading_time_last_6_mtd,
+    badge_num,
+    certificate_num,
+    imaging_academy_last_five_reading_content,
+    topic_interststr,
+    product_interest,
+    system_interest
+FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_hcp";
+
+SELECT
+    ai_rep_name,
+    hospital_name,
+    hospital_code,
+    doctor_name,
+    doctor_code,
+    recruitment_time,
+    is_speaker,
+    doctor_title,
+    doctor_lable,
+    doctor_hospital,
+    user_nickname,
+    doctor_department,
+    doctor_position,
+    doctor_phone,
+    online_representatives,
+    offline_representatives,
+    is_sign,
+    follow_users,
+    veeva_code,
+    is_binding_fusion,
+    effective_outbound_call_mtd_3,
+    effective_wechat_visit_mtd,
+    effective_meeting_mtd_20,
+    effective_outbound_call_mtd_1,
+    wechat_speeches_mtd,
+    accumulated_learning_mtd,
+    effective_meeting_mtd,
+    interactions_mtd,
+    imaging_academy_active_times_mtd,
+    speaker_times_mtd,
+    effective_outbound_call_last_mtd_3,
+    effective_wechat_visit_last_mtd,
+    effective_meeting_last_mtd_20,
+    effective_outbound_call_last_mtd_1,
+    wechat_speeches_last_mtd,
+    accumulated_learning_last_mtd,
+    effective_meeting_last_mtd,
+    interactions_last_mtd,
+    imaging_academy_active_times_last_mtd,
+    speaker_times_last_mtd,
+    effective_outbound_call_qtd_3,
+    effective_wechat_visit_qtd,
+    effective_meeting_qtd_20,
+    effective_outbound_call_qtd_1,
+    wechat_speeches_qtd,
+    accumulated_learning_qtd,
+    effective_meeting_qtd,
+    interactions_qtd,
+    imaging_academy_active_times_qtd,
+    speaker_times_qtd,
+    communication_stage,
+    doctors_interested,
+    imaging_academy_registration_time,
+    imaging_academy_academic_energy,
+    imaging_academy_reading_content_last_6_mtd,
+    imaging_academy_last_five_reading_time,
+    imaging_academy_last_five_reading_type,
+    ai_rep_code,
+    imaging_academy_academic_energy_qtd,
+    imaging_academy_academic_energy_rank,
+    imaging_academy_total_reading_time_last_6_mtd,
+    badge_num,
+    certificate_num,
+    imaging_academy_last_five_reading_content,
+    topic_interststr,
+    product_interest,
+    system_interest
+FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_hcp"
+EXCEPT
+SELECT
+    ai_rep_name,
+    hospital_name,
+    hospital_code,
+    doctor_name,
+    doctor_code,
+    recruitment_time,
+    is_speaker,
+    doctor_title,
+    doctor_lable,
+    doctor_hospital,
+    user_nickname,
+    doctor_department,
+    doctor_position,
+    doctor_phone,
+    online_representatives,
+    offline_representatives,
+    is_sign,
+    follow_users,
+    veeva_code,
+    is_binding_fusion,
+    effective_outbound_call_mtd_3,
+    effective_wechat_visit_mtd,
+    effective_meeting_mtd_20,
+    effective_outbound_call_mtd_1,
+    wechat_speeches_mtd,
+    accumulated_learning_mtd,
+    effective_meeting_mtd,
+    interactions_mtd,
+    imaging_academy_active_times_mtd,
+    speaker_times_mtd,
+    effective_outbound_call_last_mtd_3,
+    effective_wechat_visit_last_mtd,
+    effective_meeting_last_mtd_20,
+    effective_outbound_call_last_mtd_1,
+    wechat_speeches_last_mtd,
+    accumulated_learning_last_mtd,
+    effective_meeting_last_mtd,
+    interactions_last_mtd,
+    imaging_academy_active_times_last_mtd,
+    speaker_times_last_mtd,
+    effective_outbound_call_qtd_3,
+    effective_wechat_visit_qtd,
+    effective_meeting_qtd_20,
+    effective_outbound_call_qtd_1,
+    wechat_speeches_qtd,
+    accumulated_learning_qtd,
+    effective_meeting_qtd,
+    interactions_qtd,
+    imaging_academy_active_times_qtd,
+    speaker_times_qtd,
+    communication_stage,
+    doctors_interested,
+    imaging_academy_registration_time,
+    imaging_academy_academic_energy,
+    imaging_academy_reading_content_last_6_mtd,
+    imaging_academy_last_five_reading_time,
+    imaging_academy_last_five_reading_type,
+    ai_rep_code,
+    imaging_academy_academic_energy_qtd,
+    imaging_academy_academic_energy_rank,
+    imaging_academy_total_reading_time_last_6_mtd,
+    badge_num,
+    certificate_num,
+    imaging_academy_last_five_reading_content,
+    topic_interststr,
+    product_interest,
+    system_interest
+FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_hcp";
+
+-- 16
+-- 比较 customer_360_last_30days_call_log 表
+SELECT ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,doctor_name
+		,doctor_code
+		,is_getthrough
+		,duration
+		,create_time FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_30days_call_log"
+EXCEPT
+SELECT ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,doctor_name
+		,doctor_code
+		,is_getthrough
+		,duration
+		,create_time FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_30days_call_log";
+
+SELECT ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,doctor_name
+		,doctor_code
+		,is_getthrough
+		,duration
+		,create_time FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_30days_call_log"
+EXCEPT
+SELECT ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,doctor_name
+		,doctor_code
+		,is_getthrough
+		,duration
+		,create_time FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_30days_call_log";
+--16-- 比较 customer_360_last_three_wechat_visits 表
+SELECT  ai_rep_name
+    ,ai_rep_code
+    ,hospital_name
+    ,hospital_code
+    ,doctor_name
+    ,doctor_code
+    ,create_time
+    ,remarks FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_three_wechat_visits"
+EXCEPT
+SELECT  ai_rep_name
+    ,ai_rep_code
+    ,hospital_name
+    ,hospital_code
+    ,doctor_name
+    ,doctor_code
+    ,create_time
+    ,remarks FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_three_wechat_visits";
+
+SELECT  ai_rep_name
+    ,ai_rep_code
+    ,hospital_name
+    ,hospital_code
+    ,doctor_name
+    ,doctor_code
+    ,create_time
+    ,remarks FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_three_wechat_visits"
+EXCEPT
+SELECT  ai_rep_name
+    ,ai_rep_code
+    ,hospital_name
+    ,hospital_code
+    ,doctor_name
+    ,doctor_code
+    ,create_time
+    ,remarks FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_three_wechat_visits";
+
+-- 17
+-- 比较 customer_360_last_three_call 表
+SELECT ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,doctor_name
+		,doctor_code
+		,is_getthrough
+		,remarks
+		,created_time FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_three_call"
+EXCEPT
+SELECT ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,doctor_name
+		,doctor_code
+		,is_getthrough
+		,remarks
+		,created_time FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_three_call";
+
+SELECT ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,doctor_name
+		,doctor_code
+		,is_getthrough
+		,remarks
+		,created_time FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_three_call"
+EXCEPT
+SELECT ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,doctor_name
+		,doctor_code
+		,is_getthrough
+		,remarks
+		,created_time FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_three_call";
+
+--18
+-- 比较 customer_360_last_three_meeting 表
+SELECT 	ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,doctor_name
+		,doctor_code
+		,duration
+		,articipate_time
+		,conference_theme FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_three_meeting"
+EXCEPT
+SELECT 	ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,doctor_name
+		,doctor_code
+		,duration
+		,articipate_time
+		,conference_theme FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_three_meeting";
+
+SELECT 	ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,doctor_name
+		,doctor_code
+		,duration
+		,articipate_time
+		,conference_theme FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_three_meeting"
+EXCEPT
+SELECT 	ai_rep_name
+		,ai_rep_code
+		,hospital_name
+		,hospital_code
+		,doctor_name
+		,doctor_code
+		,duration
+		,articipate_time
+		,conference_theme FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_three_meeting";
+
+--19
+-- 比较 customer_360_last_five_behavior 表
+SELECT ai_rep_name,
+		ai_rep_code,
+		hospital_name,
+		hospital_code,
+		doctor_name,
+		doctor_code,
+		behavior,
+		create_time,
+		title,
+		content FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_five_behavior"
+EXCEPT
+SELECT ai_rep_name,
+		ai_rep_code,
+		hospital_name,
+		hospital_code,
+		doctor_name,
+		doctor_code,
+		behavior,
+		create_time,
+		title,
+		content FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_five_behavior";
+
+SELECT ai_rep_name,
+		ai_rep_code,
+		hospital_name,
+		hospital_code,
+		doctor_name,
+		doctor_code,
+		behavior,
+		create_time,
+		title,
+		content FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_five_behavior"
+EXCEPT
+SELECT ai_rep_name,
+		ai_rep_code,
+		hospital_name,
+		hospital_code,
+		doctor_name,
+		doctor_code,
+		behavior,
+		create_time,
+		title,
+		content FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_five_behavior";

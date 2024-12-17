@@ -1,72 +1,72 @@
 -- 比较 customer_360_admission_equipment 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_admission_equipment"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_admission_equipment";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_admission_equipment";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_admission_equipment"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_admission_equipment"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_admission_equipment";
  
 -- 比较 customer_360_ai_rep 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_ai_rep"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_ai_rep";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_ai_rep";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_ai_rep"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_ai_rep"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_ai_rep";
  
 -- 比较 customer_360_badge 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_badge"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_badge";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_badge";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_badge"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_badge"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_badge";
  
 -- 比较 customer_360_basic_kpi_detail 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_basic_kpi_detail"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_basic_kpi_detail";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_basic_kpi_detail";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_basic_kpi_detail"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_basic_kpi_detail"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_basic_kpi_detail";
  
 -- 比较 customer_360_basic_user_info 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_basic_user_info"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_basic_user_info";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_basic_user_info";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_basic_user_info"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_basic_user_info"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_basic_user_info";
  
 -- 比较 customer_360_cda_ct_mr_occupancy 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_cda_ct_mr_occupancy"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_cda_ct_mr_occupancy";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_cda_ct_mr_occupancy";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_cda_ct_mr_occupancy"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_cda_ct_mr_occupancy"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_cda_ct_mr_occupancy";
  
 -- 比较 customer_360_certificate 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_certificate"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_certificate";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_certificate";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_certificate"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_certificate"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_certificate";
  
 -- 比较 customer_360_hco 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_hco"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_hco";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_hco";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_hco"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_hco"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_hco";
  
@@ -217,7 +217,7 @@ SELECT
     topic_interststr,
     product_interest,
     system_interest
-FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_hcp";
+FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_hcp";
  
 SELECT
     ai_rep_name,
@@ -291,7 +291,7 @@ SELECT
     topic_interststr,
     product_interest,
     system_interest
-FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_hcp"
+FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_hcp"
 EXCEPT
 SELECT
     ai_rep_name,
@@ -370,99 +370,99 @@ FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_hcp";
 -- 比较 customer_360_hospital_equipment 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_hospital_equipment"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_hospital_equipment";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_hospital_equipment";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_hospital_equipment"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_hospital_equipment"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_hospital_equipment";
  
 -- 比较 customer_360_imaging_academy_last_five_reading 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_imaging_academy_last_five_reading"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_imaging_academy_last_five_reading";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_imaging_academy_last_five_reading";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_imaging_academy_last_five_reading"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_imaging_academy_last_five_reading"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_imaging_academy_last_five_reading";
  
 -- 比较 customer_360_internal_sales_mtd 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_mtd"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_internal_sales_mtd";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_mtd";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_internal_sales_mtd"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_mtd"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_mtd";
  
 -- 比较 customer_360_internal_sales_qtd 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_qtd"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_internal_sales_qtd";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_qtd";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_internal_sales_qtd"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_qtd"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_qtd";
  
 -- 比较 customer_360_internal_sales_ytd 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_ytd"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_internal_sales_ytd";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_ytd";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_internal_sales_ytd"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_ytd"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_ytd";
  
 -- 比较 customer_360_last_30days_call_log 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_30days_call_log"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_last_30days_call_log";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_30days_call_log";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_last_30days_call_log"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_30days_call_log"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_30days_call_log";
  
 -- 比较 customer_360_last_five_behavior 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_five_behavior"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_last_five_behavior";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_five_behavior";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_last_five_behavior"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_five_behavior"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_five_behavior";
  
 -- 比较 customer_360_last_three_call 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_three_call"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_last_three_call";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_three_call";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_last_three_call"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_three_call"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_three_call";
  
 -- 比较 customer_360_last_three_call_log 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_three_call_log"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_last_three_call_log";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_three_call_log";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_last_three_call_log"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_three_call_log"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_three_call_log";
  
 -- 比较 customer_360_last_three_meeting 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_three_meeting"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_last_three_meeting";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_three_meeting";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_last_three_meeting"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_three_meeting"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_three_meeting";
  
 -- 比较 customer_360_last_three_wechat_visits 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_three_wechat_visits"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_last_three_wechat_visits";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_three_wechat_visits";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_last_three_wechat_visits"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_last_three_wechat_visits"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_last_three_wechat_visits";
  
@@ -589,7 +589,7 @@ SELECT
     active_hospital_number_month,
     active_hospital_number_qtd,
     h5_last_active_time
-FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_my_customer";
+FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_my_customer";
  
 SELECT
     ai_rep_name,
@@ -651,7 +651,7 @@ SELECT
     active_hospital_number_month,
     active_hospital_number_qtd,
     h5_last_active_time
-FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_my_customer"
+FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_my_customer"
 EXCEPT
 SELECT
     ai_rep_name,
@@ -718,27 +718,27 @@ FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_my_customer";
 -- 比较 customer_360_my_subordinate 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_my_subordinate"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_my_subordinate";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_my_subordinate";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_my_subordinate"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_my_subordinate"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_my_subordinate";
  
 -- 比较 customer_360_opportunity_point 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_opportunity_point"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_opportunity_point";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_opportunity_point";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_opportunity_point"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_opportunity_point"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_opportunity_point";
  
 -- 比较 customer_360_recruiting_hospital_his 表
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_recruiting_hospital_his"
 EXCEPT
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_recruiting_hospital_his";
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_recruiting_hospital_his";
  
-SELECT * FROM "cn_cdp_dev_vr"."analytical_martph_customer360"."customer_360_recruiting_hospital_his"
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_recruiting_hospital_his"
 EXCEPT
 SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_recruiting_hospital_his";
  

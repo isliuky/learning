@@ -1,0 +1,617 @@
+-- 比较表: analytical_martph_airepbi.v_report_internal_summary_data
+SELECT * FROM "cn_cdp_dev"."analytical_martph_airepbi"."v_report_internal_summary_data"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_airepbi"."v_report_internal_summary_data";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_airepbi"."v_report_internal_summary_data"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."analytical_martph_airepbi"."v_report_internal_summary_data";
+
+
+-- 比较表: analytical_martph_customer360.customer_360_badge
+SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_badge"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_badge";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_badge"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_badge";
+
+
+-- 比较表: analytical_martph_customer360.customer_360_basic_kpi_detail
+SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_basic_kpi_detail"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_basic_kpi_detail";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_basic_kpi_detail"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_basic_kpi_detail";
+
+
+-- 比较表: analytical_martph_customer360.customer_360_basic_kpi_detail_his
+SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_basic_kpi_detail_his"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_basic_kpi_detail_his";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_basic_kpi_detail_his"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_basic_kpi_detail_his";
+
+
+-- 比较表: analytical_martph_customer360.customer_360_basic_user_info
+SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_basic_user_info"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_basic_user_info";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_basic_user_info"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_basic_user_info";
+
+
+-- 比较表: analytical_martph_customer360.customer_360_certificate
+SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_certificate"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_certificate";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_certificate"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_certificate";
+
+
+-- 比较表: analytical_martph_customer360.customer_360_internal_sales_mtd
+SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_mtd"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_mtd";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_mtd"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_mtd";
+
+
+-- 比较表: analytical_martph_customer360.customer_360_internal_sales_mtd_his
+-- SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_mtd_his"
+-- EXCEPT
+-- SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_mtd_his";
+--
+-- SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_mtd_his"
+-- EXCEPT
+-- SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_mtd_his";
+
+
+-- 比较表: analytical_martph_customer360.customer_360_internal_sales_qtd_his
+-- SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_qtd_his"
+-- EXCEPT
+-- SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_qtd_his";
+--
+-- SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_internal_sales_qtd_his"
+-- EXCEPT
+-- SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_internal_sales_qtd_his";
+
+
+-- 比较表: analytical_martph_customer360.customer_360_my_customer_his
+-- SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_my_customer_his"
+-- EXCEPT
+-- SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_my_customer_his";
+--
+-- SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_my_customer_his"
+-- EXCEPT
+-- SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_my_customer_his";
+
+
+-- 比较表: analytical_martph_customer360.customer_360_opportunity_point_his
+-- SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_opportunity_point_his"
+-- EXCEPT
+-- SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_opportunity_point_his";
+--
+-- SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_opportunity_point_his"
+-- EXCEPT
+-- SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_opportunity_point_his";
+
+
+-- 比较表: analytical_martph_customer360.customer_360_recruiting_hospital_his
+ SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_recruiting_hospital_his"
+ EXCEPT
+ SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_recruiting_hospital_his";
+
+ SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_customer360"."customer_360_recruiting_hospital_his"
+ EXCEPT
+ SELECT * FROM "cn_cdp_dev"."analytical_martph_customer360"."customer_360_recruiting_hospital_his";
+
+
+-- 比较表: analytical_martph_radsale.report_external_cpa_cha_summary_data
+SELECT * FROM "cn_cdp_dev"."analytical_martph_radsale"."report_external_cpa_cha_summary_data"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_radsale"."report_external_cpa_cha_summary_data";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."analytical_martph_radsale"."report_external_cpa_cha_summary_data"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."analytical_martph_radsale"."report_external_cpa_cha_summary_data";
+
+
+-- 比较表: enriched_prestage_airepbi.business_opportunity
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_airepbi"."business_opportunity"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_airepbi"."business_opportunity";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_airepbi"."business_opportunity"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_airepbi"."business_opportunity";
+
+
+-- 比较表: enriched_prestage_airepbi.corpinfo
+-- SELECT * FROM "cn_cdp_dev"."enriched_prestage_airepbi"."corpinfo"
+-- EXCEPT
+-- SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_airepbi"."corpinfo";
+--
+-- SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_airepbi"."corpinfo"
+-- EXCEPT
+-- SELECT * FROM "cn_cdp_dev"."enriched_prestage_airepbi"."corpinfo";
+
+-- 比较表: enriched_prestage_airepbi.corpinfo
+SELECT id
+,corpname
+,corpnickname
+,corptel
+,corpaddress
+,corpwebsite
+,industrytypeid
+,industrytypestr
+,corpsize
+,corpsizestr
+,corpcity
+,corpprovince
+,corpcitystr
+,corplevel
+,createusername
+,feed
+,ctmonthlyenhanceexaminationtotal
+,ctenhancementrate
+,mrmonthlyenhanceexaminationtotal
+,mrienhancementrate
+,hospitalrank
+,hospitalrankstr
+,chestpaincentercertificationtype
+,chestpaincentercertificationtypestr
+,checkpart
+,checkpartstr
+,affiliatedmedicalassociation
+,departmentdevelopmentdirection
+,departmentdevelopmentdirectionstr
+,businesscode
+,iscpa
+,businessregion
+,businessmanager
+,represent
+,uvsales
+,mvsales
+,gvsales
+,pvsales
+,potentialhospital
+,potential_hospital
+,hospitaltype FROM "cn_cdp_dev"."enriched_prestage_airepbi"."corpinfo"
+EXCEPT
+SELECT id
+,corpname
+,corpnickname
+,corptel
+,corpaddress
+,corpwebsite
+,industrytypeid
+,industrytypestr
+,corpsize
+,corpsizestr
+,corpcity
+,corpprovince
+,corpcitystr
+,corplevel
+,createusername
+,feed
+,ctmonthlyenhanceexaminationtotal
+,ctenhancementrate
+,mrmonthlyenhanceexaminationtotal
+,mrienhancementrate
+,hospitalrank
+,hospitalrankstr
+,chestpaincentercertificationtype
+,chestpaincentercertificationtypestr
+,checkpart
+,checkpartstr
+,affiliatedmedicalassociation
+,departmentdevelopmentdirection
+,departmentdevelopmentdirectionstr
+,businesscode
+,iscpa
+,businessregion
+,businessmanager
+,represent
+,uvsales
+,mvsales
+,gvsales
+,pvsales
+,potentialhospital
+,potential_hospital
+,hospitaltype FROM "cn_cdp_dev_vr_2"."enriched_prestage_airepbi"."corpinfo";
+
+SELECT id
+,corpname
+,corpnickname
+,corptel
+,corpaddress
+,corpwebsite
+,industrytypeid
+,industrytypestr
+,corpsize
+,corpsizestr
+,corpcity
+,corpprovince
+,corpcitystr
+,corplevel
+,createusername
+,feed
+,ctmonthlyenhanceexaminationtotal
+,ctenhancementrate
+,mrmonthlyenhanceexaminationtotal
+,mrienhancementrate
+,hospitalrank
+,hospitalrankstr
+,chestpaincentercertificationtype
+,chestpaincentercertificationtypestr
+,checkpart
+,checkpartstr
+,affiliatedmedicalassociation
+,departmentdevelopmentdirection
+,departmentdevelopmentdirectionstr
+,businesscode
+,iscpa
+,businessregion
+,businessmanager
+,represent
+,uvsales
+,mvsales
+,gvsales
+,pvsales
+,potentialhospital
+,potential_hospital
+,hospitaltype FROM "cn_cdp_dev_vr_2"."enriched_prestage_airepbi"."corpinfo"
+EXCEPT
+SELECT id
+,corpname
+,corpnickname
+,corptel
+,corpaddress
+,corpwebsite
+,industrytypeid
+,industrytypestr
+,corpsize
+,corpsizestr
+,corpcity
+,corpprovince
+,corpcitystr
+,corplevel
+,createusername
+,feed
+,ctmonthlyenhanceexaminationtotal
+,ctenhancementrate
+,mrmonthlyenhanceexaminationtotal
+,mrienhancementrate
+,hospitalrank
+,hospitalrankstr
+,chestpaincentercertificationtype
+,chestpaincentercertificationtypestr
+,checkpart
+,checkpartstr
+,affiliatedmedicalassociation
+,departmentdevelopmentdirection
+,departmentdevelopmentdirectionstr
+,businesscode
+,iscpa
+,businessregion
+,businessmanager
+,represent
+,uvsales
+,mvsales
+,gvsales
+,pvsales
+,potentialhospital
+,potential_hospital
+,hospitaltype FROM "cn_cdp_dev"."enriched_prestage_airepbi"."corpinfo";
+
+
+-- 比较表: enriched_prestage_radacademy.analysis_learn_log
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."analysis_learn_log"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."analysis_learn_log";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."analysis_learn_log"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."analysis_learn_log";
+
+
+-- 比较表: enriched_prestage_radacademy.analysis_monitor
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."analysis_monitor"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."analysis_monitor";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."analysis_monitor"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."analysis_monitor";
+
+
+-- 比较表: enriched_prestage_radacademy.bayer_campain_content
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_campain_content"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_campain_content";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_campain_content"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_campain_content";
+
+
+-- 比较表: enriched_prestage_radacademy.bayer_certificate_member
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_certificate_member"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_certificate_member";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_certificate_member"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_certificate_member";
+
+
+-- 比较表: enriched_prestage_radacademy.bayer_comments
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_comments"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_comments";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_comments"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_comments";
+
+
+-- 比较表: enriched_prestage_radacademy.bayer_content
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_content"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_content";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_content"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_content";
+
+
+-- 比较表: enriched_prestage_radacademy.bayer_form_question_answer
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_form_question_answer"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_form_question_answer";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_form_question_answer"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_form_question_answer";
+
+
+-- 比较表: enriched_prestage_radacademy.bayer_learn_log
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_learn_log"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_learn_log";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_learn_log"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_learn_log";
+
+
+-- 比较表: enriched_prestage_radacademy.bayer_learn_times_log
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_learn_times_log"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_learn_times_log";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_learn_times_log"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_learn_times_log";
+
+
+-- 比较表: enriched_prestage_radacademy.bayer_medal_member
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_medal_member"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_medal_member";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_medal_member"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_medal_member";
+
+
+-- 比较表: enriched_prestage_radacademy.bayer_meeting_ccmtv_data
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_meeting_ccmtv_data"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_meeting_ccmtv_data";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_meeting_ccmtv_data"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_meeting_ccmtv_data";
+
+
+-- 比较表: enriched_prestage_radacademy.bayer_meeting_ccmtv_data_log
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_meeting_ccmtv_data_log"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_meeting_ccmtv_data_log";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_meeting_ccmtv_data_log"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_meeting_ccmtv_data_log";
+
+
+-- 比较表: enriched_prestage_radacademy.bayer_member
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_member"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_member";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_member"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_member";
+
+
+-- 比较表: enriched_prestage_radacademy.bayer_question
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_question"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_question";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_question"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_question";
+
+
+-- 比较表: enriched_prestage_radacademy.bayer_question_answer
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_question_answer"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_question_answer";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_question_answer"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_question_answer";
+
+
+-- 比较表: enriched_prestage_radacademy.bayer_score_log
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_score_log"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_score_log";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."bayer_score_log"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."bayer_score_log";
+
+
+-- 比较表: enriched_prestage_radacademy.view_log
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."view_log"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."view_log";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_prestage_radacademy"."view_log"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_prestage_radacademy"."view_log";
+
+
+-- 比较表: enriched_stage_airepbi.airep_province_mapping
+SELECT * FROM "cn_cdp_dev"."enriched_stage_airepbi"."airep_province_mapping"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_stage_airepbi"."airep_province_mapping";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_stage_airepbi"."airep_province_mapping"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_stage_airepbi"."airep_province_mapping";
+
+
+-- 比较表: enriched_stage_airepbi.business_opportunity
+SELECT * FROM "cn_cdp_dev"."enriched_stage_airepbi"."business_opportunity"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_stage_airepbi"."business_opportunity";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_stage_airepbi"."business_opportunity"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_stage_airepbi"."business_opportunity";
+
+
+-- 比较表: enriched_stage_airepbi.hospital_equipment
+SELECT * FROM "cn_cdp_dev"."enriched_stage_airepbi"."hospital_equipment"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_stage_airepbi"."hospital_equipment";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_stage_airepbi"."hospital_equipment"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_stage_airepbi"."hospital_equipment";
+
+
+-- 比较表: enriched_stage_airepbi.internal_ai_rep_hosp_list
+SELECT * FROM "cn_cdp_dev"."enriched_stage_airepbi"."internal_ai_rep_hosp_list"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_stage_airepbi"."internal_ai_rep_hosp_list";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_stage_airepbi"."internal_ai_rep_hosp_list"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_stage_airepbi"."internal_ai_rep_hosp_list";
+
+
+-- 比较表: enriched_stage_airepbi.userinfo
+SELECT * FROM "cn_cdp_dev"."enriched_stage_airepbi"."userinfo"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_stage_airepbi"."userinfo";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."enriched_stage_airepbi"."userinfo"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."enriched_stage_airepbi"."userinfo";
+
+
+-- 比较表: model_dw_airepbi.dim_user
+SELECT * FROM "cn_cdp_dev"."model_dw_airepbi"."dim_user"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."model_dw_airepbi"."dim_user";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."model_dw_airepbi"."dim_user"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."model_dw_airepbi"."dim_user";
+
+
+-- 比较表: model_dw_airepbi.dim_user_history
+SELECT * FROM "cn_cdp_dev"."model_dw_airepbi"."dim_user_history"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."model_dw_airepbi"."dim_user_history";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."model_dw_airepbi"."dim_user_history"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."model_dw_airepbi"."dim_user_history";
+
+
+-- 比较表: model_dw_airepbi.fact_meeting
+SELECT * FROM "cn_cdp_dev"."model_dw_airepbi"."fact_meeting"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."model_dw_airepbi"."fact_meeting";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."model_dw_airepbi"."fact_meeting"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."model_dw_airepbi"."fact_meeting";
+
+
+-- 比较表: model_dw_airepbi.fact_wechat
+SELECT * FROM "cn_cdp_dev"."model_dw_airepbi"."fact_wechat"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."model_dw_airepbi"."fact_wechat";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."model_dw_airepbi"."fact_wechat"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."model_dw_airepbi"."fact_wechat";
+
+
+-- 比较表: model_dw_airepbi.scrmwechatbizrecord
+SELECT * FROM "cn_cdp_dev"."model_dw_airepbi"."scrmwechatbizrecord"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."model_dw_airepbi"."scrmwechatbizrecord";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."model_dw_airepbi"."scrmwechatbizrecord"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."model_dw_airepbi"."scrmwechatbizrecord";
+
+
+-- 比较表: model_dw_airepbi.weifeng_mobile
+SELECT * FROM "cn_cdp_dev"."model_dw_airepbi"."weifeng_mobile"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."model_dw_airepbi"."weifeng_mobile";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."model_dw_airepbi"."weifeng_mobile"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."model_dw_airepbi"."weifeng_mobile";
+
+
+-- 比较表: model_dw_radsale.dim_territoryorg_hospital_data
+SELECT * FROM "cn_cdp_dev"."model_dw_radsale"."dim_territoryorg_hospital_data"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."model_dw_radsale"."dim_territoryorg_hospital_data";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."model_dw_radsale"."dim_territoryorg_hospital_data"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."model_dw_radsale"."dim_territoryorg_hospital_data";
+
+
+-- 比较表: model_dw_radsale.fact_internal_summary_data
+SELECT * FROM "cn_cdp_dev"."model_dw_radsale"."fact_internal_summary_data"
+EXCEPT
+SELECT * FROM "cn_cdp_dev_vr_2"."model_dw_radsale"."fact_internal_summary_data";
+
+SELECT * FROM "cn_cdp_dev_vr_2"."model_dw_radsale"."fact_internal_summary_data"
+EXCEPT
+SELECT * FROM "cn_cdp_dev"."model_dw_radsale"."fact_internal_summary_data";
