@@ -1,8 +1,41 @@
-1. outbound:
-    1. 看下代码有没有改动
-    2. 准备在dev开发
-        添加字段
-        备份原来的SP
-        开发新的SP
-2. 后面没有其他事情的话，上次跟你说的分层问题和用的表不统一的事情，列出来一起看下，这次有时间就改掉吧一起
-3. 配置step function:
+1. 更改数据源, 从 enriched 到 model
+    1. 新建表
+        airep
+        radacademy
+    2. 创建SP
+        airep
+        radacademy
+    3. 更改step function
+    4. 生成SP
+2. vr 切换数据源
+    1. 加字段
+        analytical_martph_customer360.customer_360_my_customer
+        analytical_martph_customer360.customer_360_hcp
+        analytical_martph_customer360.customer_360_my_customer_his
+        analytical_martph_customer360.customer_360_hcp
+    2. 创建目标表
+    3. 生成目标表SP
+    4. 目标表view
+    5. 修改SP
+
+如果需要对比数据,执行顺序如下:
+    -- 1. call prod sp
+    -- 2 备份表
+    -- 3 call 最新的sp
+    -- 4 验证两边数据
+
+
+airep Step function 分析
+    1. 接数
+    2. enriched_prestage_airepbi.usp_airep_merge
+        CALL enriched_prestage_airepbi.ups_insert_airep_stage();
+    3. analytical_martph_airepbi.sp_data_collections -- 新逻辑可以加里面
+         CALL analytical_martph_airepbi.SP_Insert_AIREPBI_Report_PERSTAGE_DW();
+         CALL analytical_martph_airepbi.SP_Insert_AIREPBI_Report_MONTHLY();
+         CALL analytical_martph_airepbi.SP_DATA_CHECK();
+    4. 导出
+        select * from analytical_martph_airepbi.v_rad_fusion_export;
+
+radacademy Step function 分析
+    1. 接数
+    2. enriched_prestage_radacademy.insert_radacademy

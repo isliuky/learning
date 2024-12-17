@@ -26,3 +26,10 @@
     select  *from model_dw_radacademy.bayer_question_answer;
     select  *from model_dw_radacademy.bayer_score_log;
     select  *from model_dw_radacademy.view_log;
+    select  *from model_dw_radacademy.bayer_meeting;
+    select  *from model_dw_radacademy.bayer_medal;
+    select  *from model_dw_radacademy.bayer_certificate;
+-- 3. 在 enriched_prestage_airepbi.ups_insert_airep_stage() 添加
+    call model_dw_airepbi.sp_enriched_to_model();
+-- 4. 在enriched_prestage_radacademy.insert_radacademy() 添加
+    call model_dw_radacademy.sp_enriched_to_model();
